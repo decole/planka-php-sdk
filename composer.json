@@ -1,0 +1,29 @@
+{
+    "name": "decole/planka-php-sdk",
+    "type": "library",
+    "description": "An easy-to-use PHP Class for accessing Planka's API.",
+    "keywords": ["planka", "api"],
+    "homepage": "https://github.com/decole/planka-php-sdk",
+    "license": "BSD",
+    "authors": [
+        {
+            "name": "Galochkin Sergey",
+            "email": "decole@rambler.ru"
+        }
+    ],
+    "require": {
+        "php": ">=8.1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Planka\\Bridge\\": "src"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.4-dev"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
