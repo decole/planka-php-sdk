@@ -1,0 +1,104 @@
+<?php
+
+declare(strict_types = 1);
+
+namespace Planka\Bridge;
+
+use Planka\Bridge\Actions\Auth\AuthenticateAction;
+use Planka\Bridge\Actions\Auth\LogoutAction;
+use Planka\Bridge\Actions\Board\BoardViewAction;
+use Planka\Bridge\Actions\Common\GetInfoAction;
+use Planka\Bridge\Controllers\Attachment;
+use Planka\Bridge\Controllers\Board;
+use Planka\Bridge\Controllers\Card;
+use Planka\Bridge\Controllers\Comment;
+use Planka\Bridge\Controllers\Label;
+use Planka\Bridge\Controllers\BoardColumn;
+use Planka\Bridge\Controllers\Notification;
+use Planka\Bridge\Controllers\Project;
+use Planka\Bridge\Controllers\Task;
+use Planka\Bridge\Controllers\User;
+use Planka\Bridge\Exceptions\AuthenticateException;
+use Planka\Bridge\Exceptions\LogoutException;
+use Planka\Bridge\TransportClients\Client;
+use Planka\Bridge\Views\Dto\Board\BoardDto;
+use Symfony\Contracts\HttpClient\ResponseInterface;
+
+/**
+ * https://github.com/plankanban/planka/blob/master/server/config/routes.js
+ */
+final class PlankaClient
+{
+    public readonly Attachment $attachment;
+    public readonly Board $board;
+    public readonly BoardColumn $boardColumn;
+    public readonly Card $card;
+    public readonly Comment $comment;
+    public readonly Label $label;
+    public readonly Notification $notification;
+    public readonly Project $project;
+    public readonly Task $task;
+    public readonly User $user;
+
+    private readonly Client $client;
+
+    public function __construct(
+        private readonly Config $config,
+        ?Client $client = null
+    ) {
+        if ($client === null) {
+            $this->client = new Client($this->config->getBaseUri(), $this->config->getPort());
+        }
+
+        $this->attachment = new Attachment($config, $client);
+        $this->board = new Board($config, $client);
+        $this->boardColumn = new BoardColumn($config, $client);
+        $this->card = new Card($config, $client);
+        $this->comment = new Comment($config, $client);
+        $this->label = new Label($config, $client);
+        $this->notification = new Notification($config, $client);
+        $this->project = new Project($config, $client);
+        $this->task = new Task($config, $client);
+        $this->user = new User($config, $client);
+    }
+
+    /**
+     * 'POST /api/access-tokens'
+     * @throws AuthenticateException
+     */
+    public function authenticate(): bool
+    {
+        $response = $this->client->post(new AuthenticateAction($this->config->getUser(), $this->config->getPassword()));
+
+        $token = $response->toArray()['item'] ?? null;
+
+        if (empty($token)) {
+            throw new AuthenticateException('not authenticate');
+        }
+
+        $this->config->setAuthToken($token);
+
+        return true;
+    }
+
+    /**
+     * 'DELETE /api/access-tokens/me'
+     * @throws AuthenticateException|LogoutException
+     */
+    public function logout(): void
+    {
+        $response = $this->client->delete(new LogoutAction(token: $this->config->getAuthToken()));
+
+        $this->config->setAuthToken(null);
+
+        if ($response->getStatusCode() !== 200) {
+            throw new LogoutException($response->getContent());
+        }
+    }
+
+    /** 'GET /*' - for ping Planka */
+    public function getInfo(): ResponseInterface
+    {
+        return $this->client->get(new GetInfoAction());
+    }
+}
