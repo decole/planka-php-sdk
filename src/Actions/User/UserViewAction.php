@@ -2,16 +2,15 @@
 
 namespace Planka\Bridge\Actions\User;
 
-use Planka\Bridge\Contracts\Actions\ActionInterface;
-use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
+use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
+use Planka\Bridge\Contracts\Actions\ActionInterface;
 use Planka\Bridge\Traits\AuthenticateTrait;
-use Planka\Bridge\Views\Factory\User\UserDtoFactory;
-use Symfony\Contracts\HttpClient\ResponseInterface;
+use Planka\Bridge\Traits\UserHydrateTrait;
 
 final class UserViewAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait;
+    use AuthenticateTrait, UserHydrateTrait;
 
     public function __construct(string $token, private readonly string $id)
     {
@@ -26,10 +25,5 @@ final class UserViewAction implements ActionInterface, AuthenticateInterface, Re
     public function getOptions(): array
     {
         return [];
-    }
-
-    public function hydrate(ResponseInterface $response): mixed
-    {
-        return (new UserDtoFactory())->create($response->toArray()['item']);
     }
 }

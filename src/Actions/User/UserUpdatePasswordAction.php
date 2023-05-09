@@ -8,33 +8,30 @@ use Planka\Bridge\Contracts\Actions\ActionInterface;
 use Planka\Bridge\Traits\AuthenticateTrait;
 use Planka\Bridge\Traits\UserHydrateTrait;
 
-final class UserCreateAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
+final class UserUpdatePasswordAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
     use AuthenticateTrait, UserHydrateTrait;
 
     public function __construct(
         string $token,
-        private readonly string $email,
-        private readonly string $name,
-        private readonly string $password,
-        private readonly string $username
+        private readonly string $userId,
+        private readonly string $current,
+        private readonly string $new
     ) {
         $this->setToken($token);
     }
 
     public function url(): string
     {
-        return 'api/users';
+        return "api/users/{$this->userId}/password";
     }
 
     public function getOptions(): array
     {
         return [
             'body' => [
-                'email' => $this->email,
-                'name' => $this->name,
-                'password' => $this->password,
-                'username' => $this->username,
+                'currentPassword' => $this->current,
+                'password' => $this->new,
             ],
         ];
     }

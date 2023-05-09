@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Actions\Auth;
 
-use Planka\Bridge\Contracts\Actions\ActionInterface;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
+use Planka\Bridge\Contracts\Actions\ActionInterface;
 
 final class AuthenticateAction implements ActionInterface
 {

@@ -18,7 +18,7 @@ $config = new Config(
 $planka = new PlankaClient($config);
 $planka->authenticate();
 
-$result = $planka->getBoard(745435921242915851);
+$result = $planka->board->get(745435921242915851);
 var_dump($result);
 ```
 ## RTFM

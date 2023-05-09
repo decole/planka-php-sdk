@@ -4,25 +4,23 @@ declare(strict_types = 1);
 
 namespace Planka\Bridge;
 
+use Symfony\Contracts\HttpClient\ResponseInterface;
+use Planka\Bridge\Exceptions\AuthenticateException;
 use Planka\Bridge\Actions\Auth\AuthenticateAction;
-use Planka\Bridge\Actions\Auth\LogoutAction;
-use Planka\Bridge\Actions\Board\BoardViewAction;
 use Planka\Bridge\Actions\Common\GetInfoAction;
+use Planka\Bridge\Exceptions\LogoutException;
+use Planka\Bridge\Actions\Auth\LogoutAction;
+use Planka\Bridge\Controllers\Notification;
+use Planka\Bridge\Controllers\BoardColumn;
+use Planka\Bridge\TransportClients\Client;
 use Planka\Bridge\Controllers\Attachment;
+use Planka\Bridge\Controllers\Comment;
+use Planka\Bridge\Controllers\Project;
 use Planka\Bridge\Controllers\Board;
 use Planka\Bridge\Controllers\Card;
-use Planka\Bridge\Controllers\Comment;
 use Planka\Bridge\Controllers\Label;
-use Planka\Bridge\Controllers\BoardColumn;
-use Planka\Bridge\Controllers\Notification;
-use Planka\Bridge\Controllers\Project;
 use Planka\Bridge\Controllers\Task;
 use Planka\Bridge\Controllers\User;
-use Planka\Bridge\Exceptions\AuthenticateException;
-use Planka\Bridge\Exceptions\LogoutException;
-use Planka\Bridge\TransportClients\Client;
-use Planka\Bridge\Views\Dto\Board\BoardDto;
-use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * https://github.com/plankanban/planka/blob/master/server/config/routes.js
@@ -42,6 +40,9 @@ final class PlankaClient
 
     private readonly Client $client;
 
+    /**
+     * @throws AuthenticateException
+     */
     public function __construct(
         private readonly Config $config,
         ?Client $client = null
@@ -50,16 +51,20 @@ final class PlankaClient
             $this->client = new Client($this->config->getBaseUri(), $this->config->getPort());
         }
 
-        $this->attachment = new Attachment($config, $client);
-        $this->board = new Board($config, $client);
-        $this->boardColumn = new BoardColumn($config, $client);
-        $this->card = new Card($config, $client);
-        $this->comment = new Comment($config, $client);
-        $this->label = new Label($config, $client);
-        $this->notification = new Notification($config, $client);
-        $this->project = new Project($config, $client);
-        $this->task = new Task($config, $client);
-        $this->user = new User($config, $client);
+        if (!$this->client instanceof Client) {
+            throw new AuthenticateException();
+        }
+
+        $this->attachment = new Attachment($config, $this->client);
+        $this->board = new Board($config, $this->client);
+        $this->boardColumn = new BoardColumn($config, $this->client);
+        $this->card = new Card($config, $this->client);
+        $this->comment = new Comment($config, $this->client);
+        $this->label = new Label($config, $this->client);
+        $this->notification = new Notification($config, $this->client);
+        $this->project = new Project($config, $this->client);
+        $this->task = new Task($config, $this->client);
+        $this->user = new User($config, $this->client);
     }
 
     /**

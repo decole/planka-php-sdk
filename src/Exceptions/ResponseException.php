@@ -4,6 +4,6 @@ namespace Planka\Bridge\Exceptions;
 
 use Exception;
 
-class LogoutException extends Exception
+class ResponseException extends Exception
 {
 }
