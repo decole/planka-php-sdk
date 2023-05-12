@@ -2,36 +2,36 @@
 
 declare(strict_types=1);
 
-namespace Planka\Bridge\Actions\User;
+namespace Planka\Bridge\Actions\BoardList;
 
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
 use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ActionInterface;
+use Planka\Bridge\Traits\BoardListHydrateTrait;
 use Planka\Bridge\Traits\AuthenticateTrait;
-use Planka\Bridge\Traits\UserHydrateTrait;
-use Planka\Bridge\Views\Dto\User\UserDto;
 
-final class UserUpdateEmailAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
+final class BoardListUpdateAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait, UserHydrateTrait;
+    use AuthenticateTrait, BoardListHydrateTrait;
 
     public function __construct(
         string $token,
-        private readonly UserDto $user,
+        private readonly string $listId,
+        private readonly string $name
     ) {
         $this->setToken($token);
     }
 
     public function url(): string
     {
-        return "api/users/{$this->user->id}}/email";
+        return "api/lists/{$this->listId}";
     }
 
     public function getOptions(): array
     {
         return [
             'body' => [
-                'email' => $this->user->email,
+                'name' => $this->name,
             ],
         ];
     }

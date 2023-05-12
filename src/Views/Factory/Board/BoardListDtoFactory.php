@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Planka\Bridge\Views\Factory\Board;
 
 use Planka\Bridge\Contracts\Factory\OutputInterface;
+use Planka\Bridge\Views\Dto\Board\BoardListDto;
 use Planka\Bridge\Traits\DateConverterTrait;
-use Planka\Bridge\Views\Dto\Board\BoardItemDto;
 
-final class BoardItemDtoFactory implements OutputInterface
+final class BoardListDtoFactory implements OutputInterface
 {
     use DateConverterTrait;
 
@@ -19,19 +19,19 @@ final class BoardItemDtoFactory implements OutputInterface
      *     updatedAt: ?string,
      *     position: int,
      *     name: string,
-     *     projectId: string
+     *     boardId: string
      * } $data
-     * @return BoardItemDto
+     * @return BoardListDto
      */
-    public function create(array $data): BoardItemDto
+    public function create(array $data): BoardListDto
     {
-        return new BoardItemDto(
+        return new BoardListDto(
             id: $data['id'],
-            projectId: $data['projectId'],
+            createdAt: $this->convertToDateTime($data['createdAt']),
+            updatedAt: $this->convertToDateTime($data['updatedAt']),
             position: $data['position'],
             name: $data['name'],
-            createdAt: $this->convertToDateTime($data['createdAt']),
-            updatedAt: $this->convertToDateTime($data['updatedAt'])
+            boardId: $data['boardId']
         );
     }
 }

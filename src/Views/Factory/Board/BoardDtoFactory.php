@@ -12,8 +12,8 @@ final class BoardDtoFactory implements OutputInterface
     public function create(array $data): BoardDto
     {
         return new BoardDto(
-            item: (new BoardItemDtoFactory())->create($data),
-            included: (new BoardIncludedDtoFactory())->create($data),
+            item: (new BoardItemDtoFactory())->create($data['item']),
+            included: (new BoardIncludedDtoFactory())->create($data['included']),
         );
     }
 }

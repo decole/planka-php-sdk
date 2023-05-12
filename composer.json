@@ -28,5 +28,9 @@
         }
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "require-dev": {
+        "symfony/var-dumper": "^6.2",
+        "vimeo/psalm": "^5.11"
+    }
 }
