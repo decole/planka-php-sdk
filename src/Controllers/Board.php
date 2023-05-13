@@ -32,7 +32,7 @@ final class Board
     }
 
     /** 'GET /api/boards/:id' */
-    public function get(int $boardId): BoardDto
+    public function get(string $boardId): BoardDto
     {
         return $this->client->get(new BoardViewAction(token: $this->config->getAuthToken(), boardId: $boardId));
     }

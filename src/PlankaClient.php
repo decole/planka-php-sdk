@@ -7,6 +7,7 @@ namespace Planka\Bridge;
 use Planka\Bridge\Controllers\BoardMembership;
 use Planka\Bridge\Controllers\CardAction;
 use Planka\Bridge\Controllers\CardLabel;
+use Planka\Bridge\Controllers\CardMembership;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Planka\Bridge\Exceptions\AuthenticateException;
 use Planka\Bridge\Actions\Auth\AuthenticateAction;
@@ -37,6 +38,7 @@ final class PlankaClient
     public readonly Card $card;
     public readonly CardAction $cardAction;
     public readonly CardLabel $cardLabel;
+    public readonly CardMembership $cardMembership;
     public readonly Comment $comment;
     public readonly Label $label;
     public readonly Notification $notification;
@@ -46,10 +48,6 @@ final class PlankaClient
 
     private readonly Client $client;
 
-
-    /**
-     * @throws AuthenticateException
-     */
     public function __construct(
         private readonly Config $config,
         ?Client $client = null
@@ -65,6 +63,7 @@ final class PlankaClient
         $this->card = new Card($config, $this->client);
         $this->cardAction = new CardAction($config, $this->client);
         $this->cardLabel = new CardLabel($config, $this->client);
+        $this->cardMembership = new CardMembership($config, $this->client);
         $this->comment = new Comment($config, $this->client);
         $this->label = new Label($config, $this->client);
         $this->notification = new Notification($config, $this->client);
