@@ -8,6 +8,7 @@ use Planka\Bridge\Controllers\BoardMembership;
 use Planka\Bridge\Controllers\CardAction;
 use Planka\Bridge\Controllers\CardLabel;
 use Planka\Bridge\Controllers\CardMembership;
+use Planka\Bridge\Controllers\ProjectManager;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Planka\Bridge\Exceptions\AuthenticateException;
 use Planka\Bridge\Actions\Auth\AuthenticateAction;
@@ -43,6 +44,7 @@ final class PlankaClient
     public readonly Label $label;
     public readonly Notification $notification;
     public readonly Project $project;
+    public readonly ProjectManager $projectManager;
     public readonly Task $task;
     public readonly User $user;
 
@@ -68,6 +70,7 @@ final class PlankaClient
         $this->label = new Label($config, $this->client);
         $this->notification = new Notification($config, $this->client);
         $this->project = new Project($config, $this->client);
+        $this->projectManager = new ProjectManager($config, $this->client);
         $this->task = new Task($config, $this->client);
         $this->user = new User($config, $this->client);
     }
