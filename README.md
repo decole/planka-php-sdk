@@ -25,3 +25,7 @@ var_dump($result);
 
 - Planka - https://github.com/plankanban/planka
 - HTTP client lib: https://symfony.com/doc/current/http_client.html#authentication
+
+## For develop
+
+`./vendor/bin/psalm --no-cache --no-file-cache`

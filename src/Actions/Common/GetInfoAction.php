@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Planka\Bridge\Actions\Common;
 
 use Planka\Bridge\Contracts\Actions\ActionInterface;

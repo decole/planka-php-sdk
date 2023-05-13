@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Planka\Bridge;
 
+use Planka\Bridge\Controllers\CardAction;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Planka\Bridge\Exceptions\AuthenticateException;
 use Planka\Bridge\Actions\Auth\AuthenticateAction;
@@ -11,7 +12,7 @@ use Planka\Bridge\Actions\Common\GetInfoAction;
 use Planka\Bridge\Exceptions\LogoutException;
 use Planka\Bridge\Actions\Auth\LogoutAction;
 use Planka\Bridge\Controllers\Notification;
-use Planka\Bridge\Controllers\BoardColumn;
+use Planka\Bridge\Controllers\BoardList;
 use Planka\Bridge\TransportClients\Client;
 use Planka\Bridge\Controllers\Attachment;
 use Planka\Bridge\Controllers\Comment;
@@ -29,8 +30,9 @@ final class PlankaClient
 {
     public readonly Attachment $attachment;
     public readonly Board $board;
-    public readonly BoardColumn $boardColumn;
+    public readonly BoardList $boardList;
     public readonly Card $card;
+    public readonly CardAction $cardAction;
     public readonly Comment $comment;
     public readonly Label $label;
     public readonly Notification $notification;
@@ -55,10 +57,11 @@ final class PlankaClient
             throw new AuthenticateException();
         }
 
-        $this->attachment = new Attachment($config, $this->client);
+        $this->attachment = new Attachment($config, $this->client); // todo воспроизвести прикрепления
         $this->board = new Board($config, $this->client);
-        $this->boardColumn = new BoardColumn($config, $this->client);
+        $this->boardList = new BoardList($config, $this->client);
         $this->card = new Card($config, $this->client);
+        $this->cardAction = new CardAction($this->config, $this->client);
         $this->comment = new Comment($config, $this->client);
         $this->label = new Label($config, $this->client);
         $this->notification = new Notification($config, $this->client);
@@ -101,7 +104,7 @@ final class PlankaClient
         }
     }
 
-    /** 'GET /*' - for ping Planka */
+    /** 'GET /' - for ping Planka */
     public function getInfo(): ResponseInterface
     {
         return $this->client->get(new GetInfoAction());

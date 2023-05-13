@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Planka\Bridge\Traits;
 
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -15,7 +17,6 @@ use Planka\Bridge\Views\Dto\Board\BoardDto;
 trait BoardHydrateTrait
 {
     /**
-     * @return BoardDto
      * @throws ClientExceptionInterface
      * @throws DecodingExceptionInterface
      * @throws RedirectionExceptionInterface

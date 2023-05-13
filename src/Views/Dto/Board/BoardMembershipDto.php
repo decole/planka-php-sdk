@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace Planka\Bridge\Views\Dto\Board;
 
 use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
+use DateTimeImmutable;
 
-class BoardMembershipDto implements OutputDtoInterface
+final class BoardMembershipDto implements OutputDtoInterface
 {
- //      "boardMemberships": [
-    //            {
-    //                "id": "745435921712677900",
-    //                "createdAt": "2022-06-24T07:08:06.000Z",
-    //                "updatedAt": null,
-    //                "role": "editor",
-    //                "canComment": null,
-    //                "boardId": "745435921242915851",
-    //                "userId": "744724852362970113"
-    //            }
-    //        ],
+    public function __construct(
+        public readonly string $id,
+        public readonly DateTimeImmutable $createdAt,
+        public readonly ?DateTimeImmutable $updatedAt,
+        public string $userId,
+        public bool $canComment,
+        public string $role,
+        public string $boardId,
+    ) {
+    }
 }

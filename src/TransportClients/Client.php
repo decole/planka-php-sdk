@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\TransportClients;
 
-use Planka\Bridge\Contracts\Actions\ActionInterface;
-use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
-use Symfony\Component\HttpClient\HttpClient;
+use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Planka\Bridge\Contracts\Actions\ActionInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
+use Symfony\Component\HttpClient\HttpClient;
 
 class Client
 {
