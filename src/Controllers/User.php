@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Controllers;
 
-use Planka\Bridge\Actions\User\UserCreateAction;
-use Planka\Bridge\Actions\User\UserDeleteAction;
-use Planka\Bridge\Actions\User\UserListAction;
-use Planka\Bridge\Actions\User\UserUpdateAction;
-use Planka\Bridge\Actions\User\UserUpdateAvatarAction;
-use Planka\Bridge\Actions\User\UserUpdateEmailAction;
 use Planka\Bridge\Actions\User\UserUpdatePasswordAction;
 use Planka\Bridge\Actions\User\UserUpdateUsernameAction;
-use Planka\Bridge\Actions\User\UserViewAction;
-use Planka\Bridge\Config;
+use Planka\Bridge\Actions\User\UserUpdateAvatarAction;
+use Planka\Bridge\Actions\User\UserUpdateEmailAction;
+use Planka\Bridge\Actions\User\UserCreateAction;
+use Planka\Bridge\Actions\User\UserDeleteAction;
+use Planka\Bridge\Actions\User\UserUpdateAction;
 use Planka\Bridge\Exceptions\FileExistException;
+use Planka\Bridge\Actions\User\UserListAction;
+use Planka\Bridge\Actions\User\UserViewAction;
 use Planka\Bridge\TransportClients\Client;
 use Planka\Bridge\Views\Dto\User\UserDto;
+use Planka\Bridge\Config;
 
 final class User
 {

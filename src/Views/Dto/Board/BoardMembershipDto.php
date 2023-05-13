@@ -6,6 +6,7 @@ namespace Planka\Bridge\Views\Dto\Board;
 
 use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
 use DateTimeImmutable;
+use Planka\Bridge\Enum\BoardMembershipRoleEnum;
 
 final class BoardMembershipDto implements OutputDtoInterface
 {
@@ -15,7 +16,7 @@ final class BoardMembershipDto implements OutputDtoInterface
         public readonly ?DateTimeImmutable $updatedAt,
         public string $userId,
         public bool $canComment,
-        public string $role,
+        public BoardMembershipRoleEnum $role,
         public string $boardId,
     ) {
     }

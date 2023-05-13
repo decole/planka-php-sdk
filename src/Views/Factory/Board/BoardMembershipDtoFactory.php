@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Views\Factory\Board;
 
+use Planka\Bridge\Enum\BoardMembershipRoleEnum;
 use Planka\Bridge\Views\Dto\Board\BoardMembershipDto;
 use Planka\Bridge\Contracts\Factory\OutputInterface;
 use Planka\Bridge\Traits\DateConverterTrait;
@@ -32,7 +33,7 @@ final class BoardMembershipDtoFactory implements OutputInterface
             updatedAt: $this->convertToDateTime($data['updatedAt']),
             userId: $data['userId'],
             canComment: (bool)$data['canComment'],
-            role: $data['role'],
+            role: BoardMembershipRoleEnum::from($data['role']),
             boardId: $data['boardId']
         );
     }

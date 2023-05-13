@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Views\Dto\Card;
 
-use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
 use DateTimeImmutable;
+use Planka\Bridge\Enum\CommentTypeEnum;
 
-class CardMembershipDto implements OutputDtoInterface
+class CardActionItemDto
 {
     public function __construct(
         public readonly string $id,
         public readonly DateTimeImmutable $createdAt,
         public readonly ?DateTimeImmutable $updatedAt,
-        public string $cardId,
-        public string $userId
+        public readonly CommentTypeEnum $type,
+        public readonly string $dataText,
+        public readonly string $cardId,
+        public readonly string $userId
     ) {
     }
 }

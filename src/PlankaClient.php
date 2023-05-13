@@ -4,7 +4,9 @@ declare(strict_types = 1);
 
 namespace Planka\Bridge;
 
+use Planka\Bridge\Controllers\BoardMembership;
 use Planka\Bridge\Controllers\CardAction;
+use Planka\Bridge\Controllers\CardLabel;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Planka\Bridge\Exceptions\AuthenticateException;
 use Planka\Bridge\Actions\Auth\AuthenticateAction;
@@ -31,8 +33,10 @@ final class PlankaClient
     public readonly Attachment $attachment;
     public readonly Board $board;
     public readonly BoardList $boardList;
+    public readonly BoardMembership $boardMembership;
     public readonly Card $card;
     public readonly CardAction $cardAction;
+    public readonly CardLabel $cardLabel;
     public readonly Comment $comment;
     public readonly Label $label;
     public readonly Notification $notification;
@@ -41,6 +45,7 @@ final class PlankaClient
     public readonly User $user;
 
     private readonly Client $client;
+
 
     /**
      * @throws AuthenticateException
@@ -53,15 +58,13 @@ final class PlankaClient
             $this->client = new Client($this->config->getBaseUri(), $this->config->getPort());
         }
 
-        if (!$this->client instanceof Client) {
-            throw new AuthenticateException();
-        }
-
         $this->attachment = new Attachment($config, $this->client); // todo воспроизвести прикрепления
         $this->board = new Board($config, $this->client);
         $this->boardList = new BoardList($config, $this->client);
+        $this->boardMembership = new BoardMembership($config, $this->client);
         $this->card = new Card($config, $this->client);
-        $this->cardAction = new CardAction($this->config, $this->client);
+        $this->cardAction = new CardAction($config, $this->client);
+        $this->cardLabel = new CardLabel($config, $this->client);
         $this->comment = new Comment($config, $this->client);
         $this->label = new Label($config, $this->client);
         $this->notification = new Notification($config, $this->client);
