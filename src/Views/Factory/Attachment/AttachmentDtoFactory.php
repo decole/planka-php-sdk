@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Planka\Bridge\Views\Factory\Attachment;
 
 use Planka\Bridge\Views\Factory\Image\ImageDtoFactory;
