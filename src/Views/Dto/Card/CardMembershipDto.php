@@ -13,8 +13,8 @@ class CardMembershipDto implements OutputDtoInterface
         public readonly string $id,
         public readonly DateTimeImmutable $createdAt,
         public readonly ?DateTimeImmutable $updatedAt,
-        public string $cardId,
-        public string $userId
+        public readonly string $cardId,
+        public readonly string $userId
     ) {
     }
 }
