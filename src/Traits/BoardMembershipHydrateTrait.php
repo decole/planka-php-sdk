@@ -9,27 +9,27 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
-use Planka\Bridge\Views\Factory\Board\BoardDtoFactory;
+use Planka\Bridge\Views\Factory\Board\BoardMembershipDtoFactory;
+use Planka\Bridge\Views\Dto\Board\BoardMembershipDto;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Planka\Bridge\Exceptions\ResponseException;
-use Planka\Bridge\Views\Dto\Board\BoardDto;
 
-trait BoardHydrateTrait
+trait BoardMembershipHydrateTrait
 {
     /**
-     * @throws ClientExceptionInterface
-     * @throws DecodingExceptionInterface
      * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws TransportExceptionInterface
      * @throws ResponseException
      * @throws ServerExceptionInterface
-     * @throws TransportExceptionInterface
      */
-    final public function hydrate(ResponseInterface $response): BoardDto
+    final public function hydrate(ResponseInterface $response): BoardMembershipDto
     {
         $result = $response->toArray();
 
         if (array_key_exists('item', $result)) {
-            return (new BoardDtoFactory())->create($response->toArray());
+            return (new BoardMembershipDtoFactory())->create($result['item']);
         }
 
         throw new ResponseException($response->getContent());

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Views\Factory\Board;
 
+use Planka\Bridge\Views\Dto\Board\BoardMembershipDto;
 use Planka\Bridge\Contracts\Factory\OutputInterface;
 use Planka\Bridge\Traits\DateConverterTrait;
-use Planka\Bridge\Views\Dto\Board\BoardMembershipDto;
 
 final class BoardMembershipDtoFactory implements OutputInterface
 {
@@ -17,10 +17,10 @@ final class BoardMembershipDtoFactory implements OutputInterface
      *     id: string,
      *     createdAt: string,
      *     updatedAt: ?string,
-     *     role: string,
+     *     userId: string,
      *     canComment: ?bool,
-     *     boardId: string,
-     *     userId: string
+     *     role: string,
+     *     boardId: string
      * } $data
      * @return BoardMembershipDto
      */
@@ -30,10 +30,10 @@ final class BoardMembershipDtoFactory implements OutputInterface
             id: $data['id'],
             createdAt: $this->convertToDateTime($data['createdAt']),
             updatedAt: $this->convertToDateTime($data['updatedAt']),
-            role: $data['role'],
+            userId: $data['userId'],
             canComment: (bool)$data['canComment'],
-            boardId: $data['boardId'],
-            userId: $data['userId']
+            role: $data['role'],
+            boardId: $data['boardId']
         );
     }
 }
