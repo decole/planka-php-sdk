@@ -29,6 +29,21 @@ use function Fp\Collection\map;
 
 final class BoardIncludedDtoFactory implements OutputInterface
 {
+    /**
+     * @param array{
+     *     users: array,
+     *     boardMemberships: array,
+     *     labels: array,
+     *     lists: array,
+     *     cards: array,
+     *     cardMemberships: array,
+     *     cardLabels: array,
+     *     tasks: array,
+     *     attachments: array,
+     *     projects: array
+     * } $data
+     * @return BoardIncludedDto
+     */
     public function create(array $data): BoardIncludedDto
     {
         return new BoardIncludedDto(
