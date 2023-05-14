@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Controllers;
 
+use Planka\Bridge\Actions\Project\ProjectUpdateBackgroundImageAction;
+use Planka\Bridge\Actions\Project\ProjectUpdateAction;
 use Planka\Bridge\Actions\Project\ProjectCreateAction;
 use Planka\Bridge\Actions\Project\ProjectDeleteAction;
 use Planka\Bridge\Actions\Project\ProjectListAction;
-use Planka\Bridge\Actions\Project\ProjectUpdateAction;
-use Planka\Bridge\Actions\Project\ProjectUpdateBackgroundImageAction;
 use Planka\Bridge\TransportClients\Client;
 use Planka\Bridge\Config;
+use Planka\Bridge\Views\Dto\Project\ProjectDto;
 
 final class Project
 {
@@ -20,39 +21,41 @@ final class Project
     ) {
     }
 
-    /** 'GET /api/projects' */
-    public function list()
+    /** 'GET /api/projects'
+     * @return list<ProjectDto>
+     */
+    public function list(): array
     {
         return $this->client->get(new ProjectListAction(token: $this->config->getAuthToken()));
     }
 
     /** 'POST /api/projects': 'projects/create', */
-    public function create()
+    public function create(): ProjectDto
     {
         return $this->client->post(new ProjectCreateAction(token: $this->config->getAuthToken()));
     }
 
     /** 'GET /api/projects/:id': 'projects/show', */
-    public function get()
+    public function get(): ProjectDto
     {
         return $this->client->get(new ProjectViewAction(token: $this->config->getAuthToken()));
     }
 
     /** 'PATCH /api/projects/:id': 'projects/update', */
-    public function update()
+    public function update(): ProjectDto
     {
         return $this->client->get(new ProjectUpdateAction(token: $this->config->getAuthToken()));
     }
 
     /** 'DELETE /api/projects/:id': 'projects/delete', */
-    public function delete()
+    public function delete(): ProjectDto
     {
         return $this->client->get(new ProjectDeleteAction(token: $this->config->getAuthToken()));
     }
 
-    /** 'POST /api/projects/:id/background-image': 'projects/update-background-image', */
-    public function updateBackgroundImage()
-    {
-        return $this->client->get(new ProjectUpdateBackgroundImageAction(token: $this->config->getAuthToken()));
-    }
+//    /** 'POST /api/projects/:id/background-image': 'projects/update-background-image', */
+//    public function updateBackgroundImage()
+//    {
+//        return $this->client->get(new ProjectUpdateBackgroundImageAction(token: $this->config->getAuthToken()));
+//    }
 }
