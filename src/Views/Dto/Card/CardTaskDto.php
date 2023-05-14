@@ -7,7 +7,7 @@ namespace Planka\Bridge\Views\Dto\Card;
 use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
 use DateTimeImmutable;
 
-class CardTasksDto implements OutputDtoInterface
+class CardTaskDto implements OutputDtoInterface
 {
     public function __construct(
         public readonly string $id,

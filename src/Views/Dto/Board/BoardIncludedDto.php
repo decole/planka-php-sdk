@@ -7,7 +7,7 @@ namespace Planka\Bridge\Views\Dto\Board;
 use Planka\Bridge\Views\Dto\Attachment\AttachmentDto;
 use Planka\Bridge\Views\Dto\Card\CardMembershipDto;
 use Planka\Bridge\Views\Dto\Project\ProjectDto;
-use Planka\Bridge\Views\Dto\Card\CardTasksDto;
+use Planka\Bridge\Views\Dto\Card\CardTaskDto;
 use Planka\Bridge\Views\Dto\Card\CardLabelDto;
 use Planka\Bridge\Views\Dto\Label\LabelDto;
 use Planka\Bridge\Views\Dto\List\ListDto;
@@ -24,7 +24,7 @@ final class BoardIncludedDto
      * @param list<CardDto> $cards
      * @param list<CardMembershipDto> $cardMemberships
      * @param list<CardLabelDto> $cardLabels
-     * @param list<CardTasksDto> $tasks
+     * @param list<CardTaskDto> $tasks
      * @param list<AttachmentDto> $attachments
      * @param list<ProjectDto> $projects
      */
