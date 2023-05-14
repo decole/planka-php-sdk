@@ -9,12 +9,12 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
-use Planka\Bridge\Views\Factory\Board\BoardListDtoFactory;
+use Planka\Bridge\Views\Factory\Project\ProjectManagerDtoFactory;
+use Planka\Bridge\Views\Factory\Project\ProjectManagerDto;
 use Symfony\Contracts\HttpClient\ResponseInterface;
-use Planka\Bridge\Views\Dto\Board\BoardListDto;
 use Planka\Bridge\Exceptions\ResponseException;
 
-trait BoardListHydrateTrait
+trait ProjectManagerHydrateTrait
 {
     /**
      * @throws RedirectionExceptionInterface
@@ -24,12 +24,12 @@ trait BoardListHydrateTrait
      * @throws ResponseException
      * @throws ServerExceptionInterface
      */
-    final public function hydrate(ResponseInterface $response): BoardListDto
+    final public function hydrate(ResponseInterface $response): ProjectManagerDto
     {
         $result = $response->toArray();
 
         if (array_key_exists('item', $result)) {
-            return (new BoardListDtoFactory())->create($result['item']);
+            return (new ProjectManagerDtoFactory())->create($result['item']);
         }
 
         throw new ResponseException($response->getContent());

@@ -37,7 +37,7 @@ final class CardDtoFactory implements OutputInterface
             createdAt: $this->convertToDateTime($data['createdAt']),
             updatedAt: $this->convertToDateTime($data['updatedAt']),
             creatorUserId: $data['creatorUserId'],
-            position: $data['position'],
+            position: (int)$data['position'],
             name: $data['name'],
             description: $data['description'],
             dueDate: $this->convertToDateTime($data['dueDate']),
