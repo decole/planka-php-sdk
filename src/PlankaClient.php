@@ -55,10 +55,12 @@ final class PlankaClient
         ?Client $client = null
     ) {
         if ($client === null) {
-            $this->client = new Client($this->config->getBaseUri(), $this->config->getPort());
+            $client = new Client($this->config->getBaseUri(), $this->config->getPort());
         }
 
-//        $this->attachment = new Attachment($config, $this->client); // todo воспроизвести прикрепления
+        $this->client = $client;
+
+        $this->attachment = new Attachment($config, $this->client);
         $this->board = new Board($config, $this->client);
         $this->boardList = new BoardList($config, $this->client);
         $this->boardMembership = new BoardMembership($config, $this->client);

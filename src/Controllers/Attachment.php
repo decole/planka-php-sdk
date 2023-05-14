@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Controllers;
 
-use Planka\Bridge\Actions\BoardList\BoardListCreateAction;
-use Planka\Bridge\Actions\BoardList\BoardListDeleteAction;
-use Planka\Bridge\Actions\BoardList\BoardListUpdateAction;
-use Planka\Bridge\Config;
+use Planka\Bridge\Actions\Attachment\AttachmentCreateAction;
+use Planka\Bridge\Actions\Attachment\AttachmentDeleteAction;
+use Planka\Bridge\Actions\Attachment\AttachmentUpdateAction;
+use Planka\Bridge\Views\Dto\Attachment\AttachmentDto;
+use Planka\Bridge\Exceptions\FileExistException;
 use Planka\Bridge\TransportClients\Client;
-use Planka\Bridge\Views\Dto\Board\BoardDto;
+use Planka\Bridge\Config;
 
-class Attachment
+final class Attachment
 {
     public function __construct(
         private readonly Config $config,
@@ -19,40 +20,35 @@ class Attachment
     ) {
     }
 
-    // fix actions
-
-    /** 'POST /api/cards/:cardId/attachments'*/
-    public function create(string $projectId, string $name, int $position): BoardDto
+    /**
+     * 'POST /api/cards/:cardId/attachments'
+     * @throws FileExistException
+     */
+    public function upload(string $cardId, string $file): AttachmentDto
     {
-        return $this->client->post(new BoardListCreateAction(
+        return $this->client->post(new AttachmentCreateAction(
             token: $this->config->getAuthToken(),
+            cardId: $cardId,
+            file: $file
         ));
     }
 
     /** 'PATCH /api/attachments/:id' */
-    public function update(string $listId, string $name): BoardDto
+    public function updateName(string $attachmentId, string $name): AttachmentDto
     {
-        return $this->client->patch(new BoardListUpdateAction(
+        return $this->client->patch(new AttachmentUpdateAction(
             token: $this->config->getAuthToken(),
-            listId: $listId
+            attachmentId: $attachmentId,
+            name: $name
         ));
     }
 
     /** 'DELETE /api/attachments/:id' */
-    public function delete(string $listId): BoardDto
+    public function delete(string $attachmentId): AttachmentDto
     {
-        return $this->client->delete(new BoardListDeleteAction(token: $this->config->getAuthToken(), listId: $listId));
-    }
-
-    /** 'GET /attachments/:id/download/:filename' */
-    public function downloadFile()
-    {
-
-    }
-
-    /** 'GET /attachments/:id/download/thumbnails/cover-256.:extension' */
-    public function downloadThumbnail()
-    {
-
+        return $this->client->delete(new AttachmentDeleteAction(
+            token: $this->config->getAuthToken(),
+            attachmentId: $attachmentId
+        ));
     }
 }
