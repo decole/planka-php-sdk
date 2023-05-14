@@ -39,7 +39,17 @@ final class BoardIncludedDtoFactory implements OutputInterface
      *     cardMemberships: array,
      *     cardLabels: array,
      *     tasks: array,
-     *     attachments: array,
+     *     attachments: array{
+     *         id: string,
+     *         createdAt: string,
+     *         updatedAt: ?string,
+     *         name: string,
+     *         cardId: string,
+     *         url: string,
+     *         coverUrl: ?string,
+     *         creatorUserId: string,
+     *         image: array{height: int, width: int}
+     *     }|null,
      *     projects: array
      * } $data
      * @return BoardIncludedDto
@@ -139,7 +149,7 @@ final class BoardIncludedDtoFactory implements OutputInterface
     }
 
     /**
-     * @return list<AttachmentDto>
+     * @return list<AttachmentDto>|array
      */
     private function getAttachments(array $data): array
     {

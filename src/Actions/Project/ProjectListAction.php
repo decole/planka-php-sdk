@@ -49,6 +49,7 @@ final class ProjectListAction implements ActionInterface, AuthenticateInterface,
      */
     public function hydrate(ResponseInterface $response): ProjectListDto
     {
+        /** @var array{items: array, included: array} $result */
         $result = $response->toArray();
 
         if (array_key_exists('items', $result)) {

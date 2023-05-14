@@ -20,7 +20,7 @@ final class ProjectDtoFactory implements OutputInterface
      *     createdAt: string,
      *     updatedAt: ?string,
      *     name: string,
-     *     background: array{type: string}|null,
+     *     background: array{type: string,name?: ?string}|null,
      *     backgroundImage: array{url: string, coverUrl: string}|null
      * } $data
      * @return ProjectDto
@@ -32,8 +32,8 @@ final class ProjectDtoFactory implements OutputInterface
             createdAt: $this->convertToDateTime($data['createdAt']),
             updatedAt: $this->convertToDateTime($data['updatedAt']),
             name: $data['name'],
-            background: (new BackgroundDtoFactory())->create($data['background']),
-            backgroundImage: (new BackgroundImageDtoFactory())->create($data['backgroundImage'])
+            background: (new BackgroundDtoFactory())->create($data['background'] ?? null),
+            backgroundImage: (new BackgroundImageDtoFactory())->create($data['backgroundImage'] ?? null)
         );
     }
 }
