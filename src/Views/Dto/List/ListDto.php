@@ -2,21 +2,19 @@
 
 declare(strict_types=1);
 
-namespace Planka\Bridge\Views\Dto\Card;
+namespace Planka\Bridge\Views\Dto\List;
 
-use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
 use DateTimeImmutable;
 
-class CardTasksDto implements OutputDtoInterface
+class ListDto
 {
     public function __construct(
         public readonly string $id,
+        public readonly string $boardId,
         public readonly DateTimeImmutable $createdAt,
         public readonly ?DateTimeImmutable $updatedAt,
         public int $position,
         public string $name,
-        public bool $isCompleted,
-        public string $cardId
     ) {
     }
 }

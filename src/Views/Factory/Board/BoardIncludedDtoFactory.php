@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Planka\Bridge\Views\Factory\Board;
 
@@ -8,7 +8,7 @@ use Planka\Bridge\Views\Factory\Attachment\AttachmentDtoFactory;
 use Planka\Bridge\Views\Factory\Card\CardMembershipDtoFactory;
 use Planka\Bridge\Views\Factory\Project\ProjectDtoFactory;
 use Planka\Bridge\Views\Factory\Card\CardLabelDtoFactory;
-use Planka\Bridge\Views\Factory\Card\CardTasksDtoFactory;
+use Planka\Bridge\Views\Factory\Card\CardTaskDtoFactory;
 use Planka\Bridge\Views\Factory\Label\LabelDtoFactory;
 use Planka\Bridge\Views\Dto\Attachment\AttachmentDto;
 use Planka\Bridge\Views\Dto\Board\BoardMembershipDto;
@@ -20,7 +20,7 @@ use Planka\Bridge\Views\Dto\Board\BoardIncludedDto;
 use Planka\Bridge\Views\Dto\Card\CardMembershipDto;
 use Planka\Bridge\Views\Dto\Project\ProjectDto;
 use Planka\Bridge\Views\Dto\Card\CardLabelDto;
-use Planka\Bridge\Views\Dto\Card\CardTasksDto;
+use Planka\Bridge\Views\Dto\Card\CardTaskDto;
 use Planka\Bridge\Views\Dto\Label\LabelDto;
 use Planka\Bridge\Views\Dto\Card\CardDto;
 use Planka\Bridge\Views\Dto\List\ListDto;
@@ -114,12 +114,12 @@ final class BoardIncludedDtoFactory implements OutputInterface
     }
 
     /**
-     * @return list<CardTasksDto>
+     * @return list<CardTaskDto>
      */
     private function getTasks(array $data): array
     {
         return map($data['tasks'] ?? [],
-            fn(array $item) => (new CardTasksDtoFactory())->create($item)
+            fn(array $item) => (new CardTaskDtoFactory())->create($item)
         );
     }
 
