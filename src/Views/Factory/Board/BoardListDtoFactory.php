@@ -29,7 +29,7 @@ final class BoardListDtoFactory implements OutputInterface
             id: $data['id'],
             createdAt: $this->convertToDateTime($data['createdAt']),
             updatedAt: $this->convertToDateTime($data['updatedAt']),
-            position: $data['position'],
+            position: (int)$data['position'],
             name: $data['name'],
             boardId: $data['boardId']
         );

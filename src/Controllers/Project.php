@@ -1,9 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Planka\Bridge\Controllers;
 
-use Planka\Bridge\Config;
+use Planka\Bridge\Actions\Project\ProjectUpdateBackgroundImageAction;
+use Planka\Bridge\Actions\Project\ProjectUpdateAction;
+use Planka\Bridge\Actions\Project\ProjectCreateAction;
+use Planka\Bridge\Actions\Project\ProjectDeleteAction;
+use Planka\Bridge\Actions\Project\ProjectListAction;
+use Planka\Bridge\Actions\Project\ProjectViewAction;
+use Planka\Bridge\Views\Dto\Project\ProjectListDto;
+use Planka\Bridge\Exceptions\FileExistException;
+use Planka\Bridge\Views\Dto\Project\ProjectDto;
 use Planka\Bridge\TransportClients\Client;
+use Planka\Bridge\Config;
 
 final class Project
 {
@@ -13,50 +24,55 @@ final class Project
     ) {
     }
 
-    /** 'GET /api/projects' */
-    public function list()
+    /**
+     * 'GET /api/projects'
+     * @return ProjectListDto
+     */
+    public function list(): ProjectListDto
     {
+        return $this->client->get(new ProjectListAction(token: $this->config->getAuthToken()));
     }
 
-    /** 'POST /api/projects': 'projects/create', */
-    public function create()
+    /** 'POST /api/projects' */
+    public function create(string $name): ProjectDto
     {
-
+        return $this->client->post(new ProjectCreateAction(token: $this->config->getAuthToken(), name: $name));
     }
 
-    /** 'GET /api/projects/:id': 'projects/show', */
-    public function get()
+    /** 'GET /api/projects/:id' */
+    public function get(string $projectId): ProjectDto
     {
-
+        return $this->client->get(new ProjectViewAction(token: $this->config->getAuthToken(), projectId: $projectId));
     }
 
-    /** 'PATCH /api/projects/:id': 'projects/update', */
-    public function update()
+    /** 'PATCH /api/projects/:id' */
+    public function update(ProjectDto $project): ProjectDto
     {
-
+        return $this->client->patch(new ProjectUpdateAction(
+            token: $this->config->getAuthToken(),
+            project: $project,
+        ));
     }
 
-    /** 'POST /api/projects/:id/background-image': 'projects/update-background-image', */
-    public function updateBackgroundImage()
+    /** 'DELETE /api/projects/:id' */
+    public function delete(string $projectId): ProjectDto
     {
-
+        return $this->client->delete(new ProjectDeleteAction(
+            token: $this->config->getAuthToken(),
+            projectId: $projectId
+        ));
     }
 
-    /** 'DELETE /api/projects/:id': 'projects/delete', */
-    public function delete()
+    /**
+     * 'POST /api/projects/:id/background-image'
+     * @throws FileExistException
+     */
+    public function updateBackgroundImage(string $projectId, string $file): ProjectDto
     {
-
-    }
-
-    /** 'POST /api/projects/:projectId/managers': 'project-managers/create', */
-    public function createProjectManager()
-    {
-
-    }
-
-    /** 'DELETE /api/project-managers/:id': 'project-managers/delete', */
-    public function deleteProjectManager()
-    {
-
+        return $this->client->post(new ProjectUpdateBackgroundImageAction(
+            token: $this->config->getAuthToken(),
+            projectId: $projectId,
+            file: $file
+        ));
     }
 }
