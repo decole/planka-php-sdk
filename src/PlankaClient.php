@@ -4,27 +4,27 @@ declare(strict_types = 1);
 
 namespace Planka\Bridge;
 
-use Planka\Bridge\Controllers\BoardMembership;
-use Planka\Bridge\Controllers\CardAction;
-use Planka\Bridge\Controllers\CardLabel;
-use Planka\Bridge\Controllers\CardMembership;
-use Planka\Bridge\Controllers\ProjectManager;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Planka\Bridge\Exceptions\AuthenticateException;
 use Planka\Bridge\Actions\Auth\AuthenticateAction;
 use Planka\Bridge\Actions\Common\GetInfoAction;
+use Planka\Bridge\Controllers\BoardMembership;
+use Planka\Bridge\Controllers\CardMembership;
+use Planka\Bridge\Controllers\ProjectManager;
 use Planka\Bridge\Exceptions\LogoutException;
 use Planka\Bridge\Actions\Auth\LogoutAction;
 use Planka\Bridge\Controllers\Notification;
-use Planka\Bridge\Controllers\BoardList;
 use Planka\Bridge\TransportClients\Client;
 use Planka\Bridge\Controllers\Attachment;
+use Planka\Bridge\Controllers\CardAction;
+use Planka\Bridge\Controllers\BoardList;
+use Planka\Bridge\Controllers\CardLabel;
+use Planka\Bridge\Controllers\CardTask;
 use Planka\Bridge\Controllers\Comment;
 use Planka\Bridge\Controllers\Project;
 use Planka\Bridge\Controllers\Board;
-use Planka\Bridge\Controllers\Card;
 use Planka\Bridge\Controllers\Label;
-use Planka\Bridge\Controllers\CardTask;
+use Planka\Bridge\Controllers\Card;
 use Planka\Bridge\Controllers\User;
 
 /**
@@ -55,10 +55,12 @@ final class PlankaClient
         ?Client $client = null
     ) {
         if ($client === null) {
-            $this->client = new Client($this->config->getBaseUri(), $this->config->getPort());
+            $client = new Client($this->config->getBaseUri(), $this->config->getPort());
         }
 
-//        $this->attachment = new Attachment($config, $this->client); // todo воспроизвести прикрепления
+        $this->client = $client;
+
+        $this->attachment = new Attachment($config, $this->client);
         $this->board = new Board($config, $this->client);
         $this->boardList = new BoardList($config, $this->client);
         $this->boardMembership = new BoardMembership($config, $this->client);

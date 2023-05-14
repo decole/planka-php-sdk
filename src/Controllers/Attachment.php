@@ -1,11 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Planka\Bridge\Controllers;
 
-use Planka\Bridge\Config;
+use Planka\Bridge\Actions\Attachment\AttachmentCreateAction;
+use Planka\Bridge\Actions\Attachment\AttachmentDeleteAction;
+use Planka\Bridge\Actions\Attachment\AttachmentUpdateAction;
+use Planka\Bridge\Views\Dto\Attachment\AttachmentDto;
+use Planka\Bridge\Exceptions\FileExistException;
 use Planka\Bridge\TransportClients\Client;
+use Planka\Bridge\Config;
 
-class Attachment
+final class Attachment
 {
     public function __construct(
         private readonly Config $config,
@@ -13,19 +20,35 @@ class Attachment
     ) {
     }
 
-/**
-'POST /api/cards/:cardId/attachments': 'attachments/create',
-'PATCH /api/attachments/:id': 'attachments/update',
-'DELETE /api/attachments/:id': 'attachments/delete',
+    /**
+     * 'POST /api/cards/:cardId/attachments'
+     * @throws FileExistException
+     */
+    public function upload(string $cardId, string $file): AttachmentDto
+    {
+        return $this->client->post(new AttachmentCreateAction(
+            token: $this->config->getAuthToken(),
+            cardId: $cardId,
+            file: $file
+        ));
+    }
 
-'GET /attachments/:id/download/:filename': {
-action: 'attachments/download',
-skipAssets: false,
-},
+    /** 'PATCH /api/attachments/:id' */
+    public function updateName(string $attachmentId, string $name): AttachmentDto
+    {
+        return $this->client->patch(new AttachmentUpdateAction(
+            token: $this->config->getAuthToken(),
+            attachmentId: $attachmentId,
+            name: $name
+        ));
+    }
 
-'GET /attachments/:id/download/thumbnails/cover-256.:extension': {
-action: 'attachments/download-thumbnail',
-skipAssets: false,
-},
- */
+    /** 'DELETE /api/attachments/:id' */
+    public function delete(string $attachmentId): AttachmentDto
+    {
+        return $this->client->delete(new AttachmentDeleteAction(
+            token: $this->config->getAuthToken(),
+            attachmentId: $attachmentId
+        ));
+    }
 }
