@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Planka\Bridge\Views\Factory\Card;
 
 use Planka\Bridge\Contracts\Factory\OutputInterface;
-use Planka\Bridge\Views\Dto\Card\CardTasksDto;
+use Planka\Bridge\Views\Dto\Card\CardTaskDto;
 use Planka\Bridge\Traits\DateConverterTrait;
 
-final class CardTasksDtoFactory implements OutputInterface
+final class CardTaskDtoFactory implements OutputInterface
 {
     use DateConverterTrait;
 
@@ -22,11 +22,11 @@ final class CardTasksDtoFactory implements OutputInterface
      *     isCompleted: bool,
      *     cardId: string
      * } $data
-     * @return CardTasksDto
+     * @return CardTaskDto
      */
-    public function create(array $data): CardTasksDto
+    public function create(array $data): CardTaskDto
     {
-        return new CardTasksDto(
+        return new CardTaskDto(
             id: $data['id'],
             createdAt: $this->convertToDateTime($data['createdAt']),
             updatedAt: $this->convertToDateTime($data['updatedAt']),

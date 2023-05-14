@@ -20,8 +20,8 @@ final class ProjectDtoFactory implements OutputInterface
      *     createdAt: string,
      *     updatedAt: ?string,
      *     name: string,
-     *     background: array{type: string},
-     *     backgroundImage: array{url: string, coverUrl: string}
+     *     background: array{type: string}|null,
+     *     backgroundImage: array{url: string, coverUrl: string}|null
      * } $data
      * @return ProjectDto
      */

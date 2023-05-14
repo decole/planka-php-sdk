@@ -42,7 +42,7 @@ final class AttachmentDtoFactory implements OutputInterface
             createdAt: $this->convertToDateTime($data['createdAt']),
             updatedAt: $this->convertToDateTime($data['updatedAt']),
             coverUrl: $data['coverUrl'],
-            image: (new ImageDtoFactory())->create($data['image'])
+            image: (new ImageDtoFactory())->create($data['image'] ?? null)
         );
     }
 }

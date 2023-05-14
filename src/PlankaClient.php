@@ -24,7 +24,7 @@ use Planka\Bridge\Controllers\Project;
 use Planka\Bridge\Controllers\Board;
 use Planka\Bridge\Controllers\Card;
 use Planka\Bridge\Controllers\Label;
-use Planka\Bridge\Controllers\Task;
+use Planka\Bridge\Controllers\CardTask;
 use Planka\Bridge\Controllers\User;
 
 /**
@@ -39,13 +39,13 @@ final class PlankaClient
     public readonly Card $card;
     public readonly CardAction $cardAction;
     public readonly CardLabel $cardLabel;
+    public readonly CardTask $cardTask;
     public readonly CardMembership $cardMembership;
     public readonly Comment $comment;
     public readonly Label $label;
     public readonly Notification $notification;
     public readonly Project $project;
     public readonly ProjectManager $projectManager;
-    public readonly Task $task;
     public readonly User $user;
 
     private readonly Client $client;
@@ -58,7 +58,7 @@ final class PlankaClient
             $this->client = new Client($this->config->getBaseUri(), $this->config->getPort());
         }
 
-        $this->attachment = new Attachment($config, $this->client); // todo воспроизвести прикрепления
+//        $this->attachment = new Attachment($config, $this->client); // todo воспроизвести прикрепления
         $this->board = new Board($config, $this->client);
         $this->boardList = new BoardList($config, $this->client);
         $this->boardMembership = new BoardMembership($config, $this->client);
@@ -66,12 +66,12 @@ final class PlankaClient
         $this->cardAction = new CardAction($config, $this->client);
         $this->cardLabel = new CardLabel($config, $this->client);
         $this->cardMembership = new CardMembership($config, $this->client);
+        $this->cardTask = new CardTask($config, $this->client);
         $this->comment = new Comment($config, $this->client);
         $this->label = new Label($config, $this->client);
         $this->notification = new Notification($config, $this->client);
         $this->project = new Project($config, $this->client);
         $this->projectManager = new ProjectManager($config, $this->client);
-        $this->task = new Task($config, $this->client);
         $this->user = new User($config, $this->client);
     }
 
