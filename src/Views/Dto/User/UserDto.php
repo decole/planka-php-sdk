@@ -13,6 +13,7 @@ class UserDto implements OutputDtoInterface
         public readonly string $id,
         public readonly DateTimeImmutable $createdAt,
         public readonly ?DateTimeImmutable $updatedAt,
+        public readonly ?DateTimeImmutable $deletedAt,
         public ?string $email,
         public bool $isAdmin,
         public ?string $name,
@@ -21,7 +22,6 @@ class UserDto implements OutputDtoInterface
         public ?string $organization,
         public ?string $language,
         public bool $subscribeToOwnCards,
-        public readonly ?DateTimeImmutable $deletedAt,
         public ?string $avatarUrl
     ) {
     }

@@ -2,4 +2,4 @@
 composer.lock
 .idea
 index.php
-Makefile
+config.php

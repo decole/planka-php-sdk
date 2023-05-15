@@ -16,10 +16,10 @@ final class LabelUpdateAction implements ActionInterface, AuthenticateInterface,
     use AuthenticateTrait, LabelHydrateTrait;
 
     public function __construct(
-        string $token,
         private readonly string $labelId,
         private readonly string $name,
-        private readonly LabelColorEnum $color
+        private readonly LabelColorEnum $color,
+        string $token
     ) {
         $this->setToken($token);
     }

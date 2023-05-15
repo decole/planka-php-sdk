@@ -14,7 +14,7 @@ final class BoardDeleteAction implements ActionInterface, AuthenticateInterface,
 {
     use AuthenticateTrait, BoardHydrateTrait;
 
-    public function __construct(string $token, private readonly string $boardId)
+    public function __construct(private readonly string $boardId, string $token)
     {
         $this->setToken($token);
     }

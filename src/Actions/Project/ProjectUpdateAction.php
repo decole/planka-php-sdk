@@ -17,10 +17,8 @@ final class ProjectUpdateAction implements ActionInterface, AuthenticateInterfac
 {
     use AuthenticateTrait, ProjectHydrateTrait;
 
-    public function __construct(
-        string $token,
-        private readonly ProjectDto $project,
-    ) {
+    public function __construct(private readonly ProjectDto $project, string $token)
+    {
         $this->setToken($token);
     }
 
@@ -35,34 +33,34 @@ final class ProjectUpdateAction implements ActionInterface, AuthenticateInterfac
     public function getOptions(): array
     {
         $body = [
-            'body' => [
+            'json' => [
                 'name' => $this->project->name,
             ],
         ];
 
-        if ($this->project->background->type === BackgroundTypeEnum::IMAGE) {
+        if ($this->project?->background?->type === BackgroundTypeEnum::IMAGE) {
             $this->validateBackgroundImage();
 
-            $body['body']['background'] = [
+            $body['json']['background'] = [
                 'type' => BackgroundTypeEnum::IMAGE->value,
             ];
         }
 
-        if ($this->project->background->type === BackgroundTypeEnum::GRADIENT) {
+        if ($this->project?->background?->type === BackgroundTypeEnum::GRADIENT) {
             $this->validateBackgroundGradient();
 
-            $body['body']['background'] = [
+            $body['json']['background'] = [
                 'type' => BackgroundTypeEnum::GRADIENT->value,
                 'name' => $this->project->background->name->value,
             ];
         }
 
         if ($this->project->background === null) {
-            $body['body']['background'] = null;
+            $body['json']['background'] = null;
         }
 
-        if ($this->project->backgroundImage === null) {
-            $body['body']['backgroundImage'] = null;
+        if ($this->project?->backgroundImage === null) {
+            $body['json']['backgroundImage'] = null;
         }
 
         return $body;

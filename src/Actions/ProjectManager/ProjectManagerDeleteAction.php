@@ -14,10 +14,8 @@ final class ProjectManagerDeleteAction implements ActionInterface, AuthenticateI
 {
     use AuthenticateTrait, ProjectManagerHydrateTrait;
 
-    public function __construct(
-        string $token,
-        private readonly string $projectManagerId
-    ) {
+    public function __construct(private readonly string $projectManagerId, string $token)
+    {
         $this->setToken($token);
     }
 

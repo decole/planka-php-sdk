@@ -15,9 +15,9 @@ final class CommentCreateAction implements ActionInterface, AuthenticateInterfac
     use AuthenticateTrait, CommentHydrateTrait;
 
     public function __construct(
-        string $token,
         private readonly string $cardId,
-        private readonly string $text
+        private readonly string $text,
+        string $token
     ) {
         $this->setToken($token);
     }

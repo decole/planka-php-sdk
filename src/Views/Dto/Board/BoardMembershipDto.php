@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Planka\Bridge\Views\Dto\Board;
 
 use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
-use DateTimeImmutable;
 use Planka\Bridge\Enum\BoardMembershipRoleEnum;
+use DateTimeImmutable;
 
 final class BoardMembershipDto implements OutputDtoInterface
 {

@@ -14,7 +14,7 @@ final class BackgroundDtoFactory implements OutputInterface
     /**
      * @param array{
      *     type: string,
-     *     name: ?string
+     *     name?: ?string
      * }|null $data
      * @return ?BackgroundDto
      */

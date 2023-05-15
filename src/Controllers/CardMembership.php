@@ -22,9 +22,9 @@ final class CardMembership
     public function add(string $cardId, string $userId): CardMembershipDto
     {
         return $this->client->post(new CardMembershipCreateAction(
-            token: $this->config->getAuthToken(),
             cardId: $cardId,
-            userId: $userId
+            userId: $userId,
+            token: $this->config->getAuthToken()
         ));
     }
 
@@ -32,9 +32,9 @@ final class CardMembership
     public function remove(string $cardId, string $userId): CardMembershipDto
     {
         return $this->client->delete(new CardMembershipDeleteAction(
-            token: $this->config->getAuthToken(),
             cardId: $cardId,
-            userId: $userId
+            userId: $userId,
+            token: $this->config->getAuthToken()
         ));
     }
 }

@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Planka\Bridge\Traits;
 
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Planka\Bridge\Views\Factory\Notification\NotificationItemDtoFactory;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
-use Planka\Bridge\Views\Factory\Notification\NotificationItemDtoFactory;
 use Planka\Bridge\Views\Dto\Notification\NotificationItemDto;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Planka\Bridge\Exceptions\ResponseException;

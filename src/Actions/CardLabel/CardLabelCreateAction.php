@@ -15,9 +15,9 @@ final class CardLabelCreateAction implements ActionInterface, AuthenticateInterf
     use AuthenticateTrait, CardLabelHydrateTrait;
 
     public function __construct(
-        string $token,
         private readonly string $cardId,
-        private readonly string $labelId
+        private readonly string $labelId,
+        string $token
     ) {
         $this->setToken($token);
     }

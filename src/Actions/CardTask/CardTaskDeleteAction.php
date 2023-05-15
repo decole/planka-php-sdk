@@ -14,10 +14,8 @@ final class CardTaskDeleteAction implements ActionInterface, AuthenticateInterfa
 {
     use AuthenticateTrait, CardTaskHydrateTrait;
 
-    public function __construct(
-        string $token,
-        private readonly string $taskId,
-    ) {
+    public function __construct(private readonly string $taskId, string $token)
+    {
         $this->setToken($token);
     }
 

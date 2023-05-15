@@ -16,11 +16,11 @@ final class LabelCreateAction implements ActionInterface, AuthenticateInterface,
     use AuthenticateTrait, LabelHydrateTrait;
 
     public function __construct(
-        string $token,
         private readonly string $boardId,
         private readonly string $name,
         private readonly LabelColorEnum $color,
-        private readonly int $position
+        private readonly int $position,
+        string $token
     ) {
         $this->setToken($token);
     }

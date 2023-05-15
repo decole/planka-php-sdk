@@ -22,9 +22,9 @@ final class UserUpdateAvatarAction implements ActionInterface, AuthenticateInter
      * @throws FileExistException
      */
     public function __construct(
-        string $token,
         private readonly UserDto $user,
-        private readonly string $file
+        private readonly string $file,
+        string $token
     ) {
         $this->setToken($token);
 

@@ -14,10 +14,8 @@ final class AttachmentDeleteAction implements ActionInterface, AuthenticateInter
 {
     use AuthenticateTrait, AttachmentHydrateTrait;
 
-    public function __construct(
-        string $token,
-        private readonly string $attachmentId
-    ) {
+    public function __construct(private readonly string $attachmentId, string $token)
+    {
         $this->setToken($token);
     }
 

@@ -15,9 +15,9 @@ final class CommentUpdateAction implements ActionInterface, AuthenticateInterfac
     use AuthenticateTrait, CommentHydrateTrait;
 
     public function __construct(
-        string $token,
         private readonly string $commentId,
-        private readonly string $text
+        private readonly string $text,
+        string $token
     ) {
         $this->setToken($token);
     }

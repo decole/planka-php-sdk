@@ -36,21 +36,21 @@ final class Project
     /** 'POST /api/projects' */
     public function create(string $name): ProjectDto
     {
-        return $this->client->post(new ProjectCreateAction(token: $this->config->getAuthToken(), name: $name));
+        return $this->client->post(new ProjectCreateAction(name: $name, token: $this->config->getAuthToken()));
     }
 
     /** 'GET /api/projects/:id' */
     public function get(string $projectId): ProjectDto
     {
-        return $this->client->get(new ProjectViewAction(token: $this->config->getAuthToken(), projectId: $projectId));
+        return $this->client->get(new ProjectViewAction(projectId: $projectId, token: $this->config->getAuthToken()));
     }
 
     /** 'PATCH /api/projects/:id' */
     public function update(ProjectDto $project): ProjectDto
     {
         return $this->client->patch(new ProjectUpdateAction(
-            token: $this->config->getAuthToken(),
             project: $project,
+            token: $this->config->getAuthToken(),
         ));
     }
 
@@ -58,8 +58,8 @@ final class Project
     public function delete(string $projectId): ProjectDto
     {
         return $this->client->delete(new ProjectDeleteAction(
-            token: $this->config->getAuthToken(),
-            projectId: $projectId
+            projectId: $projectId,
+            token: $this->config->getAuthToken()
         ));
     }
 
@@ -70,9 +70,9 @@ final class Project
     public function updateBackgroundImage(string $projectId, string $file): ProjectDto
     {
         return $this->client->post(new ProjectUpdateBackgroundImageAction(
-            token: $this->config->getAuthToken(),
             projectId: $projectId,
-            file: $file
+            file: $file,
+            token: $this->config->getAuthToken()
         ));
     }
 }

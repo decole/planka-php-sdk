@@ -23,9 +23,9 @@ final class ProjectUpdateBackgroundImageAction implements ActionInterface,
      * @throws FileExistException
      */
     public function __construct(
-        string $token,
         private readonly string $projectId,
-        private readonly string $file
+        private readonly string $file,
+        string $token
     ) {
         $this->setToken($token);
 

@@ -6,5 +6,6 @@ interface ActionInterface
 {
     public function url(): string;
 
+    /** @return list<mixed> */
     public function getOptions(): array;
 }

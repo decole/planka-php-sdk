@@ -39,13 +39,27 @@ final class BoardIncludedDtoFactory implements OutputInterface
      *     cardMemberships: array,
      *     cardLabels: array,
      *     tasks: array,
-     *     attachments: array,
+     *     attachments: array{
+     *         id: string,
+     *         createdAt: string,
+     *         updatedAt: ?string,
+     *         name: string,
+     *         cardId: string,
+     *         url: string,
+     *         coverUrl: ?string,
+     *         creatorUserId: string,
+     *         image: array{height: int, width: int}
+     *     }|null,
      *     projects: array
-     * } $data
-     * @return BoardIncludedDto
+     * }|null $data
+     * @return BoardIncludedDto|null
      */
-    public function create(array $data): BoardIncludedDto
+    public function create(?array $data): ?BoardIncludedDto
     {
+        if ($data === null) {
+            return null;
+        }
+
         return new BoardIncludedDto(
             users: $this->getUsers($data),
             boardMemberships: $this->getBoardMemberships($data),
@@ -139,7 +153,7 @@ final class BoardIncludedDtoFactory implements OutputInterface
     }
 
     /**
-     * @return list<AttachmentDto>
+     * @return list<AttachmentDto>|array
      */
     private function getAttachments(array $data): array
     {

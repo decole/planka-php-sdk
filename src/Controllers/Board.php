@@ -24,10 +24,10 @@ final class Board
     public function create(string $projectId, string $name, int $position): BoardDto
     {
         return $this->client->post(new BoardCreateAction(
-            token: $this->config->getAuthToken(),
             projectId: $projectId,
             name: $name,
-            position: $position
+            position: $position,
+            token: $this->config->getAuthToken()
         ));
     }
 
@@ -41,15 +41,15 @@ final class Board
     public function update(string $boardId, string $name): BoardDto
     {
         return $this->client->patch(new BoardUpdateAction(
-            token: $this->config->getAuthToken(),
             boardId: $boardId,
-            name: $name
+            name: $name,
+            token: $this->config->getAuthToken()
         ));
     }
 
     /** 'DELETE /api/boards/:id' */
     public function delete(string $boardId): BoardDto
     {
-        return $this->client->delete(new BoardDeleteAction(token: $this->config->getAuthToken(), boardId: $boardId));
+        return $this->client->delete(new BoardDeleteAction(boardId: $boardId, token: $this->config->getAuthToken()));
     }
 }

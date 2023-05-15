@@ -16,10 +16,10 @@ final class BoardMembershipAddAction implements ActionInterface, AuthenticateInt
     use AuthenticateTrait, BoardMembershipHydrateTrait;
 
     public function __construct(
-        string $token,
         private readonly string $boardId,
         private readonly string $userId,
-        private readonly BoardMembershipRoleEnum $role
+        private readonly BoardMembershipRoleEnum $role,
+        string $token
     ) {
         $this->setToken($token);
     }

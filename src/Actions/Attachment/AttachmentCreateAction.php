@@ -21,9 +21,9 @@ final class AttachmentCreateAction implements ActionInterface, AuthenticateInter
      * @throws FileExistException
      */
     public function __construct(
-        string $token,
         private readonly string $cardId,
-        private readonly string $file
+        private readonly string $file,
+        string $token
     ) {
         $this->setToken($token);
 

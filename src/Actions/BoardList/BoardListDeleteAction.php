@@ -14,10 +14,8 @@ final class BoardListDeleteAction implements ActionInterface, AuthenticateInterf
 {
     use AuthenticateTrait, BoardListHydrateTrait;
 
-    public function __construct(
-        string $token,
-        private readonly string $listId,
-    ) {
+    public function __construct(private readonly string $listId, string $token)
+    {
         $this->setToken($token);
     }
 

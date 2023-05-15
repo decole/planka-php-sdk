@@ -23,10 +23,10 @@ final class BoardList
     public function create(string $boardId, string $name, int $position): BoardListDto
     {
         return $this->client->post(new BoardListCreateAction(
-            token: $this->config->getAuthToken(),
             boardId: $boardId,
             name: $name,
-            position: $position
+            position: $position,
+            token: $this->config->getAuthToken()
         ));
     }
 
@@ -34,15 +34,15 @@ final class BoardList
     public function update(string $listId, string $name): BoardListDto
     {
         return $this->client->patch(new BoardListUpdateAction(
-            token: $this->config->getAuthToken(),
             listId: $listId,
-            name: $name
+            name: $name,
+            token: $this->config->getAuthToken()
         ));
     }
 
     /** 'DELETE /api/lists/:id' */
     public function delete(string $listId): BoardListDto
     {
-        return $this->client->delete(new BoardListDeleteAction(token: $this->config->getAuthToken(), listId: $listId));
+        return $this->client->delete(new BoardListDeleteAction(listId: $listId, token: $this->config->getAuthToken()));
     }
 }
