@@ -4,7 +4,7 @@
     "description": "An easy-to-use PHP Class for accessing Planka's API.",
     "keywords": ["planka", "api"],
     "homepage": "https://github.com/decole/planka-php-sdk",
-    "license": "BSD",
+    "license": "AGPL-3.0",
     "authors": [
         {
             "name": "Galochkin Sergey",
@@ -29,6 +29,7 @@
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
+    "version": "1.0.0",
     "require-dev": {
         "symfony/var-dumper": "^6.2",
         "vimeo/psalm": "^5.11"
