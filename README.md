@@ -9,8 +9,7 @@ Implemented all entrypoints for the bar version **1.10.3** and later.
 
 ## Install
 
-`composer require decole/planka-php-sdk
-`
+`composer require decole/planka-php-sdk`
 
 
 ## How to use
@@ -42,6 +41,7 @@ var_dump($result);
 ```
 
 You can test this bundle for Rest API with a test script, in the folder/tests/index.php
+
 Copy [config.example.php](tests/config.example.php) for `config.php` and customize to your
 planka credentials.
 
