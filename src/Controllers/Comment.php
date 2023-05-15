@@ -23,9 +23,9 @@ final class Comment
     public function add(string $cardId, string $text): CommentDto
     {
         return $this->client->post(new CommentCreateAction(
-            token: $this->config->getAuthToken(),
             cardId: $cardId,
-            text: $text
+            text: $text,
+            token: $this->config->getAuthToken()
         ));
     }
 
@@ -33,9 +33,9 @@ final class Comment
     public function update(string $commentId, string $text): CommentDto
     {
         return $this->client->patch(new CommentUpdateAction(
-            token: $this->config->getAuthToken(),
             commentId: $commentId,
-            text: $text
+            text: $text,
+            token: $this->config->getAuthToken()
         ));
     }
 
@@ -43,8 +43,8 @@ final class Comment
     public function remove(string $commentId): CommentDto
     {
         return $this->client->delete(new CommentDeleteAction(
-            token: $this->config->getAuthToken(),
-            commentId: $commentId
+            commentId: $commentId,
+            token: $this->config->getAuthToken()
         ));
     }
 }

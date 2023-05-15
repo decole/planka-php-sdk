@@ -24,36 +24,34 @@ final class Card
     public function create(string $listId, string $name, int $position): CardDto
     {
         return $this->client->post(new CardCreateAction(
-            token: $this->config->getAuthToken(),
             listId: $listId,
             name: $name,
-            position: $position
+            position: $position,
+            token: $this->config->getAuthToken()
         ));
     }
 
     /** 'GET /api/cards/:id' */
     public function get(string $cardId): CardDto
     {
-        return $this->client->get(new CardViewAction(token: $this->config->getAuthToken(), cardId: $cardId));
+        return $this->client->get(new CardViewAction(cardId: $cardId, token: $this->config->getAuthToken()));
     }
 
     /** 'PATCH /api/cards/:id' */
-    public function update(string $cardId, CardDto $card): CardDto
+    public function update(CardDto $card): CardDto
     {
         return $this->client->patch(new CardUpdateAction(
-            token: $this->config->getAuthToken(),
-            cardId: $cardId,
-            card: $card
+            card: $card,
+            token: $this->config->getAuthToken()
         ));
     }
 
     /** 'PATCH /api/cards/:id' */
-    public function addSpentTime(string $cardId, CardDto $card, int $seconds): CardDto
+    public function addSpentTime(CardDto $card, int $seconds): CardDto
     {
         return $this->client->patch(new CardUpdateAction(
-            token: $this->config->getAuthToken(),
-            cardId: $cardId,
             card: $card,
+            token: $this->config->getAuthToken(),
             spentSeconds: $seconds
         ));
     }
@@ -61,6 +59,6 @@ final class Card
     /** 'DELETE /api/cards/:id' */
     public function delete(string $cardId): void
     {
-        $this->client->delete(new CardDeleteAction(token: $this->config->getAuthToken(), cardId: $cardId));
+        $this->client->delete(new CardDeleteAction(cardId: $cardId, token: $this->config->getAuthToken()));
     }
 }

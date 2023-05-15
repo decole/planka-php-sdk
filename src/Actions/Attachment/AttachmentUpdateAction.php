@@ -15,9 +15,9 @@ final class AttachmentUpdateAction implements ActionInterface, AuthenticateInter
     use AuthenticateTrait, AttachmentHydrateTrait;
 
     public function __construct(
-        string $token,
         private readonly string $attachmentId,
-        private readonly string $name
+        private readonly string $name,
+        string $token
     ) {
         $this->setToken($token);
     }

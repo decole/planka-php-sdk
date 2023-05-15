@@ -23,10 +23,10 @@ final class CardTask
     public function create(string $cardId, string $name, int $position): CardTaskDto
     {
         return $this->client->post(new CardTaskCreateAction(
-            token: $this->config->getAuthToken(),
             cardId: $cardId,
             name: $name,
-            position: $position
+            position: $position,
+            token: $this->config->getAuthToken()
         ));
     }
 
@@ -34,14 +34,14 @@ final class CardTask
     public function update(CardTaskDto $task): CardTaskDto
     {
         return $this->client->patch(new CardTaskUpdateAction(
-            token: $this->config->getAuthToken(),
-            task: $task
+            task: $task,
+            token: $this->config->getAuthToken()
         ));
     }
 
     /** 'DELETE /api/tasks/:id' */
     public function delete(string $taskId): CardTaskDto
     {
-        return $this->client->delete(new CardTaskDeleteAction(token: $this->config->getAuthToken(), taskId: $taskId));
+        return $this->client->delete(new CardTaskDeleteAction(taskId: $taskId, token: $this->config->getAuthToken()));
     }
 }

@@ -24,11 +24,11 @@ final class Label
     public function create(string $boardId, string $name, LabelColorEnum $color, int $position): LabelDto
     {
         return $this->client->post(new LabelCreateAction(
-            token: $this->config->getAuthToken(),
             boardId: $boardId,
             name: $name,
             color: $color,
-            position: $position
+            position: $position,
+            token: $this->config->getAuthToken()
         ));
     }
 
@@ -36,16 +36,16 @@ final class Label
     public function update(string $labelId, string $name, LabelColorEnum $color): LabelDto
     {
         return $this->client->patch(new LabelUpdateAction(
-            token: $this->config->getAuthToken(),
             labelId: $labelId,
             name: $name,
-            color: $color
+            color: $color,
+            token: $this->config->getAuthToken()
         ));
     }
 
     /** 'DELETE /api/labels/:id' */
     public function delete(string $labelId): LabelDto
     {
-        return $this->client->delete(new LabelDeleteAction(token: $this->config->getAuthToken(), labelId: $labelId));
+        return $this->client->delete(new LabelDeleteAction(labelId: $labelId, token: $this->config->getAuthToken()));
     }
 }

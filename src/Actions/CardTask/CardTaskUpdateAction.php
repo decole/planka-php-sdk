@@ -15,10 +15,8 @@ final class CardTaskUpdateAction implements ActionInterface, AuthenticateInterfa
 {
     use AuthenticateTrait, CardTaskHydrateTrait;
 
-    public function __construct(
-        string $token,
-        private readonly CardTaskDto $task
-    ) {
+    public function __construct(private readonly CardTaskDto $task, string $token)
+    {
         $this->setToken($token);
     }
 

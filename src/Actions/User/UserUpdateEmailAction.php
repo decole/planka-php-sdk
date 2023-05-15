@@ -15,10 +15,8 @@ final class UserUpdateEmailAction implements ActionInterface, AuthenticateInterf
 {
     use AuthenticateTrait, UserHydrateTrait;
 
-    public function __construct(
-        string $token,
-        private readonly UserDto $user,
-    ) {
+    public function __construct(private readonly UserDto $user, string $token)
+    {
         $this->setToken($token);
     }
 

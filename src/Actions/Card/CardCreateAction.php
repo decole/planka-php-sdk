@@ -15,10 +15,10 @@ final class CardCreateAction implements ActionInterface, AuthenticateInterface, 
     use AuthenticateTrait, CardHydrateTrait;
 
     public function __construct(
-        string $token,
         private readonly string $listId,
         private readonly string $name,
-        private readonly int $position
+        private readonly int $position,
+        string $token
     ) {
         $this->setToken($token);
     }

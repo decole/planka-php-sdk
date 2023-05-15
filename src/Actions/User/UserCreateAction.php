@@ -15,11 +15,11 @@ final class UserCreateAction implements ActionInterface, AuthenticateInterface, 
     use AuthenticateTrait, UserHydrateTrait;
 
     public function __construct(
-        string $token,
         private readonly string $email,
         private readonly string $name,
         private readonly string $password,
-        private readonly string $username
+        private readonly string $username,
+        string $token,
     ) {
         $this->setToken($token);
     }

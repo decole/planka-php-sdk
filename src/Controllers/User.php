@@ -39,47 +39,47 @@ final class User
     public function create(string $email, string $name, string $password, string $username): UserDto
     {
         return $this->client->post(new UserCreateAction(
-            token: $this->config->getAuthToken(),
             email: $email,
             name: $name,
             password: $password,
-            username: $username
+            username: $username,
+            token: $this->config->getAuthToken()
         ));
     }
 
     /** 'GET /api/users/:id' */
     public function get(string $id): UserDto
     {
-        return $this->client->get(new UserViewAction(token: $this->config->getAuthToken(), id: $id));
+        return $this->client->get(new UserViewAction(id: $id, token: $this->config->getAuthToken()));
     }
 
     /** 'PATCH /api/users/:id' */
     public function update(UserDto $dto): UserDto
     {
-        return $this->client->patch(new UserUpdateAction(token: $this->config->getAuthToken(), user: $dto));
+        return $this->client->patch(new UserUpdateAction(user: $dto, token: $this->config->getAuthToken()));
     }
 
     /** 'PATCH /api/users/:id/email' */
     public function updateEmail(UserDto $dto): UserDto
     {
-        return $this->client->patch(new UserUpdateEmailAction(token: $this->config->getAuthToken(), user: $dto));
+        return $this->client->patch(new UserUpdateEmailAction(user: $dto, token: $this->config->getAuthToken()));
     }
 
     /** 'PATCH /api/users/:id/password' */
     public function updatePassword(string $id, string $current, string $new): UserDto
     {
         return $this->client->patch(new UserUpdatePasswordAction(
-            token: $this->config->getAuthToken(),
             userId: $id,
             current: $current,
-            new: $new
+            new: $new,
+            token: $this->config->getAuthToken()
         ));
     }
 
     /** 'PATCH /api/users/:id/username' */
     public function updateUsername(UserDto $dto): UserDto
     {
-        return $this->client->patch(new UserUpdateUsernameAction(token: $this->config->getAuthToken(), user: $dto));
+        return $this->client->patch(new UserUpdateUsernameAction(user: $dto, token: $this->config->getAuthToken()));
     }
 
     /**
@@ -89,15 +89,15 @@ final class User
     public function updateAvatar(UserDto $dto, string $file): UserDto
     {
         return $this->client->post(new UserUpdateAvatarAction(
-            token: $this->config->getAuthToken(),
             user: $dto,
-            file: $file
+            file: $file,
+            token: $this->config->getAuthToken()
         ));
     }
 
     /** 'DELETE /api/users/:id' */
     public function delete(UserDto $dto): UserDto
     {
-        return $this->client->delete(new UserDeleteAction(token: $this->config->getAuthToken(), user: $dto));
+        return $this->client->delete(new UserDeleteAction(user: $dto, token: $this->config->getAuthToken()));
     }
 }

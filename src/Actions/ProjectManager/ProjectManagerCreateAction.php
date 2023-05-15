@@ -15,9 +15,9 @@ final class ProjectManagerCreateAction implements ActionInterface, AuthenticateI
     use AuthenticateTrait, ProjectManagerHydrateTrait;
 
     public function __construct(
-        string $token,
         private readonly string $projectId,
-        private readonly string $userId
+        private readonly string $userId,
+        string $token
     ) {
         $this->setToken($token);
     }

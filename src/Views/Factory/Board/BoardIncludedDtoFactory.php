@@ -51,11 +51,15 @@ final class BoardIncludedDtoFactory implements OutputInterface
      *         image: array{height: int, width: int}
      *     }|null,
      *     projects: array
-     * } $data
-     * @return BoardIncludedDto
+     * }|null $data
+     * @return BoardIncludedDto|null
      */
-    public function create(array $data): BoardIncludedDto
+    public function create(?array $data): ?BoardIncludedDto
     {
+        if ($data === null) {
+            return null;
+        }
+
         return new BoardIncludedDto(
             users: $this->getUsers($data),
             boardMemberships: $this->getBoardMemberships($data),

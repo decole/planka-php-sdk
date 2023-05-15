@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Planka\Bridge\Views\Factory\Label;
 
 use Planka\Bridge\Contracts\Factory\OutputInterface;
-use Planka\Bridge\Enum\LabelColorEnum;
 use Planka\Bridge\Traits\DateConverterTrait;
 use Planka\Bridge\Views\Dto\Label\LabelDto;
+use Planka\Bridge\Enum\LabelColorEnum;
 
 final class LabelDtoFactory implements OutputInterface
 {

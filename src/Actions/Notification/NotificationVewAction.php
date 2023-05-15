@@ -14,10 +14,8 @@ final class NotificationVewAction implements ActionInterface, AuthenticateInterf
 {
     use AuthenticateTrait, NotificationHydrateTrait;
 
-    public function __construct(
-        string $token,
-        private readonly string $notifyId
-    ) {
+    public function __construct(private readonly string $notifyId, string $token)
+    {
         $this->setToken($token);
     }
 

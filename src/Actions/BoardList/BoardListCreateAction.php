@@ -15,10 +15,10 @@ final class BoardListCreateAction implements ActionInterface, AuthenticateInterf
     use AuthenticateTrait, BoardListHydrateTrait;
 
     public function __construct(
-        string $token,
         private readonly string $boardId,
         private readonly string $name,
-        private readonly int $position
+        private readonly int $position,
+        string $token
     ) {
         $this->setToken($token);
     }

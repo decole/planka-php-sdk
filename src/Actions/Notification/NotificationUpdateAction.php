@@ -23,9 +23,9 @@ final class NotificationUpdateAction implements ActionInterface, AuthenticateInt
     use AuthenticateTrait;
 
     public function __construct(
-        string $token,
         private readonly array $notifyIdList,
-        private readonly bool $isRead
+        private readonly bool $isRead,
+        string $token
     ) {
         $this->setToken($token);
     }

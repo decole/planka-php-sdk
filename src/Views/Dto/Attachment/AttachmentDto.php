@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Views\Dto\Attachment;
 
-use DateTimeImmutable;
 use Planka\Bridge\Views\Dto\Image\ImageDto;
+use DateTimeImmutable;
 
 class AttachmentDto
 {

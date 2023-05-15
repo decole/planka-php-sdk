@@ -14,7 +14,7 @@ final class LabelDeleteAction implements ActionInterface, AuthenticateInterface,
 {
     use AuthenticateTrait, LabelHydrateTrait;
 
-    public function __construct(string $token, private readonly string $labelId)
+    public function __construct(private readonly string $labelId, string $token)
     {
         $this->setToken($token);
     }

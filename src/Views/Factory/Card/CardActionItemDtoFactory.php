@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Planka\Bridge\Views\Factory\Card;
 
 use Planka\Bridge\Contracts\Factory\OutputInterface;
-use Planka\Bridge\Enum\CommentTypeEnum;
-use Planka\Bridge\Traits\DateConverterTrait;
 use Planka\Bridge\Views\Dto\Card\CardActionItemDto;
+use Planka\Bridge\Traits\DateConverterTrait;
+use Planka\Bridge\Enum\CommentTypeEnum;
 
 final class CardActionItemDtoFactory implements OutputInterface
 {

@@ -15,10 +15,10 @@ final class UserUpdatePasswordAction implements ActionInterface, AuthenticateInt
     use AuthenticateTrait, UserHydrateTrait;
 
     public function __construct(
-        string $token,
         private readonly string $userId,
         private readonly string $current,
-        private readonly string $new
+        private readonly string $new,
+        string $token
     ) {
         $this->setToken($token);
     }

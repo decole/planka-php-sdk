@@ -1,44 +1,68 @@
-Что еще надо сделать:
-
-- [ ] private readonly впереди локальных переменных в конструкторе
-- [ ] написать документацию для других
-- [ ] сделать через анонимные функции создание контроллеров.
-- [ ] сделать скрипт, который будет автоматически выполнять все запросы. создавать тестовый проект, карточки, борды и удалять их. а так же прикрепленные файлы.
-- [ ] зарегистрировать либу в композер хабе.
-- [ ] написать планкоделам, что я сделал пыш(х)ную обертку
-
-
 # PHP PLANKA REST API
 
-Обертка над rest api проекта Planka
+Wrapper over the rest api of the Planka (https://github.com/plankanban/planka)
+
+Tested on Planka version **1.10.3**
+
+Implemented all entrypoints for the bar version **1.10.3** and later.
+
+
+## Install
+
+`composer require decole/planka-php-sdk
+`
+
+
+## How to use
 
 See /src/[PlankaClient.php](src/PlankaClient.php)
 
 ```php
 <?php
 
-use Planka\Bridge\PlankaClient;use Planka\Bridge\TransportClients\Client;
+use Planka\Bridge\PlankaClient;
+use Planka\Bridge\TransportClients\Client;
 
 require __DIR__ . '/vendor/autoload.php';
 
 $config = new Config(
     user: 'login',
-    password: 'Z#M**********"j',
+    password: '***************',
     baseUri: 'http://192.168.1.101', // https://your.domain.com
     port: 3000                       // 443
 );
+
 $planka = new PlankaClient($config);
+
 $planka->authenticate();
 
-$result = $planka->board->get(745435921242915851);
+$result = $client->project->list();
+
 var_dump($result);
 ```
 
-## RTFM
+You can test this bundle for Rest API with a test script, in the folder/tests/index.php
+Copy [config.example.php](tests/config.example.php) for `config.php` and customize to your
+planka credentials.
 
-- Planka - https://github.com/plankanban/planka
-- HTTP client lib: https://symfony.com/doc/current/http_client.html#authentication
+In the test script, comments describe what is being done and the project, board and card are also created and carried 
+out with them manipulations, at the end of the card, board and project are deleted.
+
+All necessary entrypoints are conveniently divided into controllers. You can view the controllers 
+in the `src/Controllers/` folder.
+
+Result data output is strongly typed and returned in Dto objects
+
 
 ## For develop
 
-`./vendor/bin/psalm --no-cache --no-file-cache`
+### RTFM
+
+- Planka - https://github.com/plankanban/planka
+- HTTP client lib: https://symfony.com/doc/current/http_client.html
+
+
+### Static analyze code
+Psalm analyze: `./vendor/bin/psalm --no-cache --no-file-cache`
+
+Or if you use linux, use `make psalm`

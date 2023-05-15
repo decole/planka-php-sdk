@@ -14,10 +14,8 @@ final class CardViewAction implements ActionInterface, AuthenticateInterface, Re
 {
     use AuthenticateTrait, CardHydrateTrait;
 
-    public function __construct(
-        string $token,
-        private readonly string $cardId,
-    ) {
+    public function __construct(private readonly string $cardId, string $token)
+    {
         $this->setToken($token);
     }
 

@@ -12,10 +12,8 @@ final class CardDeleteAction implements ActionInterface, AuthenticateInterface
 {
     use AuthenticateTrait;
 
-    public function __construct(
-        string $token,
-        private readonly string $cardId,
-    ) {
+    public function __construct(private readonly string $cardId, string $token)
+    {
         $this->setToken($token);
     }
 

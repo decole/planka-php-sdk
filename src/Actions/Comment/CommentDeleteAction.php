@@ -14,10 +14,8 @@ final class CommentDeleteAction implements ActionInterface, AuthenticateInterfac
 {
     use AuthenticateTrait, CommentHydrateTrait;
 
-    public function __construct(
-        string $token,
-        private readonly string $commentId
-    ) {
+    public function __construct(private readonly string $commentId, string $token)
+    {
         $this->setToken($token);
     }
 

@@ -27,9 +27,9 @@ final class Attachment
     public function upload(string $cardId, string $file): AttachmentDto
     {
         return $this->client->post(new AttachmentCreateAction(
-            token: $this->config->getAuthToken(),
             cardId: $cardId,
-            file: $file
+            file: $file,
+            token: $this->config->getAuthToken()
         ));
     }
 
@@ -37,9 +37,9 @@ final class Attachment
     public function updateName(string $attachmentId, string $name): AttachmentDto
     {
         return $this->client->patch(new AttachmentUpdateAction(
-            token: $this->config->getAuthToken(),
             attachmentId: $attachmentId,
-            name: $name
+            name: $name,
+            token: $this->config->getAuthToken()
         ));
     }
 
@@ -47,8 +47,8 @@ final class Attachment
     public function delete(string $attachmentId): AttachmentDto
     {
         return $this->client->delete(new AttachmentDeleteAction(
-            token: $this->config->getAuthToken(),
-            attachmentId: $attachmentId
+            attachmentId: $attachmentId,
+            token: $this->config->getAuthToken()
         ));
     }
 }

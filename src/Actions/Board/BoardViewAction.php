@@ -14,7 +14,7 @@ final class BoardViewAction implements ActionInterface, AuthenticateInterface, R
 {
     use AuthenticateTrait, BoardHydrateTrait;
 
-    public function __construct(string $token, private readonly string $boardId)
+    public function __construct(private readonly string $boardId, string $token)
     {
         $this->setToken($token);
     }

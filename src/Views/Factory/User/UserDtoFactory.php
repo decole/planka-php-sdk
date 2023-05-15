@@ -36,6 +36,7 @@ final class UserDtoFactory implements OutputInterface
             id: $data['id'],
             createdAt: $this->convertToDateTime($data['createdAt']),
             updatedAt: $this->convertToDateTime($data['updatedAt']),
+            deletedAt: $this->convertToDateTime($data['deletedAt']),
             email: $data['email'],
             isAdmin: (bool)$data['isAdmin'],
             name: $data['name'],
@@ -44,7 +45,6 @@ final class UserDtoFactory implements OutputInterface
             organization: $data['organization'],
             language: $data['language'],
             subscribeToOwnCards: (bool)$data['subscribeToOwnCards'],
-            deletedAt: $this->convertToDateTime($data['deletedAt']),
             avatarUrl: $data['avatarUrl'] ?? null
         );
     }

@@ -15,9 +15,9 @@ final class CardMembershipCreateAction implements ActionInterface, AuthenticateI
     use AuthenticateTrait, CardMembershipHydrateTrait;
 
     public function __construct(
-        string $token,
         private readonly string $cardId,
-        private readonly string $userId
+        private readonly string $userId,
+        string $token
     ) {
         $this->setToken($token);
     }

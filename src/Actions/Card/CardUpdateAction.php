@@ -16,9 +16,8 @@ final class CardUpdateAction implements ActionInterface, AuthenticateInterface, 
     use AuthenticateTrait, CardHydrateTrait;
 
     public function __construct(
-        string $token,
-        private readonly string $cardId,
         private readonly CardDto $card,
+        string $token,
         private readonly ?int $spentSeconds = null
     ) {
         $this->setToken($token);
@@ -26,7 +25,7 @@ final class CardUpdateAction implements ActionInterface, AuthenticateInterface, 
 
     public function url(): string
     {
-        return "api/cards/{$this->cardId}";
+        return "api/cards/{$this->card->id}";
     }
 
     public function getOptions(): array
@@ -42,15 +41,22 @@ final class CardUpdateAction implements ActionInterface, AuthenticateInterface, 
             ];
         }
 
-        return [
-            'body' => [
+        $body = [
+            'json' => [
                 'name' => $this->card->name,
                 'description' => $this->card->description,
-                'dueDate' => $this->card->dueDate?->format('Y-m-d\TH:i:s.v\Z'),
+                'dueDate' => $this->card?->dueDate?->format('Y-m-d\TH:i:s.v\Z'),
                 'listId' => $this->card->listId,
                 'position' => $this->card->position,
+                'stopwatch'
             ],
         ];
+
+        if ($this->card->stopwatch === null) {
+            $body['json']['stopwatch'] = null;
+        }
+
+        return $body;
     }
 
     private function getTotalTime(): int

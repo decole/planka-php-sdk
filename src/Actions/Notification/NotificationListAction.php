@@ -21,9 +21,8 @@ final class NotificationListAction implements ActionInterface, AuthenticateInter
 {
     use AuthenticateTrait;
 
-    public function __construct(
-        string $token,
-    ) {
+    public function __construct(string $token)
+    {
         $this->setToken($token);
     }
 

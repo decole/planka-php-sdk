@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Controllers;
 
-use Planka\Bridge\Actions\BoardMembership\BoardMembershipAddAction;
 use Planka\Bridge\Actions\BoardMembership\BoardMembershipDeleteAction;
 use Planka\Bridge\Actions\BoardMembership\BoardMembershipUpdateAction;
+use Planka\Bridge\Actions\BoardMembership\BoardMembershipAddAction;
+use Planka\Bridge\Views\Dto\Board\BoardMembershipDto;
 use Planka\Bridge\Enum\BoardMembershipRoleEnum;
 use Planka\Bridge\TransportClients\Client;
 use Planka\Bridge\Config;
-use Planka\Bridge\Views\Dto\Board\BoardMembershipDto;
 
 final class BoardMembership
 {
@@ -24,10 +24,10 @@ final class BoardMembership
     public function add(string $boardId, string $userId, BoardMembershipRoleEnum $role): BoardMembershipDto
     {
         return $this->client->post(new BoardMembershipAddAction(
-            token: $this->config->getAuthToken(),
             boardId: $boardId,
             userId: $userId,
-            role: $role
+            role: $role,
+            token: $this->config->getAuthToken()
         ));
     }
 
@@ -38,9 +38,9 @@ final class BoardMembership
         bool $canComment = true
     ): BoardMembershipDto {
         return $this->client->patch(new BoardMembershipUpdateAction(
-            token: $this->config->getAuthToken(),
             membershipId: $membershipId,
             role: $role,
+            token: $this->config->getAuthToken(),
             canComment: $canComment
         ));
     }
@@ -49,8 +49,8 @@ final class BoardMembership
     public function delete(string $membership): BoardMembershipDto
     {
         return $this->client->delete(new BoardMembershipDeleteAction(
-            token: $this->config->getAuthToken(),
-            membership: $membership
+            membership: $membership,
+            token: $this->config->getAuthToken()
         ));
     }
 }

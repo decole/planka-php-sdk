@@ -6,9 +6,9 @@ namespace Planka\Bridge\Controllers;
 
 use Planka\Bridge\Actions\CardLabel\CardLabelCreateAction;
 use Planka\Bridge\Actions\CardLabel\CardLabelDeleteAction;
-use Planka\Bridge\Config;
-use Planka\Bridge\TransportClients\Client;
 use Planka\Bridge\Views\Dto\Card\CardLabelDto;
+use Planka\Bridge\TransportClients\Client;
+use Planka\Bridge\Config;
 
 final class CardLabel
 {
@@ -22,9 +22,9 @@ final class CardLabel
     public function add(string $cardId, string $labelId): CardLabelDto
     {
         return $this->client->post(new CardLabelCreateAction(
-            token: $this->config->getAuthToken(),
             cardId: $cardId,
-            labelId: $labelId
+            labelId: $labelId,
+            token: $this->config->getAuthToken()
         ));
     }
 
@@ -32,9 +32,9 @@ final class CardLabel
     public function remove(string $cardId, string $labelId): CardLabelDto
     {
         return $this->client->delete(new CardLabelDeleteAction(
-            token: $this->config->getAuthToken(),
             cardId: $cardId,
-            labelId: $labelId
+            labelId: $labelId,
+            token: $this->config->getAuthToken()
         ));
     }
 }

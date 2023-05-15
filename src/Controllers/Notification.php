@@ -29,11 +29,11 @@ final class Notification
     /**
      * 'GET /api/notifications/:id'
      */
-    public function getOne(string $notifyId)
+    public function getOne(string $notifyId): NotificationItemDto
     {
         return $this->client->get(new NotificationVewAction(
-            token: $this->config->getAuthToken(),
-            notifyId: $notifyId
+            notifyId: $notifyId,
+            token: $this->config->getAuthToken()
         ));
     }
 
@@ -44,9 +44,9 @@ final class Notification
     public function markIsRead(array $notifyIdList): array
     {
         return $this->client->patch(new NotificationUpdateAction(
-            token: $this->config->getAuthToken(),
             notifyIdList: $notifyIdList,
-            isRead: true
+            isRead: true,
+            token: $this->config->getAuthToken()
         ));
     }
 
@@ -57,9 +57,9 @@ final class Notification
     public function markIsNotRead(array $notifyIdList): array
     {
         return $this->client->patch(new NotificationUpdateAction(
-            token: $this->config->getAuthToken(),
             notifyIdList: $notifyIdList,
-            isRead: false
+            isRead: false,
+            token: $this->config->getAuthToken()
         ));
     }
 }

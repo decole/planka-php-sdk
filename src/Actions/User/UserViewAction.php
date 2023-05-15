@@ -14,7 +14,7 @@ final class UserViewAction implements ActionInterface, AuthenticateInterface, Re
 {
     use AuthenticateTrait, UserHydrateTrait;
 
-    public function __construct(string $token, private readonly string $id)
+    public function __construct(private readonly string $id, string $token)
     {
         $this->setToken($token);
     }

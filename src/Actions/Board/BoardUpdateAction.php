@@ -14,8 +14,11 @@ final class BoardUpdateAction implements ActionInterface, AuthenticateInterface,
 {
     use AuthenticateTrait, BoardHydrateTrait;
 
-    public function __construct(string $token, private readonly string $boardId, private readonly string $name)
-    {
+    public function __construct(
+        private readonly string $boardId,
+        private readonly string $name,
+        string $token
+    ) {
         $this->setToken($token);
     }
 

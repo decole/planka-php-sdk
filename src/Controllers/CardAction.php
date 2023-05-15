@@ -20,6 +20,6 @@ final class CardAction
     /** 'GET /api/cards/:cardId/actions' */
     public function getActions(string $cardId): CardActionListDto
     {
-        return $this->client->get(new CardActionViewAction(token: $this->config->getAuthToken(), cardId: $cardId));
+        return $this->client->get(new CardActionViewAction(cardId: $cardId, token: $this->config->getAuthToken()));
     }
 }

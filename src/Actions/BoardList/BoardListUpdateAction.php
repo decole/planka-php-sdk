@@ -15,9 +15,9 @@ final class BoardListUpdateAction implements ActionInterface, AuthenticateInterf
     use AuthenticateTrait, BoardListHydrateTrait;
 
     public function __construct(
-        string $token,
         private readonly string $listId,
-        private readonly string $name
+        private readonly string $name,
+        string $token
     ) {
         $this->setToken($token);
     }
