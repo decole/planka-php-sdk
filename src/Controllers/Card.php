@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Controllers;
 
+use Planka\Bridge\Actions\Card\CardClearDueDateAction;
 use Planka\Bridge\Actions\Card\CardCreateAction;
 use Planka\Bridge\Actions\Card\CardDeleteAction;
+use Planka\Bridge\Actions\Card\CardMoveAction;
 use Planka\Bridge\Actions\Card\CardUpdateAction;
 use Planka\Bridge\Actions\Card\CardViewAction;
 use Planka\Bridge\TransportClients\Client;
@@ -41,6 +43,24 @@ final class Card
     public function update(CardDto $card): CardDto
     {
         return $this->client->patch(new CardUpdateAction(
+            card: $card,
+            token: $this->config->getAuthToken()
+        ));
+    }
+
+    /** 'PATCH /api/cards/:id' */
+    public function clearTime(CardDto $card): CardDto
+    {
+        return $this->client->patch(new CardClearDueDateAction(
+            card: $card,
+            token: $this->config->getAuthToken()
+        ));
+    }
+
+    /** 'PATCH /api/cards/:id' */
+    public function moveCard(CardDto $card): CardDto
+    {
+        return $this->client->patch(new CardMoveAction(
             card: $card,
             token: $this->config->getAuthToken()
         ));

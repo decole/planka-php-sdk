@@ -52,11 +52,13 @@ $client->project->update($projectGet);
 // add board
 $board = $client->board->create($projectGet->id, 'testCard', 1);
 $boardGet = $client->board->get($board->item->id);
+$boardOther = $client->board->create($projectGet->id, 'archive', 2);
 
 $client->board->update($boardGet->item->id, 'romb');
 
 // add board list
 $list = $client->boardList->create($boardGet->item->id, 'one', 1);
+$listOther = $client->boardList->create($boardOther->item->id, 'archive', 22);
 
 // add card
 $card = $client->card->create($list->id, 'card', 1);
@@ -72,11 +74,22 @@ $cardGet->isSubscribed = true;
 $cardGet->description = 'ok!';
 $client->card->update($cardGet);
 
+// test moving to other board
+$card->boardId = $boardOther->item->id;
+$card->listId = $listOther->id;
+$card->position = 33;
+$client->card->moveCard($card);
+
+$card->boardId = $board->item->id;
+$card->listId = $list->id;
+$card->position = 1;
+$client->card->moveCard($card);
+
 // add spend worked time to card
 $client->card->addSpentTime($cardGet, 290);
+
 // remove spend time
-$cardGet->stopwatch = null;
-$client->card->update($cardGet);
+$client->card->clearTime($cardGet);
 
 // get history action by card
 $client->cardAction->getActions($cardGet->id);
@@ -119,12 +132,14 @@ foreach ($boardGet->included->tasks as $task) {
 $boardGet = $client->board->get($boardGet->item->id);
 $user = $boardGet->included->users[0];
 $member = $client->cardMembership->add($cardGet->id, $user->id);
+
 // remove member
 $client->cardMembership->remove($cardGet->id, $user->id);
 
 // card due Date
 $cardGet->dueDate = (new DateTimeImmutable())->modify('+ 1 year');
 $client->card->update($cardGet);
+
 // remove due date
 $cardGet->dueDate = null;
 $client->card->update($cardGet);

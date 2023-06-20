@@ -48,7 +48,6 @@ final class CardUpdateAction implements ActionInterface, AuthenticateInterface, 
                 'dueDate' => $this->card?->dueDate?->format('Y-m-d\TH:i:s.v\Z'),
                 'listId' => $this->card->listId,
                 'position' => $this->card->position,
-                'stopwatch'
             ],
         ];
 
