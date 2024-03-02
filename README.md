@@ -37,7 +37,7 @@ $planka = new PlankaClient($config);
 
 $planka->authenticate();
 
-$result = $client->project->list();
+$result = $planka->project->list();
 
 var_dump($result);
 ```
