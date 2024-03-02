@@ -22,7 +22,7 @@ final class UserUpdateEmailAction implements ActionInterface, AuthenticateInterf
 
     public function url(): string
     {
-        return "api/users/{$this->user->id}}/email";
+        return "api/users/{$this->user->id}/email";
     }
 
     public function getOptions(): array
