@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Planka\Bridge\Controllers;
 
 use Planka\Bridge\Actions\Card\CardClearDueDateAction;
+use Planka\Bridge\Actions\Card\CardTimerAction;
 use Planka\Bridge\Actions\Card\CardCreateAction;
 use Planka\Bridge\Actions\Card\CardDeleteAction;
 use Planka\Bridge\Actions\Card\CardMoveAction;
@@ -73,6 +74,16 @@ final class Card
             card: $card,
             token: $this->config->getAuthToken(),
             spentSeconds: $seconds
+        ));
+    }
+
+    /** 'PATCH /api/cards/:id' */
+    public function triggerTimer(CardDto $card, bool $start): CardDto
+    {
+        return $this->client->patch(new CardTimerAction(
+            card: $card,
+            token: $this->config->getAuthToken(),
+            start: $start
         ));
     }
 

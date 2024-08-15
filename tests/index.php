@@ -74,6 +74,13 @@ $cardGet->isSubscribed = true;
 $cardGet->description = 'ok!';
 $client->card->update($cardGet);
 
+
+// start timer on card
+$client->card->triggerTimer($card, true);
+
+// stop timer on card
+$client->card->triggerTimer($card, false);
+
 // test moving to other board
 $card->boardId = $boardOther->item->id;
 $card->listId = $listOther->id;
