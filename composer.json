@@ -1,14 +1,14 @@
 {
-    "name": "airylinus/planka-php-sdk",
+    "name": "decole/planka-php-sdk",
     "type": "library",
-    "description": "An easy-to-use PHP Class for accessing Planka's API. Fork from decole/planka-php-sdk",
+    "description": "An easy-to-use PHP Class for accessing Planka's API.",
     "keywords": ["planka", "api"],
-    "homepage": "https://github.com/airylinus/planka-php-sdk",
+    "homepage": "https://github.com/decole/planka-php-sdk",
     "license": "AGPL-3.0",
     "authors": [
         {
-            "name": "Mongo Hsiung",
-            "email": "airy@live.com"
+            "name": "Galochkin Sergey",
+            "email": "decole@rambler.ru"
         }
     ],
     "require": {
@@ -29,7 +29,7 @@
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
-    "version": "1.1.3",
+    "version": "1.1.2",
     "require-dev": {
         "symfony/var-dumper": "^6.2",
         "vimeo/psalm": "^5.11"
