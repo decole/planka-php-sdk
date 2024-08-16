@@ -62,9 +62,10 @@ final class CardTimerAction implements ActionInterface, AuthenticateInterface, R
     {
         // pause condition
         if ($this->card->stopwatch) {
+            $diff = $this->card->stopwatch->total;
             return new StopWatchDto(
-                new DateTimeImmutable(),
-                $this->card->stopwatch->total
+                (new DateTimeImmutable())->modify("-{$diff} seconds"),
+                0
             );
         }
         return new StopWatchDto(new DateTimeImmutable(), 0);
