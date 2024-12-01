@@ -47,7 +47,7 @@ final class NotificationIncludedDtoFactory implements OutputInterface
     private function getCards(array $data): array
     {
         return map($data['cards'] ?? [],
-            fn(array $item) => (new CardDtoFactory())->create($item)
+            fn(array $item) => (new CardDtoFactory())->create(['item' => $item])
         );
     }
 

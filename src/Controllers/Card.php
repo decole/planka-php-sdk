@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Controllers;
 
+use Planka\Bridge\Actions\Card\CardUnsubscribeMembershipAction;
+use Planka\Bridge\Actions\Card\CardSubscribeMembershipAction;
 use Planka\Bridge\Actions\Card\CardClearDueDateAction;
-use Planka\Bridge\Actions\Card\CardTimerAction;
+use Planka\Bridge\Views\Dto\Card\CardMembershipDto;
 use Planka\Bridge\Actions\Card\CardCreateAction;
 use Planka\Bridge\Actions\Card\CardDeleteAction;
-use Planka\Bridge\Actions\Card\CardMoveAction;
 use Planka\Bridge\Actions\Card\CardUpdateAction;
+use Planka\Bridge\Actions\Card\CardTimerAction;
+use Planka\Bridge\Actions\Card\CardMoveAction;
 use Planka\Bridge\Actions\Card\CardViewAction;
 use Planka\Bridge\TransportClients\Client;
 use Planka\Bridge\Views\Dto\Card\CardDto;
@@ -91,5 +94,25 @@ final class Card
     public function delete(string $cardId): void
     {
         $this->client->delete(new CardDeleteAction(cardId: $cardId, token: $this->config->getAuthToken()));
+    }
+
+    /** 'POST /api/cards/:cardId/memberships' */
+    public function subscribe(string $cardId, string $userId): CardMembershipDto
+    {
+        return $this->client->post(new CardSubscribeMembershipAction(
+            cardId: $cardId,
+            userId: $userId,
+            token: $this->config->getAuthToken()
+        ));
+    }
+
+    /** 'DELETE /api/cards/:cardId/memberships' */
+    public function unsubscribe(string $cardId, string $userId): CardMembershipDto
+    {
+        return $this->client->delete(new CardUnsubscribeMembershipAction(
+            cardId: $cardId,
+            userId: $userId,
+            token: $this->config->getAuthToken()
+        ));
     }
 }

@@ -13,16 +13,18 @@ class CardDto implements OutputDtoInterface
         public readonly string $id,
         public readonly DateTimeImmutable $createdAt,
         public readonly ?DateTimeImmutable $updatedAt,
-        public readonly string $creatorUserId,
         public int $position,
         public string $name,
         public ?string $description,
         public ?DateTimeImmutable $dueDate,
+        public readonly ?bool $isDueDateCompleted,
         public ?StopWatchDto $stopwatch,
         public string $boardId,
         public string $listId,
+        public string $creatorUserId,
         public ?string $coverAttachmentId,
-        public bool $isSubscribed
+        public readonly bool $isSubscribed,
+        public readonly CardIncludedDto $included
     ) {
     }
 }

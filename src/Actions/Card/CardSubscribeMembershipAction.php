@@ -7,17 +7,16 @@ namespace Planka\Bridge\Actions\Card;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
 use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ActionInterface;
+use Planka\Bridge\Traits\CardMembershipHydrateTrait;
 use Planka\Bridge\Traits\AuthenticateTrait;
-use Planka\Bridge\Traits\CardHydrateTrait;
 
-final class CardCreateAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
+final class CardSubscribeMembershipAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait, CardHydrateTrait;
+    use AuthenticateTrait, CardMembershipHydrateTrait;
 
     public function __construct(
-        private readonly string $listId,
-        private readonly string $name,
-        private readonly int $position,
+        private readonly string $cardId,
+        private readonly string $userId,
         string $token
     ) {
         $this->setToken($token);
@@ -25,15 +24,14 @@ final class CardCreateAction implements ActionInterface, AuthenticateInterface, 
 
     public function url(): string
     {
-        return "api/lists/{$this->listId}/cards";
+        return "api/cards/{$this->cardId}/memberships";
     }
 
     public function getOptions(): array
     {
         return [
             'body' => [
-                'name' => $this->name,
-                'position' => $this->position,
+                'userId' => $this->userId,
             ],
         ];
     }
