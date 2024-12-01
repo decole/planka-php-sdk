@@ -14,9 +14,8 @@ final class CardLabel
 {
     public function __construct(
         private readonly Config $config,
-        private readonly Client $client
-    ) {
-    }
+        private readonly Client $client,
+    ) {}
 
     /** 'POST /api/cards/:cardId/labels' */
     public function add(string $cardId, string $labelId): CardLabelDto
@@ -24,7 +23,7 @@ final class CardLabel
         return $this->client->post(new CardLabelCreateAction(
             cardId: $cardId,
             labelId: $labelId,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 
@@ -34,7 +33,7 @@ final class CardLabel
         return $this->client->delete(new CardLabelDeleteAction(
             cardId: $cardId,
             labelId: $labelId,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 }

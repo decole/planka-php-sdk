@@ -10,7 +10,6 @@ class BackgroundImageDto implements OutputDtoInterface
 {
     public function __construct(
         public readonly string $url,
-        public readonly string $coverUrl
-    ) {
-    }
+        public readonly string $coverUrl,
+    ) {}
 }

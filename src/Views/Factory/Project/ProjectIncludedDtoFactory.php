@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Planka\Bridge\Views\Factory\Project;
 
@@ -12,6 +12,7 @@ use Planka\Bridge\Contracts\Factory\OutputInterface;
 use Planka\Bridge\Views\Factory\User\UserDtoFactory;
 use Planka\Bridge\Views\Dto\Board\BoardItemDto;
 use Planka\Bridge\Views\Dto\User\UserDto;
+
 use function Fp\Collection\map;
 
 final class ProjectIncludedDtoFactory implements OutputInterface
@@ -22,7 +23,7 @@ final class ProjectIncludedDtoFactory implements OutputInterface
             users: $this->getUsers($data),
             projectManagers: $this->getProjectManagers($data),
             boards: $this->getBoards($data),
-            boardMemberships: $this->getBoardMemberships($data)
+            boardMemberships: $this->getBoardMemberships($data),
         );
     }
 
@@ -55,7 +56,9 @@ final class ProjectIncludedDtoFactory implements OutputInterface
      */
     private function getBoardMemberships(array $data): array
     {
-        return map($data['boardMemberships'] ?? [],
-            fn(array $item) => (new BoardMembershipDtoFactory())->create($item));
+        return map(
+            $data['boardMemberships'] ?? [],
+            fn(array $item) => (new BoardMembershipDtoFactory())->create($item),
+        );
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Planka\Bridge\Actions\Project;
 
@@ -13,11 +13,13 @@ use Planka\Bridge\Traits\ProjectHydrateTrait;
 use Planka\Bridge\Traits\AuthenticateTrait;
 use Symfony\Component\Mime\Part\DataPart;
 
-final class ProjectUpdateBackgroundImageAction implements ActionInterface,
-                                                          AuthenticateInterface,
-                                                          ResponseResultInterface
+final class ProjectUpdateBackgroundImageAction implements
+    ActionInterface,
+    AuthenticateInterface,
+    ResponseResultInterface
 {
-    use AuthenticateTrait, ProjectHydrateTrait;
+    use AuthenticateTrait;
+    use ProjectHydrateTrait;
 
     /**
      * @throws FileExistException
@@ -25,7 +27,7 @@ final class ProjectUpdateBackgroundImageAction implements ActionInterface,
     public function __construct(
         private readonly string $projectId,
         private readonly string $file,
-        string $token
+        string $token,
     ) {
         $this->setToken($token);
 

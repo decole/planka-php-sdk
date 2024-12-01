@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Planka\Bridge\Enum;
 
 enum BackgroundGradientEnum: string
@@ -28,5 +30,5 @@ enum BackgroundGradientEnum: string
     case BLUEISH_CURVE = 'blueish-curve';
     case PRISM_LIGHT = 'prism-light';
     case GREEN_MIST = 'green-mist';
-    case RED_CURTAIN= 'red-curtain';
+    case RED_CURTAIN = 'red-curtain';
 }

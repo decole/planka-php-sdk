@@ -5,6 +5,7 @@ Wrapper over the rest api of the Planka (https://github.com/plankanban/planka)
 Tested on Planka version: 
  - 1.10.3
  - 1.11
+ - 1.24.3
 
 Implemented all entrypoints for the bar version **1.10.3** and later.
 
@@ -57,50 +58,11 @@ var_dump($result);
 ```
 
 
+## Examples
 
-### Example - Delete empty board
-
-```php
-<?php
-
-use Planka\Bridge\PlankaClient;
-use Planka\Bridge\TransportClients\Client;
-
-require __DIR__ . '/vendor/autoload.php';
-
-$config = new Config(
-    user: 'login',
-    password: '***************',
-    baseUri: 'http://192.168.1.101', // https://your.domain.com
-    port: 3000                       // 443
-);
-
-$planka = new PlankaClient($config);
-
-$planka->authenticate();
-
-// Only projects and boards assigned to your user are available
-$dto = $planka->project->list();
-
-//        dd($dto->items); // list projects
-
-// the list will only contain boards available to your user
-$boards = $dto->included->boards;
-
-/** @var BoardItemDto $item */
-foreach ($boards as $item) {
-    // we request each board separately
-    $board = $planka->board->get($item->id);
-
-    // list of board cards
-    $cardList = $board->included->cards;
-
-    if (empty($cardList)) {
-        // removing a board without cards
-        $planka->board->delete($item->id);
-    }
-}
-```
+- [Delete empty board](docs/DELETE_EMPTY_BOARD.md)
+- [Create new card on board.md](docs/ADD_NEW_CARD_ON_BOARD.md)
+- [Subscribe user to card.md](docs/SUBSCRIBE_MEMBERSHIP_TO_CARD.md)
 
 You can test this bundle for Rest API with a test script, in the folder `/tests/index.php`. 
 There you will find the main examples of using the script.

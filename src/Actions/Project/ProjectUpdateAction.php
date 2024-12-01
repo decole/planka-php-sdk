@@ -15,7 +15,8 @@ use Planka\Bridge\Enum\BackgroundTypeEnum;
 
 final class ProjectUpdateAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait, ProjectHydrateTrait;
+    use AuthenticateTrait;
+    use ProjectHydrateTrait;
 
     public function __construct(private readonly ProjectDto $project, string $token)
     {
@@ -38,7 +39,7 @@ final class ProjectUpdateAction implements ActionInterface, AuthenticateInterfac
             ],
         ];
 
-        if ($this->project?->background?->type === BackgroundTypeEnum::IMAGE) {
+        if (BackgroundTypeEnum::IMAGE === $this->project?->background?->type) {
             $this->validateBackgroundImage();
 
             $body['json']['background'] = [
@@ -46,7 +47,7 @@ final class ProjectUpdateAction implements ActionInterface, AuthenticateInterfac
             ];
         }
 
-        if ($this->project?->background?->type === BackgroundTypeEnum::GRADIENT) {
+        if (BackgroundTypeEnum::GRADIENT === $this->project?->background?->type) {
             $this->validateBackgroundGradient();
 
             $body['json']['background'] = [
@@ -55,11 +56,11 @@ final class ProjectUpdateAction implements ActionInterface, AuthenticateInterfac
             ];
         }
 
-        if ($this->project->background === null) {
+        if (null === $this->project->background) {
             $body['json']['background'] = null;
         }
 
-        if ($this->project?->backgroundImage === null) {
+        if (null === $this->project?->backgroundImage) {
             $body['json']['backgroundImage'] = null;
         }
 
@@ -71,7 +72,7 @@ final class ProjectUpdateAction implements ActionInterface, AuthenticateInterfac
      */
     private function validateBackgroundImage(): void
     {
-        if ($this->project->backgroundImage === null) {
+        if (null === $this->project->backgroundImage) {
             throw new ValidateException('Empty image data for backgroundImage parameter');
         }
     }
@@ -81,7 +82,7 @@ final class ProjectUpdateAction implements ActionInterface, AuthenticateInterfac
      */
     private function validateBackgroundGradient(): void
     {
-        if ($this->project->background->name === null) {
+        if (null === $this->project->background->name) {
             throw new ValidateException('Select gradient name by gradient background');
         }
     }

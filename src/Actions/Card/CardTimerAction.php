@@ -7,15 +7,15 @@ namespace Planka\Bridge\Actions\Card;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
 use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ActionInterface;
+use Planka\Bridge\Views\Dto\Card\StopWatchDto;
 use Planka\Bridge\Traits\AuthenticateTrait;
 use Planka\Bridge\Traits\CardHydrateTrait;
 use Planka\Bridge\Views\Dto\Card\CardDto;
-use Planka\Bridge\Views\Dto\Card\StopWatchDto;
-use DateTimeImmutable;
 
 final class CardTimerAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait, CardHydrateTrait;
+    use AuthenticateTrait;
+    use CardHydrateTrait;
 
     private bool $start;
 
@@ -42,18 +42,21 @@ final class CardTimerAction implements ActionInterface, AuthenticateInterface, R
 
         // stop timer
         if (!$this->start) {
-            $diff = time() - $this->card->stopwatch->startedAt->getTimestamp();
-            $total = $this->card->stopwatch->total + $diff;
-            $stopwatch = new StopWatchDto(null, $total);
-            
-            $this->card->stopwatch = $stopwatch;
+            if (null !== $this->card->stopwatch) {
+                $diff = time() - $this->card->stopwatch->startedAt->getTimestamp();
+                $total = $this->card->stopwatch->total + $diff;
+
+                $stopwatch = new StopWatchDto(null, $total);
+
+                $this->card->stopwatch = $stopwatch;
+            }
         }
 
         return [
             'json' => [
                 'stopwatch' => [
-                    "startedAt" => $startedAt,
-                    "total" => $total,
+                    'startedAt' => $startedAt,
+                    'total' => $total,
                 ],
             ],
         ];
@@ -65,9 +68,9 @@ final class CardTimerAction implements ActionInterface, AuthenticateInterface, R
         if ($this->card->stopwatch) {
             $diff = $this->card->stopwatch->total;
 
-            return new StopWatchDto((new DateTimeImmutable())->modify("-{$diff} seconds"), 0);
+            return new StopWatchDto((new \DateTimeImmutable())->modify("-{$diff} seconds"), 0);
         }
 
-        return new StopWatchDto(new DateTimeImmutable(), 0);
+        return new StopWatchDto(new \DateTimeImmutable(), 0);
     }
 }

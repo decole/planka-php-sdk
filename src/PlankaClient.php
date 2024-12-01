@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Planka\Bridge;
 
@@ -28,33 +28,47 @@ use Planka\Bridge\Controllers\Card;
 use Planka\Bridge\Controllers\User;
 
 /**
- * https://github.com/plankanban/planka/blob/master/server/config/routes.js
+ * https://github.com/plankanban/planka/blob/master/server/config/routes.js.
  */
 final class PlankaClient
 {
     public readonly Attachment $attachment;
+
     public readonly Board $board;
+
     public readonly BoardList $boardList;
+
     public readonly BoardMembership $boardMembership;
+
     public readonly Card $card;
+
     public readonly CardAction $cardAction;
+
     public readonly CardLabel $cardLabel;
+
     public readonly CardTask $cardTask;
+
     public readonly CardMembership $cardMembership;
+
     public readonly Comment $comment;
+
     public readonly Label $label;
+
     public readonly Notification $notification;
+
     public readonly Project $project;
+
     public readonly ProjectManager $projectManager;
+
     public readonly User $user;
 
     private readonly Client $client;
 
     public function __construct(
         private readonly Config $config,
-        ?Client $client = null
+        ?Client $client = null,
     ) {
-        if ($client === null) {
+        if (null === $client) {
             $client = new Client($this->config->getBaseUri(), $this->config->getPort());
         }
 
@@ -78,7 +92,8 @@ final class PlankaClient
     }
 
     /**
-     * 'POST /api/access-tokens'
+     * 'POST /api/access-tokens'.
+     *
      * @throws AuthenticateException
      */
     public function authenticate(): bool
@@ -97,7 +112,8 @@ final class PlankaClient
     }
 
     /**
-     * 'DELETE /api/access-tokens/me'
+     * 'DELETE /api/access-tokens/me'.
+     *
      * @throws AuthenticateException|LogoutException
      */
     public function logout(): void
@@ -106,7 +122,7 @@ final class PlankaClient
 
         $this->config->setAuthToken(null);
 
-        if ($response->getStatusCode() !== 200) {
+        if (200 !== $response->getStatusCode()) {
             throw new LogoutException($response->getContent());
         }
     }

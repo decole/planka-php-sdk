@@ -29,7 +29,7 @@ trait CardHydrateTrait
         $result = $response->toArray();
 
         if (array_key_exists('item', $result)) {
-            return (new CardDtoFactory())->create($result['item']);
+            return (new CardDtoFactory())->create($result);
         }
 
         throw new ResponseException($response->getContent());

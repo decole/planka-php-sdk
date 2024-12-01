@@ -12,7 +12,8 @@ use Planka\Bridge\Traits\AuthenticateTrait;
 
 final class CardTaskDeleteAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait, CardTaskHydrateTrait;
+    use AuthenticateTrait;
+    use CardTaskHydrateTrait;
 
     public function __construct(private readonly string $taskId, string $token)
     {

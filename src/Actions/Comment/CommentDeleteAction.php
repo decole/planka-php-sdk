@@ -12,7 +12,8 @@ use Planka\Bridge\Traits\AuthenticateTrait;
 
 final class CommentDeleteAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait, CommentHydrateTrait;
+    use AuthenticateTrait;
+    use CommentHydrateTrait;
 
     public function __construct(private readonly string $commentId, string $token)
     {

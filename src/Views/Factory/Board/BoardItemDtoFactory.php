@@ -21,17 +21,16 @@ final class BoardItemDtoFactory implements OutputInterface
      *     name: string,
      *     projectId: string
      * } $data
-     * @return BoardItemDto
      */
     public function create(array $data): BoardItemDto
     {
         return new BoardItemDto(
             id: $data['id'],
             projectId: $data['projectId'],
-            position: (int)$data['position'],
+            position: (int) $data['position'],
             name: $data['name'],
             createdAt: $this->convertToDateTime($data['createdAt']),
-            updatedAt: $this->convertToDateTime($data['updatedAt'])
+            updatedAt: $this->convertToDateTime($data['updatedAt']),
         );
     }
 }

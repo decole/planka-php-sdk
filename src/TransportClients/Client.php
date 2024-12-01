@@ -11,7 +11,7 @@ use Planka\Bridge\Contracts\Actions\ActionInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Component\HttpClient\HttpClient;
 
-class Client
+final class Client
 {
     private const URI_TEMPLATE = '%s:%u/%s';
 
@@ -20,20 +20,20 @@ class Client
     public function __construct(
         private readonly string $baseUri,
         private readonly int $port,
-        ?HttpClientInterface $client = null
+        ?HttpClientInterface $client = null,
     ) {
         $this->client = $client ?? HttpClient::create();
     }
 
     /**
-     * check throw to auth, and return authNotAuth exception
+     * check throw to auth, and return authNotAuth exception.
      */
     public function get(ActionInterface $action): mixed
     {
         $response = $this->client->request(
             method: 'GET',
             url: sprintf(self::URI_TEMPLATE, $this->baseUri, $this->port, $action->url()),
-            options: $this->compileOptions($action)
+            options: $this->compileOptions($action),
         );
 
         return $this->getResult($action, $response);
@@ -44,7 +44,7 @@ class Client
         $response = $this->client->request(
             method: 'POST',
             url: sprintf(self::URI_TEMPLATE, $this->baseUri, $this->port, $action->url()),
-            options: $this->compileOptions($action)
+            options: $this->compileOptions($action),
         );
 
         return $this->getResult($action, $response);
@@ -55,7 +55,7 @@ class Client
         $response = $this->client->request(
             method: 'PATCH',
             url: sprintf(self::URI_TEMPLATE, $this->baseUri, $this->port, $action->url()),
-            options: $this->compileOptions($action)
+            options: $this->compileOptions($action),
         );
 
         return $this->getResult($action, $response);
@@ -66,17 +66,12 @@ class Client
         $response = $this->client->request(
             method: 'DELETE',
             url: sprintf(self::URI_TEMPLATE, $this->baseUri, $this->port, $action->url()),
-            options: $this->compileOptions($action)
+            options: $this->compileOptions($action),
         );
 
         return $this->getResult($action, $response);
     }
 
-    /**
-     * @param ActionInterface $action
-     * @param ResponseInterface $response
-     * @return mixed
-     */
     private function getResult(ActionInterface $action, ResponseInterface $response): mixed
     {
         if ($action instanceof ResponseResultInterface) {

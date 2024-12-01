@@ -16,7 +16,6 @@ final class BackgroundDtoFactory implements OutputInterface
      *     type: string,
      *     name?: ?string
      * }|null $data
-     * @return ?BackgroundDto
      */
     public function create(?array $data): ?BackgroundDto
     {
@@ -26,7 +25,7 @@ final class BackgroundDtoFactory implements OutputInterface
 
         return new BackgroundDto(
             type: BackgroundTypeEnum::from($data['type']),
-            name: BackgroundGradientEnum::tryFrom($data['name'] ?? '')
+            name: BackgroundGradientEnum::tryFrom($data['name'] ?? ''),
         );
     }
 }

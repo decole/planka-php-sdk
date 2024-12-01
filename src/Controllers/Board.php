@@ -16,9 +16,8 @@ final class Board
 {
     public function __construct(
         private readonly Config $config,
-        private readonly Client $client
-    ) {
-    }
+        private readonly Client $client,
+    ) {}
 
     /** 'POST /api/projects/:projectId/boards' */
     public function create(string $projectId, string $name, int $position): BoardDto
@@ -27,7 +26,7 @@ final class Board
             projectId: $projectId,
             name: $name,
             position: $position,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 
@@ -43,7 +42,7 @@ final class Board
         return $this->client->patch(new BoardUpdateAction(
             boardId: $boardId,
             name: $name,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 // before run `composer install`
 
 use Planka\Bridge\Config;
@@ -8,7 +10,7 @@ use Planka\Bridge\PlankaClient;
 use Planka\Bridge\Views\Dto\Card\StopWatchDto;
 
 // copy config.example.php to config.php and setup for you
-$config = include(__DIR__.'/config.php');
+$config = include __DIR__ . '/config.php';
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -16,16 +18,16 @@ $config = new Config(
     user: $config['login'],
     password: $config['password'],
     baseUri: $config['uri'],
-    port: $config['port']
+    port: $config['port'],
 );
 $client = new PlankaClient($config);
 
-if($client->getInfo()->getStatusCode() !== 200) {
-    die('Planka server not connected!');
+if (200 !== $client->getInfo()->getStatusCode()) {
+    exit('Planka server not connected!');
 }
 
 if (!$client->authenticate()) {
-    die('User credentials not corrected!');
+    exit('User credentials not corrected!');
 }
 
 $filePath = __DIR__ . '/image.png';
@@ -41,7 +43,7 @@ $client->project->update($projectGet);
 try {
     $projectWithImage = $client->project->updateBackgroundImage($projectGet->id, $filePath);
 } catch (Throwable $exception) {
-    die('Upload image to project error');
+    exit('Upload image to project error');
 }
 
 // delete project background image
@@ -105,7 +107,7 @@ $client->cardAction->getActions($cardGet->id);
 try {
     $attachment = $client->attachment->upload($cardGet->id, $filePath);
 } catch (Throwable $exception) {
-    die('Upload attachment to card error');
+    exit('Upload attachment to card error');
 }
 
 // update name by attachment

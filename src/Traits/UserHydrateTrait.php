@@ -13,12 +13,14 @@ use Planka\Bridge\Views\Factory\User\UserDtoFactory;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Planka\Bridge\Exceptions\ResponseException;
 use Planka\Bridge\Views\Dto\User\UserDto;
+
 use function Fp\Collection\map;
 
 trait UserHydrateTrait
 {
     /**
      * @return list<UserDto>|UserDto
+     *
      * @throws ClientExceptionInterface
      * @throws DecodingExceptionInterface
      * @throws RedirectionExceptionInterface

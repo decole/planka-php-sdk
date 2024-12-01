@@ -13,9 +13,8 @@ final class CardAction
 {
     public function __construct(
         private readonly Config $config,
-        private readonly Client $client
-    ) {
-    }
+        private readonly Client $client,
+    ) {}
 
     /** 'GET /api/cards/:cardId/actions' */
     public function getActions(string $cardId): CardActionListDto

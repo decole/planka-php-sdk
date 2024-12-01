@@ -13,7 +13,8 @@ use Planka\Bridge\Traits\AuthenticateTrait;
 
 final class CardTaskUpdateAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait, CardTaskHydrateTrait;
+    use AuthenticateTrait;
+    use CardTaskHydrateTrait;
 
     public function __construct(private readonly CardTaskDto $task, string $token)
     {

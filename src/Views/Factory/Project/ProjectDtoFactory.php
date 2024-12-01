@@ -23,7 +23,6 @@ final class ProjectDtoFactory implements OutputInterface
      *     background: array{type: string,name?: ?string}|null,
      *     backgroundImage: array{url: string, coverUrl: string}|null
      * } $data
-     * @return ProjectDto
      */
     public function create(array $data): ProjectDto
     {
@@ -33,7 +32,7 @@ final class ProjectDtoFactory implements OutputInterface
             updatedAt: $this->convertToDateTime($data['updatedAt']),
             name: $data['name'],
             background: (new BackgroundDtoFactory())->create($data['background'] ?? null),
-            backgroundImage: (new BackgroundImageDtoFactory())->create($data['backgroundImage'] ?? null)
+            backgroundImage: (new BackgroundImageDtoFactory())->create($data['backgroundImage'] ?? null),
         );
     }
 }

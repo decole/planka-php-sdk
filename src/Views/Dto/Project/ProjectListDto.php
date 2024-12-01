@@ -8,11 +8,9 @@ class ProjectListDto
 {
     /**
      * @param list<ProjectDto> $items
-     * @param ProjectIncludedDto $included
      */
     public function __construct(
         public readonly array $items,
-        public readonly ProjectIncludedDto $included
-    ) {
-    }
+        public readonly ProjectIncludedDto $included,
+    ) {}
 }

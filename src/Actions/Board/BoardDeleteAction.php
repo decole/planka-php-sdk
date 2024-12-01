@@ -12,7 +12,8 @@ use Planka\Bridge\Traits\BoardHydrateTrait;
 
 final class BoardDeleteAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait, BoardHydrateTrait;
+    use AuthenticateTrait;
+    use BoardHydrateTrait;
 
     public function __construct(private readonly string $boardId, string $token)
     {

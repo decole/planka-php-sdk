@@ -20,7 +20,7 @@ final class StopWatchDtoFactory implements OutputInterface
 
         return new StopWatchDto(
             startedAt: $this->convertToDateTime($data['startedAt']),
-            total: (int)$data['total']
+            total: (int) $data['total'],
         );
     }
 }

@@ -16,9 +16,8 @@ final class Label
 {
     public function __construct(
         private readonly Config $config,
-        private readonly Client $client
-    ) {
-    }
+        private readonly Client $client,
+    ) {}
 
     /** 'POST /api/boards/:boardId/labels' */
     public function create(string $boardId, string $name, LabelColorEnum $color, int $position): LabelDto
@@ -28,7 +27,7 @@ final class Label
             name: $name,
             color: $color,
             position: $position,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 
@@ -39,7 +38,7 @@ final class Label
             labelId: $labelId,
             name: $name,
             color: $color,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 

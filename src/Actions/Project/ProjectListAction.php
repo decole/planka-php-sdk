@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Planka\Bridge\Actions\Project;
 
@@ -29,7 +29,7 @@ final class ProjectListAction implements ActionInterface, AuthenticateInterface,
 
     public function url(): string
     {
-        return "api/projects";
+        return 'api/projects';
     }
 
     public function getOptions(): array
@@ -38,8 +38,6 @@ final class ProjectListAction implements ActionInterface, AuthenticateInterface,
     }
 
     /**
-     * @param ResponseInterface $response
-     * @return ProjectListDto
      * @throws ClientExceptionInterface
      * @throws DecodingExceptionInterface
      * @throws RedirectionExceptionInterface

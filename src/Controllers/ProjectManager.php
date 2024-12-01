@@ -17,12 +17,12 @@ final class ProjectManager
 {
     public function __construct(
         private readonly Config $config,
-        private readonly Client $client
-    ) {
-    }
+        private readonly Client $client,
+    ) {}
 
     /**
-     * 'POST /api/projects/:projectId/managers'
+     * 'POST /api/projects/:projectId/managers'.
+     *
      * @throws ResponseException|ValidateException
      */
     public function add(string $projectId, string $userId): ProjectManagerDto
@@ -31,10 +31,10 @@ final class ProjectManager
             return $this->client->post(new ProjectManagerCreateAction(
                 projectId: $projectId,
                 userId: $userId,
-                token: $this->config->getAuthToken()
+                token: $this->config->getAuthToken(),
             ));
         } catch (ClientException $exception) {
-            if ($exception->getCode() === 409) {
+            if (409 === $exception->getCode()) {
                 throw new ValidateException('User already joined to project managers');
             }
 
@@ -47,7 +47,7 @@ final class ProjectManager
     {
         return $this->client->delete(new ProjectManagerDeleteAction(
             projectManagerId: $managerId,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 }

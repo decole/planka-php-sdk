@@ -9,7 +9,6 @@ class NotificationIncludedDto
     public function __construct(
         public readonly array $users,
         public readonly array $cards,
-        public readonly array $actions
-    ) {
-    }
+        public readonly array $actions,
+    ) {}
 }

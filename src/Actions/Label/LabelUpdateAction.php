@@ -13,13 +13,14 @@ use Planka\Bridge\Enum\LabelColorEnum;
 
 final class LabelUpdateAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait, LabelHydrateTrait;
+    use AuthenticateTrait;
+    use LabelHydrateTrait;
 
     public function __construct(
         private readonly string $labelId,
         private readonly string $name,
         private readonly LabelColorEnum $color,
-        string $token
+        string $token,
     ) {
         $this->setToken($token);
     }

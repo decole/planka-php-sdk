@@ -21,7 +21,6 @@ final class ListDtoFactory implements OutputInterface
      *     name: string,
      *     boardId: string
      * } $data
-     * @return ListDto
      */
     public function create(array $data): ListDto
     {
@@ -30,8 +29,8 @@ final class ListDtoFactory implements OutputInterface
             boardId: $data['boardId'],
             createdAt: $this->convertToDateTime($data['createdAt']),
             updatedAt: $this->convertToDateTime($data['updatedAt']),
-            position: (int)$data['position'],
-            name: $data['name']
+            position: (int) $data['position'],
+            name: $data['name'],
         );
     }
 }

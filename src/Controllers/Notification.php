@@ -16,9 +16,8 @@ final class Notification
 {
     public function __construct(
         private readonly Config $config,
-        private readonly Client $client
-    ) {
-    }
+        private readonly Client $client,
+    ) {}
 
     /** 'GET /api/notifications' */
     public function list(): NotificationListDto
@@ -27,18 +26,19 @@ final class Notification
     }
 
     /**
-     * 'GET /api/notifications/:id'
+     * 'GET /api/notifications/:id'.
      */
     public function getOne(string $notifyId): NotificationItemDto
     {
         return $this->client->get(new NotificationVewAction(
             notifyId: $notifyId,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 
     /**
-     * 'PATCH /api/notifications/:ids'
+     * 'PATCH /api/notifications/:ids'.
+     *
      * @return list<NotificationItemDto>
      */
     public function markIsRead(array $notifyIdList): array
@@ -46,12 +46,13 @@ final class Notification
         return $this->client->patch(new NotificationUpdateAction(
             notifyIdList: $notifyIdList,
             isRead: true,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 
     /**
-     * 'PATCH /api/notifications/:ids'
+     * 'PATCH /api/notifications/:ids'.
+     *
      * @return list<NotificationItemDto>
      */
     public function markIsNotRead(array $notifyIdList): array
@@ -59,7 +60,7 @@ final class Notification
         return $this->client->patch(new NotificationUpdateAction(
             notifyIdList: $notifyIdList,
             isRead: false,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 }

@@ -23,7 +23,6 @@ final class CardActionItemDtoFactory implements OutputInterface
      *     cardId: string,
      *     userId: string
      * } $data
-     * @return CardActionItemDto
      */
     public function create(array $data): CardActionItemDto
     {

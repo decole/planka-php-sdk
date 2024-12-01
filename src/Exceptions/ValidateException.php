@@ -1,9 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Planka\Bridge\Exceptions;
 
-use Exception;
-
-class ValidateException extends Exception
-{
-}
+class ValidateException extends \Exception {}

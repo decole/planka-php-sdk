@@ -13,7 +13,8 @@ use Planka\Bridge\Traits\AuthenticateTrait;
 
 final class BoardMembershipUpdateAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait, BoardMembershipHydrateTrait;
+    use AuthenticateTrait;
+    use BoardMembershipHydrateTrait;
 
     public function __construct(
         private readonly string $membershipId,

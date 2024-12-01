@@ -16,7 +16,8 @@ use Planka\Bridge\Views\Dto\User\UserDto;
 
 final class UserUpdateAvatarAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait, UserHydrateTrait;
+    use AuthenticateTrait;
+    use UserHydrateTrait;
 
     /**
      * @throws FileExistException
@@ -24,7 +25,7 @@ final class UserUpdateAvatarAction implements ActionInterface, AuthenticateInter
     public function __construct(
         private readonly UserDto $user,
         private readonly string $file,
-        string $token
+        string $token,
     ) {
         $this->setToken($token);
 

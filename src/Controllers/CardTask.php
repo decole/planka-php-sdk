@@ -15,9 +15,8 @@ final class CardTask
 {
     public function __construct(
         private readonly Config $config,
-        private readonly Client $client
-    ) {
-    }
+        private readonly Client $client,
+    ) {}
 
     /** 'POST /api/cards/:cardId/tasks' */
     public function create(string $cardId, string $name, int $position): CardTaskDto
@@ -26,7 +25,7 @@ final class CardTask
             cardId: $cardId,
             name: $name,
             position: $position,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 
@@ -35,7 +34,7 @@ final class CardTask
     {
         return $this->client->patch(new CardTaskUpdateAction(
             task: $task,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 

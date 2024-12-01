@@ -16,8 +16,8 @@ final class ImageDtoFactory implements OutputInterface
         }
 
         return new ImageDto(
-            height: (int)$data['height'],
-            width: (int)$data['width']
+            height: (int) $data['height'],
+            width: (int) $data['width'],
         );
     }
 }

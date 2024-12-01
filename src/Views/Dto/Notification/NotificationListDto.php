@@ -8,11 +8,9 @@ class NotificationListDto
 {
     /**
      * @param list<NotificationItemDto> $items
-     * @param NotificationIncludedDto $included
      */
     public function __construct(
         public readonly array $items,
         public readonly NotificationIncludedDto $included,
-    ) {
-    }
+    ) {}
 }

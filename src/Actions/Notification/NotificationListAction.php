@@ -28,7 +28,7 @@ final class NotificationListAction implements ActionInterface, AuthenticateInter
 
     public function url(): string
     {
-        return "api/notifications";
+        return 'api/notifications';
     }
 
     public function getOptions(): array
