@@ -22,7 +22,7 @@ class CardDto implements OutputDtoInterface
         public string $listId,
         public string $creatorUserId,
         public ?string $coverAttachmentId,
-        public readonly bool $isSubscribed,
+        public bool $isSubscribed,
         public readonly CardIncludedDto $included,
     ) {}
 }

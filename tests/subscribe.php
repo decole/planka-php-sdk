@@ -81,7 +81,7 @@ foreach ($boardInfo->included->cards as $item) {
         ]),
     ];
 
-    dump($info);
+    var_dump($info);
 }
 
 // unsubscribe

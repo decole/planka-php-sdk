@@ -83,7 +83,7 @@ foreach ($boardInfo->included->cards as $item) {
         ]),
     ];
 
-    dump($info);
+    var_dump($info);
 }
 
 // If you need unsubscribe user on cards use this - $client->card->unsubscribe($cardId, $userId);

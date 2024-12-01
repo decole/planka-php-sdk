@@ -11,7 +11,7 @@ use Planka\Bridge\Contracts\Actions\ActionInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Component\HttpClient\HttpClient;
 
-class Client
+final class Client
 {
     private const URI_TEMPLATE = '%s:%u/%s';
 

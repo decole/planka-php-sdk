@@ -8,12 +8,12 @@ trait AuthenticateTrait
 {
     private string $token;
 
-    public function getToken(): string
+    final public function getToken(): string
     {
         return $this->token;
     }
 
-    public function setToken(string $token): void
+    final public function setToken(string $token): void
     {
         $this->token = $token;
     }
