@@ -12,13 +12,14 @@ use Planka\Bridge\Traits\CardHydrateTrait;
 
 final class CardCreateAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait, CardHydrateTrait;
+    use AuthenticateTrait;
+    use CardHydrateTrait;
 
     public function __construct(
         private readonly string $listId,
         private readonly string $name,
         private readonly int $position,
-        string $token
+        string $token,
     ) {
         $this->setToken($token);
     }

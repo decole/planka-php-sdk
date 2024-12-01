@@ -13,8 +13,7 @@ final class Config
         private readonly string $password,
         private readonly string $baseUri,
         private readonly int $port,
-    ) {
-    }
+    ) {}
 
     public function getUser(): string
     {

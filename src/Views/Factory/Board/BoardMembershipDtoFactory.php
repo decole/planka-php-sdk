@@ -23,7 +23,6 @@ final class BoardMembershipDtoFactory implements OutputInterface
      *     role: string,
      *     boardId: string
      * } $data
-     * @return BoardMembershipDto
      */
     public function create(array $data): BoardMembershipDto
     {
@@ -32,9 +31,9 @@ final class BoardMembershipDtoFactory implements OutputInterface
             createdAt: $this->convertToDateTime($data['createdAt']),
             updatedAt: $this->convertToDateTime($data['updatedAt']),
             userId: $data['userId'],
-            canComment: (bool)$data['canComment'],
+            canComment: (bool) $data['canComment'],
             role: BoardMembershipRoleEnum::from($data['role']),
-            boardId: $data['boardId']
+            boardId: $data['boardId'],
         );
     }
 }

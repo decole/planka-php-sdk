@@ -25,7 +25,6 @@ final class AttachmentDtoFactory implements OutputInterface
      *     creatorUserId: string,
      *     image: array{height: int, width: int}
      * }|null $data
-     * @return ?AttachmentDto
      */
     public function create(?array $data): ?AttachmentDto
     {
@@ -42,7 +41,7 @@ final class AttachmentDtoFactory implements OutputInterface
             createdAt: $this->convertToDateTime($data['createdAt']),
             updatedAt: $this->convertToDateTime($data['updatedAt']),
             coverUrl: $data['coverUrl'],
-            image: (new ImageDtoFactory())->create($data['image'] ?? null)
+            image: (new ImageDtoFactory())->create($data['image'] ?? null),
         );
     }
 }

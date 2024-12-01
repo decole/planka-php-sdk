@@ -16,6 +16,7 @@ use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ActionInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Planka\Bridge\Traits\AuthenticateTrait;
+
 use function Fp\Collection\map;
 
 final class NotificationUpdateAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
@@ -25,7 +26,7 @@ final class NotificationUpdateAction implements ActionInterface, AuthenticateInt
     public function __construct(
         private readonly array $notifyIdList,
         private readonly bool $isRead,
-        string $token
+        string $token,
     ) {
         $this->setToken($token);
     }
@@ -48,6 +49,7 @@ final class NotificationUpdateAction implements ActionInterface, AuthenticateInt
 
     /**
      * @return list<NotificationItemDto>
+     *
      * @throws ClientExceptionInterface
      * @throws DecodingExceptionInterface
      * @throws RedirectionExceptionInterface

@@ -12,7 +12,8 @@ use Planka\Bridge\Traits\AuthenticateTrait;
 
 final class ProjectCreateAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait, ProjectHydrateTrait;
+    use AuthenticateTrait;
+    use ProjectHydrateTrait;
 
     public function __construct(private readonly string $name, string $token)
     {
@@ -21,7 +22,7 @@ final class ProjectCreateAction implements ActionInterface, AuthenticateInterfac
 
     public function url(): string
     {
-        return "api/projects";
+        return 'api/projects';
     }
 
     public function getOptions(): array

@@ -12,7 +12,8 @@ use Planka\Bridge\Traits\CardHydrateTrait;
 
 final class CardViewAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait, CardHydrateTrait;
+    use AuthenticateTrait;
+    use CardHydrateTrait;
 
     public function __construct(private readonly string $cardId, string $token)
     {

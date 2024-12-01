@@ -13,12 +13,13 @@ use Planka\Bridge\Views\Dto\Card\CardDto;
 
 final class CardUpdateAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait, CardHydrateTrait;
+    use AuthenticateTrait;
+    use CardHydrateTrait;
 
     public function __construct(
         private readonly CardDto $card,
         string $token,
-        private readonly ?int $spentSeconds = null
+        private readonly ?int $spentSeconds = null,
     ) {
         $this->setToken($token);
     }
@@ -30,7 +31,7 @@ final class CardUpdateAction implements ActionInterface, AuthenticateInterface, 
 
     public function getOptions(): array
     {
-        if ($this->spentSeconds !== null) {
+        if (null !== $this->spentSeconds) {
             return [
                 'json' => [
                     'stopwatch' => [
@@ -51,7 +52,7 @@ final class CardUpdateAction implements ActionInterface, AuthenticateInterface, 
             ],
         ];
 
-        if ($this->card->stopwatch === null) {
+        if (null === $this->card->stopwatch) {
             $body['json']['stopwatch'] = null;
         }
 

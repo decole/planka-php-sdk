@@ -12,7 +12,8 @@ use Planka\Bridge\Traits\AuthenticateTrait;
 
 final class NotificationVewAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait, NotificationHydrateTrait;
+    use AuthenticateTrait;
+    use NotificationHydrateTrait;
 
     public function __construct(private readonly string $notifyId, string $token)
     {

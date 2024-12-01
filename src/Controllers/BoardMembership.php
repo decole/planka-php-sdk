@@ -16,9 +16,8 @@ final class BoardMembership
 {
     public function __construct(
         private readonly Config $config,
-        private readonly Client $client
-    ) {
-    }
+        private readonly Client $client,
+    ) {}
 
     /** 'POST /api/boards/:boardId/memberships' */
     public function add(string $boardId, string $userId, BoardMembershipRoleEnum $role): BoardMembershipDto
@@ -27,7 +26,7 @@ final class BoardMembership
             boardId: $boardId,
             userId: $userId,
             role: $role,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 
@@ -35,13 +34,13 @@ final class BoardMembership
     public function update(
         string $membershipId,
         BoardMembershipRoleEnum $role,
-        bool $canComment = true
+        bool $canComment = true,
     ): BoardMembershipDto {
         return $this->client->patch(new BoardMembershipUpdateAction(
             membershipId: $membershipId,
             role: $role,
             token: $this->config->getAuthToken(),
-            canComment: $canComment
+            canComment: $canComment,
         ));
     }
 
@@ -50,7 +49,7 @@ final class BoardMembership
     {
         return $this->client->delete(new BoardMembershipDeleteAction(
             membership: $membership,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 }

@@ -12,16 +12,15 @@ use Planka\Bridge\Views\Dto\User\UserDto;
 class ProjectIncludedDto
 {
     /**
-     * @param list<UserDto> $users
-     * @param list<ProjectManagerDto> $projectManagers
-     * @param list<BoardItemDto> $boards
+     * @param list<UserDto>            $users
+     * @param list<ProjectManagerDto>  $projectManagers
+     * @param list<BoardItemDto>       $boards
      * @param list<BoardMembershipDto> $boardMemberships
      */
     public function __construct(
         public array $users,
         public array $projectManagers,
         public array $boards,
-        public array $boardMemberships
-    ) {
-    }
+        public array $boardMemberships,
+    ) {}
 }

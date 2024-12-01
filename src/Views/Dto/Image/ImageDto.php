@@ -8,7 +8,6 @@ class ImageDto
 {
     public function __construct(
         public readonly int $height,
-        public readonly int $width
-    ) {
-    }
+        public readonly int $width,
+    ) {}
 }

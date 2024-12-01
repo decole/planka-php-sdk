@@ -9,16 +9,15 @@ use Planka\Bridge\Views\Dto\Attachment\AttachmentDto;
 class CardIncludedDto
 {
     /**
-     * @param list<CardMembershipDto> $cardMemberships
-     * @param list<CardLabelDto> $cardLabels
-     * @param list<CardTaskDto> $tasks
-     * @param list<AttachmentDto> $attachments
+     * @param list<CardMembershipDto|null> $cardMemberships
+     * @param list<CardLabelDto|null>      $cardLabels
+     * @param list<CardTaskDto|null>       $tasks
+     * @param list<AttachmentDto|null>     $attachments
      */
     public function __construct(
         public array $cardMemberships,
         public array $cardLabels,
         public array $tasks,
-        public array $attachments
-    ) {
-    }
+        public array $attachments,
+    ) {}
 }

@@ -15,7 +15,8 @@ use Symfony\Component\Mime\Part\DataPart;
 
 final class AttachmentCreateAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait, AttachmentHydrateTrait;
+    use AuthenticateTrait;
+    use AttachmentHydrateTrait;
 
     /**
      * @throws FileExistException
@@ -23,7 +24,7 @@ final class AttachmentCreateAction implements ActionInterface, AuthenticateInter
     public function __construct(
         private readonly string $cardId,
         private readonly string $file,
-        string $token
+        string $token,
     ) {
         $this->setToken($token);
 

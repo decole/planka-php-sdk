@@ -13,6 +13,5 @@ class BackgroundDto implements OutputDtoInterface
     public function __construct(
         public BackgroundTypeEnum $type,
         public ?BackgroundGradientEnum $name,
-    ) {
-    }
+    ) {}
 }

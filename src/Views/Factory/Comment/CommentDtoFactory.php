@@ -23,7 +23,6 @@ final class CommentDtoFactory implements OutputInterface
      *     cardId: string,
      *     userId: string
      * } $data
-     * @return CommentDto
      */
     public function create(array $data): CommentDto
     {
@@ -34,7 +33,7 @@ final class CommentDtoFactory implements OutputInterface
             cardId: $data['cardId'],
             userId: $data['userId'],
             type: CommentTypeEnum::from($data['type']),
-            dataText: $data['data']['text']
+            dataText: $data['data']['text'],
         );
     }
 }

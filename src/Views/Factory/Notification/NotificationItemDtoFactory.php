@@ -22,7 +22,6 @@ final class NotificationItemDtoFactory implements OutputInterface
      *     actionId: string,
      *     cardId: string
      * } $data
-     * @return NotificationItemDto
      */
     public function create(array $data): NotificationItemDto
     {
@@ -30,10 +29,10 @@ final class NotificationItemDtoFactory implements OutputInterface
             id: $data['id'],
             createdAt: $this->convertToDateTime($data['createdAt']),
             updatedAt: $this->convertToDateTime($data['updatedAt']),
-            isRead: (bool)$data['isRead'],
+            isRead: (bool) $data['isRead'],
             userId: $data['userId'],
             cardId: $data['cardId'],
-            actionId: $data['actionId']
+            actionId: $data['actionId'],
         );
     }
 }

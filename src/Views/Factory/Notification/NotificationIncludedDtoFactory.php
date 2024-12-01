@@ -12,6 +12,7 @@ use Planka\Bridge\Views\Factory\User\UserDtoFactory;
 use Planka\Bridge\Views\Dto\Card\CardActionItemDto;
 use Planka\Bridge\Views\Dto\Card\CardDto;
 use Planka\Bridge\Views\Dto\User\UserDto;
+
 use function Fp\Collection\map;
 
 final class NotificationIncludedDtoFactory implements OutputInterface
@@ -22,14 +23,13 @@ final class NotificationIncludedDtoFactory implements OutputInterface
      *     cards: array,
      *     actions: array
      * } $data
-     * @return NotificationIncludedDto
      */
     public function create(array $data): NotificationIncludedDto
     {
         return new NotificationIncludedDto(
             users: $this->getUsers($data),
             cards: $this->getCards($data),
-            actions: $this->getActions($data)
+            actions: $this->getActions($data),
         );
     }
 
@@ -46,8 +46,9 @@ final class NotificationIncludedDtoFactory implements OutputInterface
      */
     private function getCards(array $data): array
     {
-        return map($data['cards'] ?? [],
-            fn(array $item) => (new CardDtoFactory())->create(['item' => $item])
+        return map(
+            $data['cards'] ?? [],
+            fn(array $item) => (new CardDtoFactory())->create(['item' => $item]),
         );
     }
 
@@ -56,8 +57,9 @@ final class NotificationIncludedDtoFactory implements OutputInterface
      */
     private function getActions(array $data): array
     {
-        return map($data['actions'] ?? [],
-            fn(array $item) => (new CardActionItemDtoFactory())->create($item)
+        return map(
+            $data['actions'] ?? [],
+            fn(array $item) => (new CardActionItemDtoFactory())->create($item),
         );
     }
 }

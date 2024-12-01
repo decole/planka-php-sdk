@@ -11,11 +11,11 @@ use Planka\Bridge\Views\Dto\Card\StopWatchDto;
 use Planka\Bridge\Traits\AuthenticateTrait;
 use Planka\Bridge\Traits\CardHydrateTrait;
 use Planka\Bridge\Views\Dto\Card\CardDto;
-use DateTimeImmutable;
 
 final class CardTimerAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait, CardHydrateTrait;
+    use AuthenticateTrait;
+    use CardHydrateTrait;
 
     private bool $start;
 
@@ -42,7 +42,7 @@ final class CardTimerAction implements ActionInterface, AuthenticateInterface, R
 
         // stop timer
         if (!$this->start) {
-            if ($this->card->stopwatch !== null) {
+            if (null !== $this->card->stopwatch) {
                 $diff = time() - $this->card->stopwatch->startedAt->getTimestamp();
                 $total = $this->card->stopwatch->total + $diff;
 
@@ -55,8 +55,8 @@ final class CardTimerAction implements ActionInterface, AuthenticateInterface, R
         return [
             'json' => [
                 'stopwatch' => [
-                    "startedAt" => $startedAt,
-                    "total" => $total,
+                    'startedAt' => $startedAt,
+                    'total' => $total,
                 ],
             ],
         ];
@@ -68,9 +68,9 @@ final class CardTimerAction implements ActionInterface, AuthenticateInterface, R
         if ($this->card->stopwatch) {
             $diff = $this->card->stopwatch->total;
 
-            return new StopWatchDto((new DateTimeImmutable())->modify("-{$diff} seconds"), 0);
+            return new StopWatchDto((new \DateTimeImmutable())->modify("-{$diff} seconds"), 0);
         }
 
-        return new StopWatchDto(new DateTimeImmutable(), 0);
+        return new StopWatchDto(new \DateTimeImmutable(), 0);
     }
 }

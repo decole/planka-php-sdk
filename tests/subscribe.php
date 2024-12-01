@@ -7,10 +7,11 @@ declare(strict_types=1);
 use Planka\Bridge\Config;
 use Planka\Bridge\PlankaClient;
 use Planka\Bridge\Views\Dto\Card\CardMembershipDto;
+
 use function Fp\Collection\map;
 
 // copy config.example.php to config.php and setup for you
-$config = include(__DIR__.'/config.php');
+$config = include __DIR__ . '/config.php';
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -18,16 +19,16 @@ $config = new Config(
     user: $config['login'],
     password: $config['password'],
     baseUri: $config['uri'],
-    port: $config['port']
+    port: $config['port'],
 );
 $client = new PlankaClient($config);
 
-if($client->getInfo()->getStatusCode() !== 200) {
-    die('Planka server not connected!');
+if (200 !== $client->getInfo()->getStatusCode()) {
+    exit('Planka server not connected!');
 }
 
 if (!$client->authenticate()) {
-    die('User credentials not corrected!');
+    exit('User credentials not corrected!');
 }
 
 $list = $client->project->list();
@@ -59,7 +60,8 @@ foreach ($boardInfo->included->cards as $item) {
         $cardId = $item->id;
         // subscribe user on cards
         $client->card->subscribe($cardId, $userId);
-    } catch (Throwable $e) {}
+    } catch (Throwable $e) {
+    }
 }
 
 $boardInfo = $client->board->get($board->id);
@@ -93,5 +95,6 @@ foreach ($boardInfo->included->cards as $item) {
 
         // subscribe user on cards
         $client->card->unsubscribe($cardId, $userId);
-    } catch (Throwable $e) {}
+    } catch (Throwable $e) {
+    }
 }

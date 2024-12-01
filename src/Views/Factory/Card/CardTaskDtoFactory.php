@@ -22,7 +22,6 @@ final class CardTaskDtoFactory implements OutputInterface
      *     isCompleted: bool,
      *     cardId: string
      * } $data
-     * @return CardTaskDto
      */
     public function create(array $data): CardTaskDto
     {
@@ -30,10 +29,10 @@ final class CardTaskDtoFactory implements OutputInterface
             id: $data['id'],
             createdAt: $this->convertToDateTime($data['createdAt']),
             updatedAt: $this->convertToDateTime($data['updatedAt']),
-            position: (int)$data['position'],
+            position: (int) $data['position'],
             name: $data['name'],
-            isCompleted: (bool)$data['isCompleted'],
-            cardId: $data['cardId']
+            isCompleted: (bool) $data['isCompleted'],
+            cardId: $data['cardId'],
         );
     }
 }

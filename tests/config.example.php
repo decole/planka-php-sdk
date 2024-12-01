@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'uri' => 'http://192.168.1.2',
     'port' => 3000,

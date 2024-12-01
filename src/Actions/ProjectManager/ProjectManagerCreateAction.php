@@ -12,12 +12,13 @@ use Planka\Bridge\Traits\AuthenticateTrait;
 
 final class ProjectManagerCreateAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait, ProjectManagerHydrateTrait;
+    use AuthenticateTrait;
+    use ProjectManagerHydrateTrait;
 
     public function __construct(
         private readonly string $projectId,
         private readonly string $userId,
-        string $token
+        string $token,
     ) {
         $this->setToken($token);
     }

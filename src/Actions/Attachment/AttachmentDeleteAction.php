@@ -12,7 +12,8 @@ use Planka\Bridge\Traits\AuthenticateTrait;
 
 final class AttachmentDeleteAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait, AttachmentHydrateTrait;
+    use AuthenticateTrait;
+    use AttachmentHydrateTrait;
 
     public function __construct(private readonly string $attachmentId, string $token)
     {

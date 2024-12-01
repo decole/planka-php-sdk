@@ -15,7 +15,7 @@ final class AuthenticateAction implements ActionInterface
     {
         $formFields = [
             'emailOrUsername' => $username,
-            'password' => $password
+            'password' => $password,
         ];
         $formData = new FormDataPart($formFields);
         $this->options['headers'] = $formData->getPreparedHeaders()->toArray();

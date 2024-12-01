@@ -15,9 +15,8 @@ final class Comment
 {
     public function __construct(
         private readonly Config $config,
-        private readonly Client $client
-    ) {
-    }
+        private readonly Client $client,
+    ) {}
 
     /** 'POST /api/cards/:cardId/comment-actions' */
     public function add(string $cardId, string $text): CommentDto
@@ -25,7 +24,7 @@ final class Comment
         return $this->client->post(new CommentCreateAction(
             cardId: $cardId,
             text: $text,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 
@@ -35,7 +34,7 @@ final class Comment
         return $this->client->patch(new CommentUpdateAction(
             commentId: $commentId,
             text: $text,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 
@@ -44,7 +43,7 @@ final class Comment
     {
         return $this->client->delete(new CommentDeleteAction(
             commentId: $commentId,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 }

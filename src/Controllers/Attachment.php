@@ -16,12 +16,12 @@ final class Attachment
 {
     public function __construct(
         private readonly Config $config,
-        private readonly Client $client
-    ) {
-    }
+        private readonly Client $client,
+    ) {}
 
     /**
-     * 'POST /api/cards/:cardId/attachments'
+     * 'POST /api/cards/:cardId/attachments'.
+     *
      * @throws FileExistException
      */
     public function upload(string $cardId, string $file): AttachmentDto
@@ -29,7 +29,7 @@ final class Attachment
         return $this->client->post(new AttachmentCreateAction(
             cardId: $cardId,
             file: $file,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 
@@ -39,7 +39,7 @@ final class Attachment
         return $this->client->patch(new AttachmentUpdateAction(
             attachmentId: $attachmentId,
             name: $name,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 
@@ -48,7 +48,7 @@ final class Attachment
     {
         return $this->client->delete(new AttachmentDeleteAction(
             attachmentId: $attachmentId,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 }

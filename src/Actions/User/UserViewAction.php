@@ -12,7 +12,8 @@ use Planka\Bridge\Traits\UserHydrateTrait;
 
 final class UserViewAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait, UserHydrateTrait;
+    use AuthenticateTrait;
+    use UserHydrateTrait;
 
     public function __construct(private readonly string $id, string $token)
     {

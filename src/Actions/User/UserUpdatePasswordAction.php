@@ -12,13 +12,14 @@ use Planka\Bridge\Traits\UserHydrateTrait;
 
 final class UserUpdatePasswordAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait, UserHydrateTrait;
+    use AuthenticateTrait;
+    use UserHydrateTrait;
 
     public function __construct(
         private readonly string $userId,
         private readonly string $current,
         private readonly string $new,
-        string $token
+        string $token,
     ) {
         $this->setToken($token);
     }

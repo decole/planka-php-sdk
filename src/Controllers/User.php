@@ -22,12 +22,12 @@ final class User
 {
     public function __construct(
         private readonly Config $config,
-        private readonly Client $client
-    ) {
-    }
+        private readonly Client $client,
+    ) {}
 
     /**
-     * 'GET /api/users'
+     * 'GET /api/users'.
+     *
      * @return UserDto[]
      */
     public function list(): array
@@ -43,7 +43,7 @@ final class User
             name: $name,
             password: $password,
             username: $username,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 
@@ -72,7 +72,7 @@ final class User
             userId: $id,
             current: $current,
             new: $new,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 
@@ -83,7 +83,8 @@ final class User
     }
 
     /**
-     * 'POST /api/users/:id/avatar'
+     * 'POST /api/users/:id/avatar'.
+     *
      * @throws FileExistException
      */
     public function updateAvatar(UserDto $dto, string $file): UserDto
@@ -91,7 +92,7 @@ final class User
         return $this->client->post(new UserUpdateAvatarAction(
             user: $dto,
             file: $file,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 

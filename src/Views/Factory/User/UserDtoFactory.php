@@ -28,7 +28,6 @@ final class UserDtoFactory implements OutputInterface
      *     deletedAt: ?string,
      *     avatarUrl: ?string,
      * } $data
-     * @return UserDto
      */
     public function create(array $data): UserDto
     {
@@ -38,14 +37,14 @@ final class UserDtoFactory implements OutputInterface
             updatedAt: $this->convertToDateTime($data['updatedAt']),
             deletedAt: $this->convertToDateTime($data['deletedAt']),
             email: $data['email'],
-            isAdmin: (bool)$data['isAdmin'],
+            isAdmin: (bool) $data['isAdmin'],
             name: $data['name'],
             username: $data['username'],
             phone: $data['phone'],
             organization: $data['organization'],
             language: $data['language'],
-            subscribeToOwnCards: (bool)$data['subscribeToOwnCards'],
-            avatarUrl: $data['avatarUrl'] ?? null
+            subscribeToOwnCards: (bool) $data['subscribeToOwnCards'],
+            avatarUrl: $data['avatarUrl'] ?? null,
         );
     }
 }

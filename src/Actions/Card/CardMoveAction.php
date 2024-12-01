@@ -13,7 +13,8 @@ use Planka\Bridge\Views\Dto\Card\CardDto;
 
 final class CardMoveAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait, CardHydrateTrait;
+    use AuthenticateTrait;
+    use CardHydrateTrait;
 
     public function __construct(private readonly CardDto $card, string $token)
     {

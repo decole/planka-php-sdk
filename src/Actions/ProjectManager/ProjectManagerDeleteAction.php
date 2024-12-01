@@ -12,7 +12,8 @@ use Planka\Bridge\Traits\AuthenticateTrait;
 
 final class ProjectManagerDeleteAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait, ProjectManagerHydrateTrait;
+    use AuthenticateTrait;
+    use ProjectManagerHydrateTrait;
 
     public function __construct(private readonly string $projectManagerId, string $token)
     {

@@ -17,16 +17,16 @@ use Planka\Bridge\Views\Dto\Card\CardDto;
 final class BoardIncludedDto
 {
     /**
-     * @param list<UserDto> $users
+     * @param list<UserDto>            $users
      * @param list<BoardMembershipDto> $boardMemberships
-     * @param list<LabelDto> $labels
-     * @param list<ListDto> $lists
-     * @param list<CardDto> $cards
-     * @param list<CardMembershipDto> $cardMemberships
-     * @param list<CardLabelDto> $cardLabels
-     * @param list<CardTaskDto> $tasks
-     * @param list<AttachmentDto> $attachments
-     * @param list<ProjectDto> $projects
+     * @param list<LabelDto>           $labels
+     * @param list<ListDto>            $lists
+     * @param list<CardDto>            $cards
+     * @param list<CardMembershipDto>  $cardMemberships
+     * @param list<CardLabelDto>       $cardLabels
+     * @param list<CardTaskDto>        $tasks
+     * @param list<AttachmentDto>      $attachments
+     * @param list<ProjectDto>         $projects
      */
     public function __construct(
         public array $users,
@@ -39,6 +39,5 @@ final class BoardIncludedDto
         public array $tasks,
         public array $attachments,
         public array $projects,
-    ) {
-    }
+    ) {}
 }

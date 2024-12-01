@@ -8,6 +8,7 @@ use Planka\Bridge\Views\Dto\Notification\NotificationIncludedDto;
 use Planka\Bridge\Views\Dto\Notification\NotificationItemDto;
 use Planka\Bridge\Views\Dto\Notification\NotificationListDto;
 use Planka\Bridge\Contracts\Factory\OutputInterface;
+
 use function Fp\Collection\map;
 
 final class NotificationListDtoFactory implements OutputInterface
@@ -17,13 +18,12 @@ final class NotificationListDtoFactory implements OutputInterface
      *     items: array,
      *     included: array
      * } $data
-     * @return NotificationListDto
      */
     public function create(array $data): NotificationListDto
     {
         return new NotificationListDto(
             items: $this->getItems($data),
-            included: $this->getIncluded($data)
+            included: $this->getIncluded($data),
         );
     }
 

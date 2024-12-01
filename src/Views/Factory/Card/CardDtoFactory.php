@@ -9,6 +9,7 @@ use Planka\Bridge\Traits\DateConverterTrait;
 use Planka\Bridge\Views\Dto\Card\CardDto;
 use Planka\Bridge\Views\Dto\Card\CardIncludedDto;
 use Planka\Bridge\Views\Factory\Attachment\AttachmentDtoFactory;
+
 use function Fp\Collection\map;
 
 final class CardDtoFactory implements OutputInterface
@@ -73,7 +74,6 @@ final class CardDtoFactory implements OutputInterface
      *         },
      *     }
      * } $data
-     * @return CardDto
      */
     public function create(array $data): CardDto
     {
@@ -83,7 +83,7 @@ final class CardDtoFactory implements OutputInterface
             id: $item['id'],
             createdAt: $this->convertToDateTime($item['createdAt']),
             updatedAt: $this->convertToDateTime($item['updatedAt']),
-            position: (int)$item['position'],
+            position: (int) $item['position'],
             name: $item['name'],
             description: $item['description'],
             dueDate: $this->convertToDateTime($item['dueDate']),
@@ -93,8 +93,8 @@ final class CardDtoFactory implements OutputInterface
             listId: $item['listId'],
             creatorUserId: $item['creatorUserId'],
             coverAttachmentId: $item['coverAttachmentId'],
-            isSubscribed: (bool)($item['isSubscribed'] ?? false),
-            included: $this->getIncluded($data)
+            isSubscribed: (bool) ($item['isSubscribed'] ?? false),
+            included: $this->getIncluded($data),
         );
     }
 
@@ -103,9 +103,9 @@ final class CardDtoFactory implements OutputInterface
         if (!isset($data['included'])) {
             return new CardIncludedDto(
                 cardMemberships: [],
-                cardLabels:  [],
-                tasks:  [],
-                attachments:  []
+                cardLabels: [],
+                tasks: [],
+                attachments: [],
             );
         }
 
@@ -113,7 +113,7 @@ final class CardDtoFactory implements OutputInterface
             cardMemberships: map($data['included']['cardMemberships'] ?? [], fn(array $item) => (new CardMembershipDtoFactory())->create($item)),
             cardLabels: map($data['included']['cardLabels'] ?? [], fn(array $item) => (new CardLabelDtoFactory())->create($item)),
             tasks: map($data['included']['tasks'] ?? [], fn(array $item) => (new CardTaskDtoFactory())->create($item)),
-            attachments: map($data['included']['attachments'] ?? [], fn(array $item) => (new AttachmentDtoFactory())->create($item))
+            attachments: map($data['included']['attachments'] ?? [], fn(array $item) => (new AttachmentDtoFactory())->create($item)),
         );
     }
 }

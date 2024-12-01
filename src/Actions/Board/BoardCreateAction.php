@@ -12,13 +12,14 @@ use Planka\Bridge\Traits\BoardHydrateTrait;
 
 final class BoardCreateAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait, BoardHydrateTrait;
+    use AuthenticateTrait;
+    use BoardHydrateTrait;
 
     public function __construct(
         private readonly string $projectId,
         private readonly string $name,
         private readonly int $position,
-        string $token
+        string $token,
     ) {
         $this->setToken($token);
     }

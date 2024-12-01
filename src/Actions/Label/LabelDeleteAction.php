@@ -12,7 +12,8 @@ use Planka\Bridge\Traits\LabelHydrateTrait;
 
 final class LabelDeleteAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait, LabelHydrateTrait;
+    use AuthenticateTrait;
+    use LabelHydrateTrait;
 
     public function __construct(private readonly string $labelId, string $token)
     {

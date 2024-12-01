@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Planka\Bridge\Views\Factory\Project;
 
@@ -19,7 +19,6 @@ final class ProjectManagerDtoFactory implements OutputInterface
      *     projectId: string,
      *     userId: string
      * } $data
-     * @return ProjectManagerDto
      */
     public function create(array $data): ProjectManagerDto
     {
@@ -28,7 +27,7 @@ final class ProjectManagerDtoFactory implements OutputInterface
             createdAt: $this->convertToDateTime($data['createdAt']),
             updatedAt: $this->convertToDateTime($data['updatedAt']),
             projectId: $data['projectId'],
-            userId: $data['userId']
+            userId: $data['userId'],
         );
     }
 }

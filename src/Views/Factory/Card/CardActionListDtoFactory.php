@@ -9,6 +9,7 @@ use Planka\Bridge\Views\Factory\User\UserDtoFactory;
 use Planka\Bridge\Views\Dto\Card\CardActionItemDto;
 use Planka\Bridge\Views\Dto\Card\CardActionListDto;
 use Planka\Bridge\Views\Dto\User\UserDto;
+
 use function Fp\Collection\map;
 
 final class CardActionListDtoFactory implements OutputInterface
@@ -42,13 +43,12 @@ final class CardActionListDtoFactory implements OutputInterface
      *         }
      *     }
      * } $data
-     * @return CardActionListDto
      */
     public function create(array $data): CardActionListDto
     {
         return new CardActionListDto(
             items: $this->getItems($data),
-            included: $this->getIncluded($data)
+            included: $this->getIncluded($data),
         );
     }
 

@@ -14,9 +14,8 @@ final class CardMembership
 {
     public function __construct(
         private readonly Config $config,
-        private readonly Client $client
-    ) {
-    }
+        private readonly Client $client,
+    ) {}
 
     /** 'POST /api/cards/:cardId/memberships' */
     public function add(string $cardId, string $userId): CardMembershipDto
@@ -24,7 +23,7 @@ final class CardMembership
         return $this->client->post(new CardMembershipCreateAction(
             cardId: $cardId,
             userId: $userId,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 
@@ -34,7 +33,7 @@ final class CardMembership
         return $this->client->delete(new CardMembershipDeleteAction(
             cardId: $cardId,
             userId: $userId,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 }

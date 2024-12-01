@@ -20,7 +20,6 @@ final class CardLabelDtoFactory implements OutputInterface
      *     cardId: string,
      *     labelId: ?string
      * } $data
-     * @return CardLabelDto
      */
     public function create(array $data): CardLabelDto
     {
@@ -29,7 +28,7 @@ final class CardLabelDtoFactory implements OutputInterface
             createdAt: $this->convertToDateTime($data['createdAt']),
             updatedAt: $this->convertToDateTime($data['updatedAt']),
             cardId: $data['cardId'],
-            labelId: $data['labelId']
+            labelId: $data['labelId'],
         );
     }
 }

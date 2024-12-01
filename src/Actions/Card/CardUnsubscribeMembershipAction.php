@@ -12,12 +12,13 @@ use Planka\Bridge\Traits\AuthenticateTrait;
 
 final class CardUnsubscribeMembershipAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait, CardMembershipHydrateTrait;
+    use AuthenticateTrait;
+    use CardMembershipHydrateTrait;
 
     public function __construct(
         private readonly string $cardId,
         private readonly string $userId,
-        string $token
+        string $token,
     ) {
         $this->setToken($token);
     }

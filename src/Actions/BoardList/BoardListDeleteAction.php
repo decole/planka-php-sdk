@@ -12,7 +12,8 @@ use Planka\Bridge\Traits\AuthenticateTrait;
 
 final class BoardListDeleteAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait, BoardListHydrateTrait;
+    use AuthenticateTrait;
+    use BoardListHydrateTrait;
 
     public function __construct(private readonly string $listId, string $token)
     {

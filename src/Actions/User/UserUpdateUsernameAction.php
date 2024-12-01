@@ -13,7 +13,8 @@ use Planka\Bridge\Views\Dto\User\UserDto;
 
 final class UserUpdateUsernameAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait, UserHydrateTrait;
+    use AuthenticateTrait;
+    use UserHydrateTrait;
 
     public function __construct(private readonly UserDto $user, string $token)
     {

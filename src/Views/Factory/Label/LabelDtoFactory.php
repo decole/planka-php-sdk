@@ -23,7 +23,6 @@ final class LabelDtoFactory implements OutputInterface
      *     color: ?string,
      *     boardId: string
      * } $data
-     * @return LabelDto
      */
     public function create(array $data): LabelDto
     {
@@ -32,9 +31,9 @@ final class LabelDtoFactory implements OutputInterface
             boardId: $data['boardId'],
             createdAt: $this->convertToDateTime($data['createdAt']),
             updatedAt: $this->convertToDateTime($data['updatedAt']),
-            position: (int)$data['position'],
+            position: (int) $data['position'],
             name: $data['name'],
-            color: LabelColorEnum::tryFrom($data['color'])
+            color: LabelColorEnum::tryFrom($data['color']),
         );
     }
 }

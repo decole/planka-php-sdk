@@ -14,7 +14,6 @@ final class BackgroundImageDtoFactory implements OutputInterface
      *     url: string,
      *     coverUrl: string
      * }|null $data
-     * @return ?BackgroundImageDto
      */
     public function create(?array $data): ?BackgroundImageDto
     {
@@ -24,7 +23,7 @@ final class BackgroundImageDtoFactory implements OutputInterface
 
         return new BackgroundImageDto(
             url: $data['url'],
-            coverUrl: $data['coverUrl']
+            coverUrl: $data['coverUrl'],
         );
     }
 }

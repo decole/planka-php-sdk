@@ -20,13 +20,11 @@ final class Project
 {
     public function __construct(
         private readonly Config $config,
-        private readonly Client $client
-    ) {
-    }
+        private readonly Client $client,
+    ) {}
 
     /**
-     * 'GET /api/projects'
-     * @return ProjectListDto
+     * 'GET /api/projects'.
      */
     public function list(): ProjectListDto
     {
@@ -59,12 +57,13 @@ final class Project
     {
         return $this->client->delete(new ProjectDeleteAction(
             projectId: $projectId,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 
     /**
-     * 'POST /api/projects/:id/background-image'
+     * 'POST /api/projects/:id/background-image'.
+     *
      * @throws FileExistException
      */
     public function updateBackgroundImage(string $projectId, string $file): ProjectDto
@@ -72,7 +71,7 @@ final class Project
         return $this->client->post(new ProjectUpdateBackgroundImageAction(
             projectId: $projectId,
             file: $file,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 }

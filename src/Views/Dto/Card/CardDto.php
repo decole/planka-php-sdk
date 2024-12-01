@@ -5,18 +5,17 @@ declare(strict_types=1);
 namespace Planka\Bridge\Views\Dto\Card;
 
 use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
-use DateTimeImmutable;
 
 class CardDto implements OutputDtoInterface
 {
     public function __construct(
         public readonly string $id,
-        public readonly DateTimeImmutable $createdAt,
-        public readonly ?DateTimeImmutable $updatedAt,
+        public readonly \DateTimeImmutable $createdAt,
+        public readonly ?\DateTimeImmutable $updatedAt,
         public int $position,
         public string $name,
         public ?string $description,
-        public ?DateTimeImmutable $dueDate,
+        public ?\DateTimeImmutable $dueDate,
         public readonly ?bool $isDueDateCompleted,
         public ?StopWatchDto $stopwatch,
         public string $boardId,
@@ -24,7 +23,6 @@ class CardDto implements OutputDtoInterface
         public string $creatorUserId,
         public ?string $coverAttachmentId,
         public readonly bool $isSubscribed,
-        public readonly CardIncludedDto $included
-    ) {
-    }
+        public readonly CardIncludedDto $included,
+    ) {}
 }

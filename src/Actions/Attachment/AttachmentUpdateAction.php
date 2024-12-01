@@ -12,12 +12,13 @@ use Planka\Bridge\Traits\AuthenticateTrait;
 
 final class AttachmentUpdateAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait, AttachmentHydrateTrait;
+    use AuthenticateTrait;
+    use AttachmentHydrateTrait;
 
     public function __construct(
         private readonly string $attachmentId,
         private readonly string $name,
-        string $token
+        string $token,
     ) {
         $this->setToken($token);
     }

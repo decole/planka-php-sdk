@@ -15,9 +15,8 @@ final class BoardList
 {
     public function __construct(
         private readonly Config $config,
-        private readonly Client $client
-    ) {
-    }
+        private readonly Client $client,
+    ) {}
 
     /** 'POST /api/boards/:boardId/lists' */
     public function create(string $boardId, string $name, int $position): BoardListDto
@@ -26,7 +25,7 @@ final class BoardList
             boardId: $boardId,
             name: $name,
             position: $position,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 
@@ -36,7 +35,7 @@ final class BoardList
         return $this->client->patch(new BoardListUpdateAction(
             listId: $listId,
             name: $name,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 

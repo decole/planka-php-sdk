@@ -22,9 +22,8 @@ final class Card
 {
     public function __construct(
         private readonly Config $config,
-        private readonly Client $client
-    ) {
-    }
+        private readonly Client $client,
+    ) {}
 
     /** 'POST /api/lists/:listId/cards' */
     public function create(string $listId, string $name, int $position): CardDto
@@ -33,7 +32,7 @@ final class Card
             listId: $listId,
             name: $name,
             position: $position,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 
@@ -48,7 +47,7 @@ final class Card
     {
         return $this->client->patch(new CardUpdateAction(
             card: $card,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 
@@ -57,7 +56,7 @@ final class Card
     {
         return $this->client->patch(new CardClearDueDateAction(
             card: $card,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 
@@ -66,7 +65,7 @@ final class Card
     {
         return $this->client->patch(new CardMoveAction(
             card: $card,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 
@@ -76,7 +75,7 @@ final class Card
         return $this->client->patch(new CardUpdateAction(
             card: $card,
             token: $this->config->getAuthToken(),
-            spentSeconds: $seconds
+            spentSeconds: $seconds,
         ));
     }
 
@@ -86,7 +85,7 @@ final class Card
         return $this->client->patch(new CardTimerAction(
             card: $card,
             token: $this->config->getAuthToken(),
-            start: $start
+            start: $start,
         ));
     }
 
@@ -102,7 +101,7 @@ final class Card
         return $this->client->post(new CardSubscribeMembershipAction(
             cardId: $cardId,
             userId: $userId,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 
@@ -112,7 +111,7 @@ final class Card
         return $this->client->delete(new CardUnsubscribeMembershipAction(
             cardId: $cardId,
             userId: $userId,
-            token: $this->config->getAuthToken()
+            token: $this->config->getAuthToken(),
         ));
     }
 }

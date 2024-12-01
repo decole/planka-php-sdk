@@ -12,12 +12,13 @@ use Planka\Bridge\Traits\AuthenticateTrait;
 
 final class CommentCreateAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait, CommentHydrateTrait;
+    use AuthenticateTrait;
+    use CommentHydrateTrait;
 
     public function __construct(
         private readonly string $cardId,
         private readonly string $text,
-        string $token
+        string $token,
     ) {
         $this->setToken($token);
     }

@@ -20,7 +20,6 @@ final class CardMembershipDtoFactory implements OutputInterface
      *     cardId: string,
      *     userId: string
      * } $data
-     * @return CardMembershipDto
      */
     public function create(array $data): CardMembershipDto
     {
@@ -29,7 +28,7 @@ final class CardMembershipDtoFactory implements OutputInterface
             createdAt: $this->convertToDateTime($data['createdAt']),
             updatedAt: $this->convertToDateTime($data['updatedAt']),
             cardId: $data['cardId'],
-            userId: $data['userId']
+            userId: $data['userId'],
         );
     }
 }
