@@ -1,4 +1,4 @@
-# Example Subscribe and Unsubscribe ussr on cards
+# Example Subscribe and Unsubscribe user on cards
 
 ```php
 <?php
