@@ -7,10 +7,10 @@ namespace Planka\Bridge\Actions\Card;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
 use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ActionInterface;
+use Planka\Bridge\Views\Dto\Card\StopWatchDto;
 use Planka\Bridge\Traits\AuthenticateTrait;
 use Planka\Bridge\Traits\CardHydrateTrait;
 use Planka\Bridge\Views\Dto\Card\CardDto;
-use Planka\Bridge\Views\Dto\Card\StopWatchDto;
 use DateTimeImmutable;
 
 final class CardTimerAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
@@ -42,11 +42,14 @@ final class CardTimerAction implements ActionInterface, AuthenticateInterface, R
 
         // stop timer
         if (!$this->start) {
-            $diff = time() - $this->card->stopwatch->startedAt->getTimestamp();
-            $total = $this->card->stopwatch->total + $diff;
-            $stopwatch = new StopWatchDto(null, $total);
-            
-            $this->card->stopwatch = $stopwatch;
+            if ($this->card->stopwatch !== null) {
+                $diff = time() - $this->card->stopwatch->startedAt->getTimestamp();
+                $total = $this->card->stopwatch->total + $diff;
+
+                $stopwatch = new StopWatchDto(null, $total);
+
+                $this->card->stopwatch = $stopwatch;
+            }
         }
 
         return [
