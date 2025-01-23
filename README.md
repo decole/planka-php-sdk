@@ -98,3 +98,14 @@ the password cannot be intact. Because of this, it is impossible to log in with 
 Psalm analyze: `./vendor/bin/psalm --no-cache --no-file-cache`
 
 Or if you use linux, use `make psalm`
+
+## API Sources From Planka
+
+### [Routes](https://github.com/plankanban/planka/blob/master/server/config/routes.js)
+### [Models](https://github.com/plankanban/planka/tree/master/server/api/models)
+### [Helpers](https://github.com/plankanban/planka/tree/master/server/api/helpers)
+
+## Alternative SDK
+
+Python:
+- [plankapy](https://github.com/hwelch-fle/plankapy/tree/master)
