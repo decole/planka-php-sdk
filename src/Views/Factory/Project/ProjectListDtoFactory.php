@@ -24,6 +24,7 @@ final class ProjectListDtoFactory implements OutputInterface
         return new ProjectListDto(
             items: $this->getItems($data),
             included: $this->getIncluded($data),
+            _rawResponse: $data,
         );
     }
 
