@@ -9,6 +9,8 @@ Tested on Planka version:
 
 Implemented all entrypoints for the bar version **1.10.3** and later.
 
+On 1.24.3 add new entrypoints for OIDC and update result DTO on 1.24.3. - on version this project **1.3.0**
+
 
 ## Install
 
@@ -77,6 +79,11 @@ All necessary entrypoints are conveniently divided into controllers. You can vie
 in the `src/Controllers/` folder.
 
 Result data output is strongly typed and returned in Dto objects
+
+## Dto has raw array result
+
+- ProjectListDto `$client->project->list();`
+- 
 
 
 ## Found problems:
