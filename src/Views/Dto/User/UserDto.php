@@ -26,5 +26,6 @@ class UserDto implements OutputDtoInterface
         public bool $isUsernameLocked,
         public bool $isDeletionLocked,
         public ?string $avatarUrl,
+        public readonly array $_rawResponse = [],
     ) {}
 }

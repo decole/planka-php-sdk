@@ -116,3 +116,108 @@ Or if you use linux, use `make psalm`
 
 Python:
 - [plankapy](https://github.com/hwelch-fle/plankapy/tree/master)
+
+
+----
+
+[Routes:](https://github.com/plankanban/planka/blob/master/server/config/routes.js)
+
+----
+
+**(create for next iteration)**
+
+
+- 'GET /api/config'
+
+- 'POST /api/access-tokens'
+- 'POST /api/access-tokens/exchange-using-oidc' 
+- 'DELETE /api/access-tokens/me' 
+
+----
+
+## Checking routes
+
+~~- 'GET /api/users'~~
+~~- 'POST /api/users'~~
+~~- 'GET /api/users/:id'~~
+~~- 'PATCH /api/users/:id'~~
+~~- 'PATCH /api/users/:id/email'~~
+~~- 'PATCH /api/users/:id/password'~~
+~~- 'PATCH /api/users/:id/username'~~
+~~- 'POST /api/users/:id/avatar'~~
+~~- 'DELETE /api/users/:id'~~
+
+
+~~- 'GET /api/projects'~~
+~~- 'POST /api/projects'~~
+~~- 'GET /api/projects/:id'~~
+~~- 'PATCH /api/projects/:id'~~
+~~- 'POST /api/projects/:id/background-image'~~
+~~- 'DELETE /api/projects/:id'~~
+ 
+
+~~- 'POST /api/projects/:projectId/managers'~~
+~~- 'DELETE /api/project-managers/:id'~~
+
+
+- 'POST /api/projects/:projectId/boards'
+- 'GET /api/boards/:id'
+- 'PATCH /api/boards/:id'
+- 'DELETE /api/boards/:id'
+
+
+- 'POST /api/boards/:boardId/memberships'
+- 'PATCH /api/board-memberships/:id'
+- 'DELETE /api/board-memberships/:id'
+
+
+- 'POST /api/boards/:boardId/labels'
+- 'PATCH /api/labels/:id'
+- 'DELETE /api/labels/:id'
+
+
+- 'POST /api/boards/:boardId/lists'
+- 'PATCH /api/lists/:id'
+- 'POST /api/lists/:id/sort'
+- 'DELETE /api/lists/:id'
+
+
+- 'POST /api/lists/:listId/cards'
+- 'GET /api/cards/:id'
+- 'PATCH /api/cards/:id'
+- 'POST /api/cards/:id/duplicate'
+- 'DELETE /api/cards/:id'
+- 'POST /api/cards/:cardId/memberships'
+- 'DELETE /api/cards/:cardId/memberships'
+- 'POST /api/cards/:cardId/labels'
+- 'DELETE /api/cards/:cardId/labels/:labelId'
+
+
+- 'POST /api/cards/:cardId/tasks'
+- 'PATCH /api/tasks/:id'
+- 'DELETE /api/tasks/:id'
+
+
+- 'POST /api/cards/:cardId/attachments'
+- 'PATCH /api/attachments/:id'
+- 'DELETE /api/attachments/:id'
+
+
+- 'GET /api/cards/:cardId/actions'
+
+
+- 'POST /api/cards/:cardId/comment-actions'
+- 'PATCH /api/comment-actions/:id'
+- 'DELETE /api/comment-actions/:id'
+
+
+- 'GET /api/notifications'
+- 'GET /api/notifications/:id'
+- 'PATCH /api/notifications/:ids'
+
+
+- 'GET /user-avatars/*'
+- 'GET /project-background-images/*'
+- 'GET /attachments/:id/download/:filename'
+- 'GET /attachments/:id/download/thumbnails/cover-256.:extension'
+- 'GET /*'

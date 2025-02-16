@@ -53,6 +53,7 @@ final class UserDtoFactory implements OutputInterface
             isUsernameLocked: (bool) ($data['isUsernameLocked'] ?? false),
             isDeletionLocked: (bool) ($data['isDeletionLocked'] ?? false),
             avatarUrl: $data['avatarUrl'] ?? null,
+            _rawResponse: $data,
         );
     }
 }

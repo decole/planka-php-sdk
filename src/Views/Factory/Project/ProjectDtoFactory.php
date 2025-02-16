@@ -33,6 +33,7 @@ final class ProjectDtoFactory implements OutputInterface
             name: $data['name'],
             background: (new BackgroundDtoFactory())->create($data['background'] ?? null),
             backgroundImage: (new BackgroundImageDtoFactory())->create($data['backgroundImage'] ?? null),
+            _rawResponse: $data,
         );
     }
 }

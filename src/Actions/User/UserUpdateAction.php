@@ -33,6 +33,7 @@ final class UserUpdateAction implements ActionInterface, AuthenticateInterface, 
                 'name' => $this->user->name,
                 'organization' => $this->user->organization,
                 'phone' => $this->user->phone,
+                'isAdmin' => $this->user->isAdmin,
             ],
         ];
     }
