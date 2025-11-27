@@ -12,5 +12,6 @@ class ProjectManagerDto
         public readonly ?\DateTimeImmutable $updatedAt,
         public readonly string $projectId,
         public readonly string $userId,
+        public readonly array $_rawResponse = [],
     ) {}
 }

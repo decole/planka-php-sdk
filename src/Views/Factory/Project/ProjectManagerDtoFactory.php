@@ -28,6 +28,7 @@ final class ProjectManagerDtoFactory implements OutputInterface
             updatedAt: $this->convertToDateTime($data['updatedAt']),
             projectId: $data['projectId'],
             userId: $data['userId'],
+            _rawResponse: $data,
         );
     }
 }

@@ -17,5 +17,6 @@ class ProjectDto implements OutputDtoInterface
         public string $name,
         public ?BackgroundDto $background,
         public ?BackgroundImageDto $backgroundImage,
+        public readonly array $_rawResponse = [],
     ) {}
 }

@@ -18,10 +18,10 @@ final class BoardMembershipDtoFactory implements OutputInterface
      *     id: string,
      *     createdAt: string,
      *     updatedAt: ?string,
-     *     userId: string,
-     *     canComment: ?bool,
      *     role: string,
-     *     boardId: string
+     *     canComment: ?bool,
+     *     boardId: string,
+     *     userId: string,
      * } $data
      */
     public function create(array $data): BoardMembershipDto
