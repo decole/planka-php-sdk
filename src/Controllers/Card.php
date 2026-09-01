@@ -114,4 +114,16 @@ final class Card
             token: $this->config->getAuthToken(),
         ));
     }
+
+    /** 'POST /api/cards/:id/duplicate' */
+    public function duplicate(string $cardId): CardDto
+    {
+        return $this->client->post(new \Planka\Bridge\Actions\Card\CardDuplicateAction(cardId: $cardId));
+    }
+
+    /** 'POST /api/cards/:id/read-notifications' */
+    public function readNotifications(string $cardId): CardDto
+    {
+        return $this->client->post(new \Planka\Bridge\Actions\Card\CardReadNotificationsAction(cardId: $cardId));
+    }
 }
