@@ -88,6 +88,19 @@ $projects = $planka->project->list();
 
 ---
 
+### Configuration & Architecture Differences (SDK v1.x vs v2.x)
+
+| Feature / Setting | SDK v1.x (Legacy) | SDK v2.x (Current) |
+| :--- | :--- | :--- |
+| **Planka Version Support** | Planka v1.x | **Planka v2.x** |
+| **Authentication Methods** | Username & Password (JWT) only | **JWT** OR **User API Key** (`apiKey` parameter) |
+| **Config Instantiation** | `new Config(user, password, baseUri, port)` | `new Config(user, password, baseUri, port, apiKey)` |
+| **Mandatory Auth Call** | Always required `$planka->authenticate()` | Required only for JWT. **Skipped** when using `apiKey`. |
+| **Transport Injection** | Standard Symfony HttpClient | Supports custom `Client` injection: `new PlankaClient($config, $customTransportClient)` for mocking/unit testing |
+| **API Endpoints & Features** | Standard boards/cards | Adds **Webhooks**, **Base Custom Fields**, **Notification Services**, **System Config**, **Card Duplication**, etc. |
+
+---
+
 ## Controllers & Features
 
 All Planka API endpoints are organized into clean, strongly-typed controllers:
