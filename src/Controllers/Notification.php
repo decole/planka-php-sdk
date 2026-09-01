@@ -63,4 +63,10 @@ final class Notification
             token: $this->config->getAuthToken(),
         ));
     }
+
+    /** 'POST /api/notifications/read-all' */
+    public function readAll(): array
+    {
+        return $this->client->post(new \Planka\Bridge\Actions\Notification\NotificationReadAllAction());
+    }
 }
