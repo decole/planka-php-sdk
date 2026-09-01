@@ -18,9 +18,13 @@ final class CustomFieldCreateInGroupAction implements ActionInterface, ResponseR
     public function __construct(
         private readonly string $groupId,
         string $name,
+        int $position = 65536,
         ?bool $showOnFrontOfCard = null,
     ) {
-        $body = ['name' => $name];
+        $body = [
+            'name' => $name,
+            'position' => $position,
+        ];
 
         if (null !== $showOnFrontOfCard) {
             $body['showOnFrontOfCard'] = $showOnFrontOfCard;

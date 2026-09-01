@@ -4,24 +4,28 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Actions\BoardList;
 
-use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
-use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ActionInterface;
+use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
+use Planka\Bridge\Enum\ListTypeEnum;
 use Planka\Bridge\Traits\BoardListHydrateTrait;
-use Planka\Bridge\Traits\AuthenticateTrait;
 
-final class BoardListCreateAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
+final class BoardListCreateAction implements ActionInterface, ResponseResultInterface
 {
-    use AuthenticateTrait;
     use BoardListHydrateTrait;
+
+    private array $options = [];
 
     public function __construct(
         private readonly string $boardId,
-        private readonly string $name,
-        private readonly int $position,
-        string $token,
+        string $name,
+        int $position,
+        ListTypeEnum $type = ListTypeEnum::ACTIVE,
     ) {
-        $this->setToken($token);
+        $this->options['json'] = [
+            'type' => $type->value,
+            'name' => $name,
+            'position' => $position,
+        ];
     }
 
     public function url(): string
@@ -31,11 +35,6 @@ final class BoardListCreateAction implements ActionInterface, AuthenticateInterf
 
     public function getOptions(): array
     {
-        return [
-            'body' => [
-                'name' => $this->name,
-                'position' => $this->position,
-            ],
-        ];
+        return $this->options;
     }
 }

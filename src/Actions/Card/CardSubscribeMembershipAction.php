@@ -31,7 +31,7 @@ final class CardSubscribeMembershipAction implements ActionInterface, Authentica
     public function getOptions(): array
     {
         return [
-            'body' => [
+            'json' => [
                 'userId' => $this->userId,
             ],
         ];

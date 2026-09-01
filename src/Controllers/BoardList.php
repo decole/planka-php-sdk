@@ -22,13 +22,17 @@ final class BoardList
     ) {}
 
     /** 'POST /api/boards/:boardId/lists' */
-    public function create(string $boardId, string $name, int $position): BoardListDto
-    {
+    public function create(
+        string $boardId,
+        string $name,
+        int $position,
+        \Planka\Bridge\Enum\ListTypeEnum $type = \Planka\Bridge\Enum\ListTypeEnum::ACTIVE,
+    ): BoardListDto {
         return $this->client->post(new BoardListCreateAction(
             boardId: $boardId,
             name: $name,
             position: $position,
-            token: $this->config->getAuthToken(),
+            type: $type,
         ));
     }
 

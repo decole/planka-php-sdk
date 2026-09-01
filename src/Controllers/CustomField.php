@@ -20,21 +20,23 @@ final class CustomField
     ) {}
 
     /** 'POST /api/base-custom-field-groups/:baseGroupId/custom-fields' */
-    public function createInBaseGroup(string $baseGroupId, string $name, ?bool $showOnFrontOfCard = null): CustomFieldDto
+    public function createInBaseGroup(string $baseGroupId, string $name, int $position = 65536, ?bool $showOnFrontOfCard = null): CustomFieldDto
     {
         return $this->client->post(new CustomFieldCreateInBaseGroupAction(
             baseGroupId: $baseGroupId,
             name: $name,
+            position: $position,
             showOnFrontOfCard: $showOnFrontOfCard,
         ));
     }
 
     /** 'POST /api/custom-field-groups/:groupId/custom-fields' */
-    public function createInGroup(string $groupId, string $name, ?bool $showOnFrontOfCard = null): CustomFieldDto
+    public function createInGroup(string $groupId, string $name, int $position = 65536, ?bool $showOnFrontOfCard = null): CustomFieldDto
     {
         return $this->client->post(new CustomFieldCreateInGroupAction(
             groupId: $groupId,
             name: $name,
+            position: $position,
             showOnFrontOfCard: $showOnFrontOfCard,
         ));
     }

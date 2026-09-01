@@ -74,7 +74,7 @@ final class Client
         if (
             80 !== $this->config->getPort()
             && 443 !== $this->config->getPort()
-            && !str_contains($base, ':', 7)
+            && false === strpos($base, ':', 7)
         ) {
             $base .= ':' . $this->config->getPort();
         }

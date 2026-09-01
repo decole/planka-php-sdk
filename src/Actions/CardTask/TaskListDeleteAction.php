@@ -6,17 +6,17 @@ namespace Planka\Bridge\Actions\CardTask;
 
 use Planka\Bridge\Contracts\Actions\ActionInterface;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
-use Planka\Bridge\Traits\CardTaskHydrateTrait;
+use Planka\Bridge\Traits\TaskListHydrateTrait;
 
-final class CardTaskDeleteAction implements ActionInterface, ResponseResultInterface
+final class TaskListDeleteAction implements ActionInterface, ResponseResultInterface
 {
-    use CardTaskHydrateTrait;
+    use TaskListHydrateTrait;
 
-    public function __construct(private readonly string $taskId) {}
+    public function __construct(private readonly string $id) {}
 
     public function url(): string
     {
-        return "api/tasks/{$this->taskId}";
+        return "api/task-lists/{$this->id}";
     }
 
     public function getOptions(): array

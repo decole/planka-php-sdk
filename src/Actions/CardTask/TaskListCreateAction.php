@@ -6,32 +6,32 @@ namespace Planka\Bridge\Actions\CardTask;
 
 use Planka\Bridge\Contracts\Actions\ActionInterface;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
-use Planka\Bridge\Traits\CardTaskHydrateTrait;
+use Planka\Bridge\Traits\TaskListHydrateTrait;
 
-final class CardTaskCreateAction implements ActionInterface, ResponseResultInterface
+final class TaskListCreateAction implements ActionInterface, ResponseResultInterface
 {
-    use CardTaskHydrateTrait;
+    use TaskListHydrateTrait;
 
     private array $options = [];
 
     public function __construct(
-        private readonly string $taskListId,
+        private readonly string $cardId,
         string $name,
         int $position = 65536,
-        ?string $linkedCardId = null,
-        ?bool $isCompleted = null,
+        ?bool $showOnFrontOfCard = null,
+        ?bool $hideCompletedTasks = null,
     ) {
         $body = [
             'name' => $name,
             'position' => $position,
         ];
 
-        if (null !== $linkedCardId) {
-            $body['linkedCardId'] = $linkedCardId;
+        if (null !== $showOnFrontOfCard) {
+            $body['showOnFrontOfCard'] = $showOnFrontOfCard;
         }
 
-        if (null !== $isCompleted) {
-            $body['isCompleted'] = $isCompleted;
+        if (null !== $hideCompletedTasks) {
+            $body['hideCompletedTasks'] = $hideCompletedTasks;
         }
 
         $this->options['json'] = $body;
@@ -39,7 +39,7 @@ final class CardTaskCreateAction implements ActionInterface, ResponseResultInter
 
     public function url(): string
     {
-        return "api/task-lists/{$this->taskListId}/tasks";
+        return "api/cards/{$this->cardId}/task-lists";
     }
 
     public function getOptions(): array

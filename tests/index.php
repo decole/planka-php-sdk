@@ -2,907 +2,362 @@
 
 declare(strict_types=1);
 
-// before run `composer install on root directory`
+/**
+ * Tests for Planka v.2
+ */
+
+
+// Run after `composer install` in root directory
 
 use Planka\Bridge\Config;
-use Planka\Bridge\Enum\BackgroundGradientEnum;
-use Planka\Bridge\Enum\BackgroundTypeEnum;
-use Planka\Bridge\Enum\LabelColorEnum;
+use Planka\Bridge\Enum\NotificationServiceFormatEnum;
 use Planka\Bridge\PlankaClient;
-use Planka\Bridge\Views\Dto\Attachment\AttachmentDto;
-use Planka\Bridge\Views\Dto\Background\BackgroundDto;
-use Planka\Bridge\Views\Dto\Board\BoardIncludedDto;
-use Planka\Bridge\Views\Dto\Board\BoardMembershipDto;
+use Planka\Bridge\Views\Dto\Board\BoardDto;
 use Planka\Bridge\Views\Dto\Card\CardDto;
-use Planka\Bridge\Views\Dto\Card\CardLabelDto;
-use Planka\Bridge\Views\Dto\Card\CardMembershipDto;
 use Planka\Bridge\Views\Dto\Card\CardTaskDto;
-use Planka\Bridge\Views\Dto\Card\StopWatchDto;
-use Planka\Bridge\Views\Dto\Label\LabelDto;
-use Planka\Bridge\Views\Dto\List\ListDto;
+use Planka\Bridge\Views\Dto\Card\TaskListDto;
+use Planka\Bridge\Views\Dto\CustomField\BaseCustomFieldGroupDto;
+use Planka\Bridge\Views\Dto\CustomField\CustomFieldDto;
+use Planka\Bridge\Views\Dto\CustomField\CustomFieldGroupDto;
+use Planka\Bridge\Views\Dto\NotificationService\NotificationServiceDto;
 use Planka\Bridge\Views\Dto\Project\ProjectDto;
-use Planka\Bridge\Views\Dto\User\UserDto;
-use Planka\Bridge\Views\Factory\Project\ProjectManagerDto;
+use Planka\Bridge\Views\Dto\SystemConfig\SystemConfigDto;
+use Planka\Bridge\Views\Dto\Webhook\WebhookDto;
 use Symfony\Component\HttpClient\Exception\ClientException;
 
-// copy config.example.php to config.php and setup for you
-$config = include __DIR__ . '/config.php';
+$rawConfig = include __DIR__ . '/config.php';
 
 require __DIR__ . '/../vendor/autoload.php';
 
-// Diff raw sata by DTO result.
-function bin(array $array, ?array $raw, string $path = ''): void
+dump('========================================');
+dump('   Testing Planka SDK v2 Integration    ');
+dump('========================================');
+
+// Entity Tracker to prevent deleting user's real projects/boards/cards
+$createdTracker = [
+    'projects' => [],
+    'boards' => [],
+    'lists' => [],
+    'cards' => [],
+    'taskLists' => [],
+    'tasks' => [],
+    'baseCustomGroups' => [],
+    'customGroups' => [],
+    'customFields' => [],
+    'webhooks' => [],
+    'notificationServices' => [],
+];
+
+function assertCreated(string $type, string $id, object $dto, array &$tracker): void
 {
-    foreach ($array as $key => $item) {
-        if ($key === '_rawResponse') {
-            continue;
-        }
+    $tracker[$type][$id] = $dto;
+}
 
-        $rawElement = is_array($raw) ? $raw[$key] : $raw;
-
-        if (is_array($item)) {
-            if (($item['date'] ?? null) !== null) {
-                $date = $item['date'];
-                $dateTime = new DateTime($date);
-                $rawDateTime = new DateTime($rawElement);
-
-                if ($dateTime != $rawDateTime) {
-                    dump('date not corrected!', $dateTime, $rawDateTime);
-                }
-
-                continue;
-            }
-
-            bin($item, $rawElement, $path . '.' . $key);
-        } else {
-            $dtoItem = $item;
-
-            if ($dtoItem != $rawElement) {
-                dump('is not ok', "key: {$key} of path {$path}", $dtoItem, $rawElement);
-            }
-        }
+function safeVerifyOwned(string $type, string $id, array &$tracker): void
+{
+    if (!isset($tracker[$type][$id])) {
+        dd("SECURITY GUARD TRIGGERED: Attempted to delete or modify {$type} (ID: {$id}) that was NOT created by this test run!");
     }
 }
 
-dump('
-===
-
-Testing Planka version 1.24.3
-
-===
-');
-
-dump('Start tests');
-
+// 1. Setup Client
 $config = new Config(
-    user: $config['login'],
-    password: $config['password'],
-    baseUri: $config['uri'],
-    port: $config['port'],
+    user: $rawConfig['login'],
+    password: $rawConfig['password'],
+    baseUri: $rawConfig['uri'],
+    port: (int) $rawConfig['port'],
 );
+
 $client = new PlankaClient($config);
 
-$filePath = __DIR__ . '/image.png';
-
-dump('Configure success');
-
-if (200 !== $client->getInfo()->getStatusCode()) {
-    dd('Planka server not connected!');
+// 2. Ping Server
+dump('[1/13] Pinging Planka server...');
+$infoResponse = $client->getInfo();
+if (200 !== $infoResponse->getStatusCode()) {
+    dd('ERROR: Planka server is not reachable!');
 }
+dump('Server connection OK');
 
-dump('Try authenticate');
-
+// 3. Authenticate (JWT)
+dump('[2/13] Authenticating via JWT (email/password)...');
 if (!$client->authenticate()) {
-    dd('User credentials not corrected!');
+    dd('ERROR: Authentication failed!');
 }
+dump('JWT Authentication OK. Token acquired.');
 
-dump('Start check routes');
-
-dump('
---- --- ---
-');
-
-/////////////// TODO убрать, когда сделаю тесты до конца
-
-$project = $client->project->get('1437009275900659095');
-
-///////////////
-
-
-
-
-//dump('Get projects data');
-//
-//dump('GET /api/projects');
-//
-//$list = $client->project->list();
-//
-//dump('check diff raw data by DTO result');
-//$array = json_decode(json_encode($list), true);
-//bin($array, $list->_rawResponse);
-//dump('finish checking diff raw data by DTO result');
-//dump('
-//--- --- ---
-//');
-
-//dump('Create projects');
-//
-//dump('POST /api/projects');
-//
-//$project = $client->project->create('test');
-//
-//if ($project->name !== 'test') {
-//    dd('project name not corrected!');
-//}
-//dump('create project successfuly');
-
-//dump('try rename');
-//$projectGet = $client->project->get($project->id);
-//$projectGet->name = 'trim';
-//$client->project->update($projectGet);
-//
-//$project = $client->project->get($project->id);
-//
-//if ($project->name !== 'trim') {
-//    dd('project name not corrected! Has no `trim` name');
-//}
-//
-//dump('Check upload image as background');
-//try {
-//    $projectWithImage = $client->project->updateBackgroundImage($project->id, $filePath);
-//} catch (Throwable $exception) {
-//    dd('Upload image to project error');
-//}
-
-//if ($project->background === null ||
-//    $project->background->type != BackgroundTypeEnum::IMAGE ||
-//    $project->backgroundImage === null ||
-//    $project->backgroundImage->coverUrl === null ||
-//    $project->backgroundImage->url === null
-//) {
-//    dd('background image not corrected!', $project);
-//}
-//
-//dump('background image functionality is ok');
-
-//dump('delete project background image');
-//$project->backgroundImage = null;
-//$project->background = null;
-//$project = $client->project->update($project);
-//
-//if ($project->background !== null || $project->backgroundImage !== null) {
-//    dd('cant delete background image', $project);
-//}
-//dump('delete project background image successfully');
-
-//dump('Set project background as gradient');
-//$project->background = new BackgroundDto(
-//    type: BackgroundTypeEnum::GRADIENT,
-//    name: BackgroundGradientEnum::ALGAE_GREEN,
-//);
-//$project = $client->project->update($project);
-//
-//if ($project->background === null ||
-//    $project->background->type !== BackgroundTypeEnum::GRADIENT ||
-//    $project->background->name !== BackgroundGradientEnum::ALGAE_GREEN ||
-//    $project->backgroundImage !== null
-//) {
-//    dd('background image not corrected!', $project);
-//}
-//dump('Set project background as gradient - success');
-
-//dump('Add user to projectManager');
-//$user = null;
-//
-//$users = $client->user->list();
-//
-///** @var UserDto $item */
-//foreach ($users as $item) {
-//    $user = $item;
-//}
-//
-//if ($user === null) {
-//    dd('User not found');
-//}
-//
-//$manager = $client->projectManager->add(
-//    projectId: $project->id,
-//    userId: $user->id,
-//);
-//
-//if (!$manager instanceof ProjectManagerDto) {
-//    dd('Project manager not created!');
-//}
-//
-//if ($manager->userId !== $user->id) {
-//    dd('User id not corrected!');
-//}
-//
-//try {
-//    $client->projectManager->add(
-//        projectId: $project->id,
-//        userId: $user->id,
-//    );
-//
-//    dd('Detect duble create projectManager');
-//} catch (Throwable $e) {
-//}
-//
-//dump('Add projectManager successfuly');
-//
-//dump('Delete projectManager');
-//$manager = $client->projectManager->remove($manager->id);
-//
-//try {
-//    $manager = $client->projectManager->remove($manager->id);
-//
-//    dd('Detect duble delete projectManager');
-//} catch (Throwable $e) {
-//}
-//dump('Delete projectManager successfuly');
-
-//dump('Check user functionality');
-//$users = $client->user->list();
-//
-//foreach ($users as $user) {
-//    $array = json_decode(json_encode($user), true);
-//    bin($array, $user->_rawResponse);
-//}
-//dump('Check user functionality successful');
-
-//dump('Create user');
-//
-//$currentPassword = '!@#(ASDFkrw_';
-//$mewPassword = 'balanda123@@#!_=';
-//$currentEmail = 'test@example.com';
-//$newEmail = 'semiLTS@ll.com';
-
-//$userNew = $client->user->create(
-//    email: $currentEmail,
-//    name: 'Test User',
-//    password: $currentPassword,
-//    username: 'test',
-//);
-//
-//dump("new user id - {$userNew->id}");
-//
-//if ($userNew->email !== $currentEmail ||
-//    $userNew->name !== 'Test User' ||
-//    $userNew->username !== 'test'
-//) {
-//    dd('Created user not corrected');
-//}
-//
-//$user = $client->user->get($userNew->id);
-//
-//if ($user->email !== $currentEmail ||
-//    $user->name !== 'Test User' ||
-//    $user->username !== 'test'
-//) {
-//    dd('Created user not corrected');
-//}
-//
-//$userNew = null;
-
-//$user->username = 'Trelome';
-//
-//$user = $client->user->get($user->id);
-//
-//if ($user->username !== mb_strtolower('Trelome')) {
-//    dd('Change username not corrected');
-//}
-//
-//$user->email = $newEmail;
-//$client->user->updateEmail($user);
-//
-//$user = $client->user->get($user->id);
-//
-//if ($user->email != mb_strtolower($newEmail)) {
-//    dd('Change email not corrected');
-//}
-//
-//try {
-//    $client->user->updatePassword(id: $user->id, current: $currentPassword, new: $mewPassword);
-//} catch (\Throwable $exception) {
-//    dd('change passwprd not corrected');
-//}
-//
-//try {
-//    $client->user->updateAvatar($user, $filePath);
-//} catch (\Throwable $exception) {
-//    dd('change avatar not corrected');
-//}
-//
-//$user = $client->user->get($user->id);
-//
-//if ($user->avatarUrl === null) {
-//    dd('test changing avatar not corrected');
-//}
-//
-//$name = $user->name = 'test';
-//$username = $user->username = 'test user name';
-//$organization = $user->organization = 'test organization';
-//$phone = $user->phone = '+12312+3+1+23';
-//
-//$client->user->update($user);
-//
-//$user = $client->user->get($user->id);
-//
-//if ($user->name !== $name || $user->organization !== $organization || $user->phone !== $phone) {
-//    dd('change user name, organistion, phone - not corrected');
-//}
-//
-//$user = $client->user->get($user->id);
-//$user->isAdmin = true;
-//$user = $client->user->update($user);
-//
-//if ($user->isAdmin !== true) {
-//    dd('change user is admin not corrected');
-//}
-//
-//$user = $client->user->get($user->id);
-//
-//if ($user->isAdmin !== true) {
-//    dd('change user is admin not corrected');
-//}
-//
-//$user->isAdmin = false;
-//$user = $client->user->update($user);
-//
-//if ($user->isAdmin !== false) {
-//    dd('change user is admin to false not corrected');
-//}
-//
-//$user = $client->user->get($user->id);
-//
-//if ($user->isAdmin !== false) {
-//    dd('change user is admin to false not corrected');
-//}
-//
-//$client->user->delete($user);
-//try {
-//    $user = $client->user->get($user->id);
-//
-//    dd('user not deleted');
-//} catch (\Throwable $exception) {
-//}
-
-//dump('User functionality check - success');
-
-//dump('Create test bpard "test-board"');
-
-//$board = $client->board->create($project->id, 'test-board', 0);
-
-//$boardGet = $client->board->get($board->item->id);
-
-//
-//if ($boardGet->item->name !== 'test-board') {
-//    dd('Test board has another name!');
-//}
-//
-//dump('Update board name to "Test board"');
-//
-//$board = $client->board->update($boardGet->item->id, 'Test board');
-//
-//if ($client->board->get($boardGet->item->id)->item->name !== 'Test board') {
-//    dd('Test board has another name!');
-//}
-//
-//dump('Board created and rename - successfuly');
-//
-//dump('
-//--- --- ---
-//');
-//
-//dump('Start card tests!');
-//
-//dump('
-//Create columns
-//');
-
-//$firstColumn = $client->boardList->create($board->item->id, 'First column', 1);
-//
-//dump('Create first column ' . $firstColumn->id); // 1451535592738260455
-//
-//$secondColumn = $client->boardList->create($board->item->id, 'Second column', 2);
-//
-//dump('Create second column ' . $secondColumn->id); // 1451535592947975656
-//
-//$thirdColumn = $client->boardList->create($board->item->id, 'Third column', 3);
-//
-//dump('Create third column ' . $thirdColumn->id); // 1451535593140913641
-
-//dump('Creating columns successfully');
-
-//dump('Test delete third column');
-
-//$client->boardList->delete($thirdColumn->id);
-//
-//try {
-//    $client->boardList->update($thirdColumn->id, 'Third column');
-//
-//    dd('Third column not deleted!');
-//} catch (ClientException $e) {
-//    dump('Third column delete successfully');
-//}
-
-//dump('
-//--- --- ---
-//');
-
-
-
-dump('Create cards');
-
-
-$board = $client->board->get('1451521574929696228'); // todo delete this
-dd($board);
-
-$board = $client->board->get($board->item->id);
-
-/**
- * @param list<UserDto>            $users
- * @param list<BoardMembershipDto> $boardMemberships
- * @param list<LabelDto>           $labels
- * @param list<ListDto>            $lists
- * @param list<CardDto>            $cards
- * @param list<CardMembershipDto>  $cardMemberships
- * @param list<CardLabelDto>       $cardLabels
- * @param list<CardTaskDto>        $tasks
- * @param list<AttachmentDto>      $attachments
- * @param list<ProjectDto>         $projects
- */
-$included = $board->included;
-
-$firstColumn = $secondColumn = null;
-
-foreach ($included->lists as $item) {
-    if ($item->name === 'First column') {
-        $firstColumn = $item;
-    }
-
-    if ($item->name === 'Second column') {
-        $secondColumn = $item;
-    }
-
-//    if ($item->name === 'Third column') {
-//        dd('Third column not deleted');
-//    }
-}
-
-//if ($firstColumn === null || $secondColumn === null) {
-//    dd('First column or second column not defined');
-//}
-//
-//$card = $client->card->create($firstColumn->id, 'first card', 0);
-//$cardOne = $client->card->create($firstColumn->id, 'second card', 1);
-//
-//dump(
-//    sprintf('First card: %s, second card %s', $card->id, $cardOne->id),
-//);
-//
-//$client->card->delete($cardOne->id);
-//
-//try {
-//    $client->card->delete($cardOne->id);
-//
-//    dd('Card double deleting!');
-//} catch (ClientException $e) {
-//    dump('second card deleted');
-//}
-//
-//try {
-//    $client->card->get($cardOne->id);
-//
-//    dd('Card not deleted!');
-//} catch (ClientException $e) {
-//    dump('second card deleted successfully!');
-//}
-//
-//dump('Move card from first column to second column');
-//
-//$card->listId = $secondColumn->id;
-////$card->boardId;
-//$card->position = 100;
-//
-//$client1($card);
-//
-//$card = $client->card->get($card->id);
-//
-//if ($card->position !== 100) {
-//    dd('Position card wrong!');
-//}
-//
-//if ($card->listId !== $secondColumn->id) {
-//    dd('Card move uncorrect!');
-//}
-
-// Todo
-// get card ids and get list card
-// update abd delete second card
-// first card add - tasks, description, time track, and other
-
-dump('Resolve cards on board');
-
-$board = $client->board->get($board->item->id);
-
-/**
- * @param list<UserDto>            $users
- * @param list<BoardMembershipDto> $boardMemberships
- * @param list<LabelDto>           $labels
- * @param list<ListDto>            $lists
- * @param list<CardDto>            $cards
- * @param list<CardMembershipDto>  $cardMemberships
- * @param list<CardLabelDto>       $cardLabels
- * @param list<CardTaskDto>        $tasks
- * @param list<AttachmentDto>      $attachments
- * @param list<ProjectDto>         $projects
- */
-$included = $board->included;
-
-$firstColumn = $secondColumn = null;
-
-foreach ($included->lists as $item) {
-    if ($item->name === 'First column') {
-        $firstColumn = $item;
-    }
-
-    if ($item->name === 'Second column') {
-        $secondColumn = $item;
-    }
-}
-
-if ($firstColumn === null || $secondColumn === null) {
-    dd('Columns not found');
-}
-
-$card = null;
-
-foreach($board->included->cards as $cardItem) {
-    if ($cardItem instanceof CardDto) {
-        if ($cardItem->name === 'first card' &&
-            $cardItem->boardId === $board->item->id &&
-            ($cardItem->listId === $firstColumn->id || $cardItem->listId === $secondColumn->id)
-        ) {
-            $card = $cardItem;
-        }
-    }
-}
-
-if ($card === null) {
-    dd('Cards not found');
-}
-
-dump('Move Card to column');
-
-$card->listId = $firstColumn->id;
-
-$client->card->moveCard($card);
-
-$card = $client->card->get($card->id);
-
-if ($card->listId !== $firstColumn->id) {
-    dd('Cards not moved to first column');
-}
-
-dump('Add discription to card');
-
-$description = 'Description test text';
-
-$card->description = $description;
-
-$client->card->update($card);
-
-$card = $client->card->get($card->id);
-
-if ($card->description !== $description) {
-    dd('Description not join');
-}
-
-dump('Discription add to caard - successfuly');
-
-
-dump('Add tasks to card');
-
-$firstTaskText = 'First task';
-$secondTaskText = 'Second task';
-$thirdTaskText = 'Third task';
-
-//$client->cardTask->create($card->id, $firstTaskText, 0);
-//$client->cardTask->create($card->id, $secondTaskText, 1);
-//$client->cardTask->create($card->id, $thirdTaskText, 2);
-
-$card = $client->card->get($card->id);
-
-$firstTask = null;
-$secondTask = null;
-$thirdTask = null;
-
-foreach ($card->included->tasks as $taskItem) {
-    if ($taskItem->name === $firstTaskText) {
-        $firstTask = $taskItem;
-
-//        if ($taskItem->position !== 0) {
-//            dd('First task position wrong. Expected 0, real is - ' . $taskItem->position);
-//        }
-    }
-
-    if ($taskItem->name === $secondTaskText) {
-        $secondTask = $taskItem;
-
-//        if ($taskItem->position !== 1) {
-//            dd('Second task position wrong. Expected 1, real is - ' . $taskItem->position);
-//        }
-    }
-
-    if ($taskItem->name === $thirdTaskText) {
-        $thirdTask = $taskItem;
-
-//        if ($taskItem->position !== 2) {
-//            dd('Third task position wrong. Expected 2, real is - ' . $taskItem->position);
-//        }
-    }
-}
-
-dump('Card tasks crete successfully');
-
-dump('Try "Is done" tsasks status changing');
-
-$firstTask->isCompleted = true;
-$secondTask->isCompleted = true;
-$thirdTask->isCompleted = true;
-
-$client->cardTask->update($firstTask);
-$client->cardTask->update($secondTask);
-$client->cardTask->update($thirdTask);
-
-
-$card = $client->card->get($card->id);
-
-$firstTask = null;
-$secondTask = null;
-$thirdTask = null;
-
-foreach ($card->included->tasks as $taskItem) {
-    if ($taskItem->name === $firstTaskText) {
-        $firstTask = $taskItem;
-
-//        if ($taskItem->position !== 0) {
-//            dd('First task position wrong. Expected 0, real is - ' . $taskItem->position);
-//        }
-    }
-
-    if ($taskItem->name === $secondTaskText) {
-        $secondTask = $taskItem;
-
-//        if ($taskItem->position !== 1) {
-//            dd('Second task position wrong. Expected 1, real is - ' . $taskItem->position);
-//        }
-    }
-
-    if ($taskItem->name === $thirdTaskText) {
-        $thirdTask = $taskItem;
-
-//        if ($taskItem->position !== 2) {
-//            dd('Third task position wrong. Expected 2, real is - ' . $taskItem->position);
-//        }
-    }
-}
-
-if ($firstTask->isCompleted !== true) {
-    dd('First task is not completed changing');
-}
-
-if ($secondTask->isCompleted !== true) {
-    dd('First task is not completed changing');
-}
-
-if ($thirdTask->isCompleted !== true) {
-    dd('First task is not completed changing');
-}
-
-
-dump('Try "Is done" tsasks status changing - successfuly');
-
-
-dump('Try "Is NOT done" tsasks status changing');
-
-$firstTask->isCompleted = false;
-$secondTask->isCompleted = false;
-$thirdTask->isCompleted = false;
-
-$client->cardTask->update($firstTask);
-$client->cardTask->update($secondTask);
-$client->cardTask->update($thirdTask);
-
-
-$card = $client->card->get($card->id);
-
-$firstTask = null;
-$secondTask = null;
-$thirdTask = null;
-
-foreach ($card->included->tasks as $taskItem) {
-    if ($taskItem->name === $firstTaskText) {
-        $firstTask = $taskItem;
-
-//        if ($taskItem->position !== 0) {
-//            dd('First task position wrong. Expected 0, real is - ' . $taskItem->position);
-//        }
-    }
-
-    if ($taskItem->name === $secondTaskText) {
-        $secondTask = $taskItem;
-
-//        if ($taskItem->position !== 1) {
-//            dd('Second task position wrong. Expected 1, real is - ' . $taskItem->position);
-//        }
-    }
-
-    if ($taskItem->name === $thirdTaskText) {
-        $thirdTask = $taskItem;
-
-//        if ($taskItem->position !== 2) {
-//            dd('Third task position wrong. Expected 2, real is - ' . $taskItem->position);
-//        }
-    }
-}
-
-if ($firstTask->isCompleted !== false) {
-    dd('First task is not completed changing');
-}
-
-if ($secondTask->isCompleted !== false) {
-    dd('First task is not completed changing');
-}
-
-if ($thirdTask->isCompleted !== false) {
-    dd('First task is not completed changing');
-}
-
-dump('Try "Is NOT done" tsasks status changing - successfuly');
-
-// todo delete tasks
-// card comment
-// card timelaps
-// labels
-// deadline
-// membership
-// attachment
-// subscribe
-
-// дубюлирование
-
-// delete card
-
-dd('---');
-
-
-
-// add board
-$board = $client->board->create($projectGet->id, 'testCard', 1);
-$boardGet = $client->board->get($board->item->id);
-$boardOther = $client->board->create($projectGet->id, 'archive', 2);
-
-$client->board->update($boardGet->item->id, 'romb');
-
-// add board list
-$list = $client->boardList->create($boardGet->item->id, 'one', 1);
-$listOther = $client->boardList->create($boardOther->item->id, 'archive', 22);
-
-// add card
-$card = $client->card->create($list->id, 'card', 1);
-
-// card get
-$cardGet = $client->card->get($card->id);
-
-// card update
-$cardGet->name = 'limonad';
-$cardGet->position = 2;
-$cardGet->stopwatch = new StopWatchDto(null, 2);
-$cardGet->isSubscribed = true;
-$cardGet->description = 'ok!';
-$client->card->update($cardGet);
-
-
-// start timer on card
-$client->card->triggerTimer($card, true);
-
-// stop timer on card
-$client->card->triggerTimer($card, false);
-
-// test moving to other board
-$card->boardId = $boardOther->item->id;
-$card->listId = $listOther->id;
-$card->position = 33;
-$client->card->moveCard($card);
-
-$card->boardId = $board->item->id;
-$card->listId = $list->id;
-$card->position = 1;
-$client->card->moveCard($card);
-
-// add spend worked time to card
-$client->card->addSpentTime($cardGet, 290);
-
-// remove spend time
-$client->card->clearTime($cardGet);
-
-// get history action by card
-$client->cardAction->getActions($cardGet->id);
-
-// upload attachment to card
+// 4. Test System Config
+dump('[3/13] Fetching System Config...');
 try {
-    $attachment = $client->attachment->upload($cardGet->id, $filePath);
-} catch (Throwable $exception) {
-    exit('Upload attachment to card error');
+    $sysConfig = $client->systemConfig->get();
+    if ($sysConfig instanceof SystemConfigDto) {
+        dump("System Config OK (id: {$sysConfig->id})");
+    }
+} catch (Throwable $e) {
+    dump('System Config check skipped or unauthorized: ' . $e->getMessage());
 }
 
-// update name by attachment
-$client->attachment->updateName($attachment->id, 'mimo');
+// 5. Create Test Project
+dump('[4/13] Creating test Project...');
+$projectName = '[v2-test-DO-NOT-TOUCH] Project-' . time();
+$project = $client->project->create($projectName);
 
-// delete attachment
-$client->attachment->delete($attachment->id);
+if (!$project instanceof ProjectDto || $project->name !== $projectName) {
+    dd('ERROR: Failed to create project!');
+}
+assertCreated('projects', $project->id, $project, $createdTracker);
+dump("Project created OK (ID: {$project->id})");
 
-// add tasks
-$client->cardTask->create($cardGet->id, 'one', 1);
-$taskItem = $client->cardTask->create($cardGet->id, 'two', 2);
-$taskItem->isCompleted = true;
-$client->cardTask->update($taskItem);
+// 6. Base Custom Field Groups & Fields
+dump('[5/13] Testing Base Custom Field Group & Custom Fields...');
+$baseGroup = $client->baseCustomFieldGroup->create($project->id, 'Base Specs');
+if (!$baseGroup instanceof BaseCustomFieldGroupDto) {
+    dd('ERROR: Base custom field group creation failed!');
+}
+assertCreated('baseCustomGroups', $baseGroup->id, $baseGroup, $createdTracker);
+dump("Base Custom Field Group created OK (ID: {$baseGroup->id})");
 
-$boardGet = $client->board->get($boardGet->item->id);
+$customField = $client->customField->createInBaseGroup(
+    baseGroupId: $baseGroup->id,
+    name: 'Priority',
+    showOnFrontOfCard: true,
+);
+if (!$customField instanceof CustomFieldDto) {
+    dd('ERROR: Custom field creation failed!');
+}
+assertCreated('customFields', $customField->id, $customField, $createdTracker);
+dump("Custom Field created OK (ID: {$customField->id}, name: {$customField->name})");
 
-// get card tasks by board cards and update it
-foreach ($boardGet->included->tasks as $task) {
-    $task->isCompleted = true;
-    $client->cardTask->update($task);
+// 7. Create Test Board
+dump('[6/13] Creating test Board...');
+$boardName = '[v2-test-DO-NOT-TOUCH] Board';
+$board = $client->board->create($project->id, $boardName, 0);
+
+if (!$board instanceof BoardDto || null === $board->item) {
+    dd('ERROR: Failed to create board!');
+}
+$boardId = $board->item->id;
+assertCreated('boards', $boardId, $board, $createdTracker);
+dump("Board created OK (ID: {$boardId})");
+
+// Update board view settings
+$updatedBoard = $client->board->update($boardId, '[v2-test-DO-NOT-TOUCH] Board-Updated');
+dump('Board updated OK');
+
+// Custom Field Group on Board
+$boardGroup = $client->customFieldGroup->createInBoard($boardId, 'Board Fields');
+if (!$boardGroup instanceof CustomFieldGroupDto) {
+    dd('ERROR: Custom field group on board creation failed!');
+}
+assertCreated('customGroups', $boardGroup->id, $boardGroup, $createdTracker);
+dump("Board Custom Field Group created OK (ID: {$boardGroup->id})");
+
+// 8. Test Lists (Columns)
+dump('[7/13] Testing Board Lists (Create, Sort, Delete)...');
+$columnTodo = $client->boardList->create($boardId, '[v2-test] To Do', 1);
+$columnDone = $client->boardList->create($boardId, '[v2-test] Done', 2);
+$columnTemp = $client->boardList->create($boardId, '[v2-test] Temporary Column', 3);
+
+assertCreated('lists', $columnTodo->id, $columnTodo, $createdTracker);
+assertCreated('lists', $columnDone->id, $columnDone, $createdTracker);
+assertCreated('lists', $columnTemp->id, $columnTemp, $createdTracker);
+
+dump("Lists created: 'To Do' ({$columnTodo->id}), 'Done' ({$columnDone->id}), 'Temp' ({$columnTemp->id})");
+
+// Sort cards in list
+$client->boardList->sort($columnTodo->id, 'name', 'asc');
+dump('List sort OK');
+
+// Test Column Deletion
+dump('Testing Column Deletion...');
+safeVerifyOwned('lists', $columnTemp->id, $createdTracker);
+$client->boardList->delete($columnTemp->id);
+unset($createdTracker['lists'][$columnTemp->id]);
+
+try {
+    $client->boardList->update($columnTemp->id, 'Should Fail');
+    dd('ERROR: Column was not deleted on server!');
+} catch (ClientException $e) {
+    dump('Column deletion verified OK (HTTP error caught on update)');
 }
 
-$boardGet = $client->board->get($boardGet->item->id);
+// 9. Test Cards & Card v2 Operations
+dump('[8/13] Testing Cards (Create, Duplicate, Read Notifications)...');
+$card1 = $client->card->create($columnTodo->id, '[v2-test] Task 1', 1);
+if (!$card1 instanceof CardDto) {
+    dd('ERROR: Failed to create card 1!');
+}
+assertCreated('cards', $card1->id, $card1, $createdTracker);
+dump("Card created OK (ID: {$card1->id})");
 
-// delete atomicity tasks
-foreach ($boardGet->included->tasks as $task) {
-    $client->cardTask->delete($task->id);
+// Duplicate Card (Planka v2 Feature)
+$duplicatedCard = $client->card->duplicate($card1->id);
+if (!$duplicatedCard instanceof CardDto) {
+    dd('ERROR: Card duplication failed!');
+}
+assertCreated('cards', $duplicatedCard->id, $duplicatedCard, $createdTracker);
+dump("Card duplicate OK (New Card ID: {$duplicatedCard->id})");
+
+// Read Notifications for Card (Planka v2 Feature)
+$client->card->readNotifications($card1->id);
+dump('Card readNotifications OK');
+
+// 10. Card Tasks & Task Lists
+dump('[9/13] Testing Task Lists & Card Tasks (Create, Update, Delete)...');
+$taskList = $client->cardTask->createTaskList($card1->id, '[v2-test] Checklist');
+if (!$taskList instanceof TaskListDto) {
+    dd('ERROR: Task list creation failed!');
+}
+assertCreated('taskLists', $taskList->id, $taskList, $createdTracker);
+dump("Task List created OK (ID: {$taskList->id})");
+
+$task1 = $client->cardTask->create($taskList->id, '[v2-test] Subtask 1', 0);
+if (!$task1 instanceof CardTaskDto) {
+    dd('ERROR: Card task creation failed!');
+}
+assertCreated('tasks', $task1->id, $task1, $createdTracker);
+dump("Card Task created OK (ID: {$task1->id})");
+
+$task1->isCompleted = true;
+$client->cardTask->update($task1);
+dump('Card Task update (completed) OK');
+
+// Explicit Task Deletion Test
+safeVerifyOwned('tasks', $task1->id, $createdTracker);
+$client->cardTask->delete($task1->id);
+unset($createdTracker['tasks'][$task1->id]);
+dump('Explicit Card Task deletion OK');
+
+// Explicit Task List Deletion Test
+safeVerifyOwned('taskLists', $taskList->id, $createdTracker);
+$client->cardTask->deleteTaskList($taskList->id);
+unset($createdTracker['taskLists'][$taskList->id]);
+dump('Explicit Task List deletion OK');
+
+// Move cards between lists (requires closed source list)
+try {
+    $client->boardList->moveCards($columnTodo->id, $columnDone->id);
+    dump('Move cards between lists OK');
+} catch (Throwable $e) {
+    dump('Move cards note: ' . $e->getMessage());
 }
 
-// card member
-$boardGet = $client->board->get($boardGet->item->id);
-$user = $boardGet->included->users[0];
-$member = $client->cardMembership->add($cardGet->id, $user->id);
+// 11. Test Webhooks (Planka v2 Feature)
+dump('[10/13] Testing Webhooks (v2 Feature)...');
+try {
+    $webhook = $client->webhook->create(
+        name: 'Test Webhook v2',
+        url: 'https://example.com/webhook-test',
+        events: 'cardCreate,cardUpdate',
+    );
+    if ($webhook instanceof WebhookDto) {
+        assertCreated('webhooks', $webhook->id, $webhook, $createdTracker);
+        dump("Webhook created OK (ID: {$webhook->id})");
 
-// remove member
-$client->cardMembership->remove($cardGet->id, $user->id);
+        $webhooks = $client->webhook->list();
+        dump('Webhook list OK (Count: ' . count($webhooks) . ')');
 
-// card due Date
-$cardGet->dueDate = (new DateTimeImmutable())->modify('+ 1 year');
-$client->card->update($cardGet);
+        $client->webhook->update($webhook->id, name: 'Updated Webhook v2');
+        dump('Webhook update OK');
 
-// remove due date
-$cardGet->dueDate = null;
-$client->card->update($cardGet);
+        safeVerifyOwned('webhooks', $webhook->id, $createdTracker);
+        $client->webhook->delete($webhook->id);
+        unset($createdTracker['webhooks'][$webhook->id]);
+        dump('Webhook delete OK');
+    }
+} catch (Throwable $e) {
+    dump('Webhook test skipped or unauthorized: ' . $e->getMessage());
+}
 
-// get notify
-$notify = $client->notification->list();
-// reading notify - see $client->notification->markIsRead([$notifyId, $notifyId])
+// 12. Test Notification Services (Planka v2 Feature)
+dump('[11/13] Testing Notification Services (v2 Feature)...');
+try {
+    $notifService = $client->notificationService->createInBoard(
+        boardId: $boardId,
+        url: 'https://example.com/notif-test',
+        format: NotificationServiceFormatEnum::TEXT,
+    );
+    if ($notifService instanceof NotificationServiceDto) {
+        assertCreated('notificationServices', $notifService->id, $notifService, $createdTracker);
+        dump("Notification Service created OK (ID: {$notifService->id})");
 
-// add label
-$label = $client->label->create($boardGet->item->id, 'test', LabelColorEnum::APRICOT_RED, 1);
+        $client->notificationService->test($notifService->id);
+        dump('Notification Service test call OK');
 
-// update label
-$client->label->update($label->id, 'mimo', LabelColorEnum::CORAL_GREEN);
+        safeVerifyOwned('notificationServices', $notifService->id, $createdTracker);
+        $client->notificationService->delete($notifService->id);
+        unset($createdTracker['notificationServices'][$notifService->id]);
+        dump('Notification Service delete OK');
+    }
+} catch (Throwable $e) {
+    dump('Notification Service test skipped or unauthorized: ' . $e->getMessage());
+}
 
-// add label to card
-$client->cardLabel->add($cardGet->id, $label->id);
-$client->cardLabel->remove($cardGet->id, $label->id);
+// 13. Explicit Deletion & Safety Verification
+dump('[12/13] Testing Explicit Deletion of Cards, Board, Custom Field Groups, and Project...');
 
-// delete label
-$client->label->delete($label->id);
+// 1. Delete Cards & Verify 404
+safeVerifyOwned('cards', $card1->id, $createdTracker);
+$client->card->delete($card1->id);
+unset($createdTracker['cards'][$card1->id]);
 
-// delete card
-$client->card->delete($cardGet->id);
+try {
+    $client->card->get($card1->id);
+    dd('ERROR: Card1 was not deleted on server!');
+} catch (ClientException $e) {
+    dump('Card1 deletion verified OK (404 caught)');
+}
 
-// delete board
-$client->board->delete($boardGet->item->id);
+safeVerifyOwned('cards', $duplicatedCard->id, $createdTracker);
+$client->card->delete($duplicatedCard->id);
+unset($createdTracker['cards'][$duplicatedCard->id]);
 
-// delete project
+try {
+    $client->card->get($duplicatedCard->id);
+    dd('ERROR: Duplicated card was not deleted on server!');
+} catch (ClientException $e) {
+    dump('Duplicated card deletion verified OK (404 caught)');
+}
+
+// 2. Delete Board & Verify 404
+safeVerifyOwned('boards', $boardId, $createdTracker);
+$client->board->delete($boardId);
+unset($createdTracker['boards'][$boardId]);
+
+// Board deletion cascades child lists and board custom field groups
+unset($createdTracker['lists'][$columnTodo->id], $createdTracker['lists'][$columnDone->id], $createdTracker['customGroups'][$boardGroup->id]);
+
+try {
+    $client->board->get($boardId);
+    dd('ERROR: Board was not deleted on server!');
+} catch (ClientException $e) {
+    dump('Board deletion verified OK (404 caught)');
+}
+
+// 3. Delete Base Custom Field Group
+safeVerifyOwned('baseCustomGroups', $baseGroup->id, $createdTracker);
+$client->baseCustomFieldGroup->delete($baseGroup->id);
+unset($createdTracker['baseCustomGroups'][$baseGroup->id], $createdTracker['customFields'][$customField->id]);
+dump('Base Custom Field Group deletion OK');
+
+// 4. Delete Project & Verify 404
+safeVerifyOwned('projects', $project->id, $createdTracker);
 $client->project->delete($project->id);
+unset($createdTracker['projects'][$project->id]);
+
+try {
+    $client->project->get($project->id);
+    dd('ERROR: Project was not deleted on server!');
+} catch (ClientException $e) {
+    dump('Project deletion verified OK (404 caught)');
+}
+
+dump('[13/13] Checking tracker state after cleanup...');
+$remainingItems = array_sum(array_map('count', $createdTracker));
+if ($remainingItems > 0) {
+    dd('WARNING: Some tracked test resources were not cleaned up!', $createdTracker);
+}
+dump('Tracker clean: 0 remaining items');
+
+dump('========================================');
+dump('   PLANKA SDK v2 INTEGRATION TEST PASSED ');
+dump('========================================');

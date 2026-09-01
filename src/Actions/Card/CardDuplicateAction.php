@@ -12,7 +12,33 @@ final class CardDuplicateAction implements ActionInterface, ResponseResultInterf
 {
     use CardHydrateTrait;
 
-    public function __construct(private readonly string $cardId) {}
+    private array $options = [];
+
+    public function __construct(
+        private readonly string $cardId,
+        ?string $boardId = null,
+        ?string $listId = null,
+        int $position = 65536,
+        ?string $name = null,
+    ) {
+        $body = [
+            'position' => $position,
+        ];
+
+        if (null !== $boardId) {
+            $body['boardId'] = $boardId;
+        }
+
+        if (null !== $listId) {
+            $body['listId'] = $listId;
+        }
+
+        if (null !== $name) {
+            $body['name'] = $name;
+        }
+
+        $this->options['json'] = $body;
+    }
 
     public function url(): string
     {
@@ -21,6 +47,6 @@ final class CardDuplicateAction implements ActionInterface, ResponseResultInterf
 
     public function getOptions(): array
     {
-        return [];
+        return $this->options;
     }
 }

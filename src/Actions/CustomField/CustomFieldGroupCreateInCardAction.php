@@ -19,8 +19,9 @@ final class CustomFieldGroupCreateInCardAction implements ActionInterface, Respo
         private readonly string $cardId,
         ?string $name = null,
         ?string $baseCustomFieldGroupId = null,
+        int $position = 65536,
     ) {
-        $body = [];
+        $body = ['position' => $position];
 
         if (null !== $name) {
             $body['name'] = $name;

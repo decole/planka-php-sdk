@@ -20,22 +20,24 @@ final class CustomFieldGroup
     ) {}
 
     /** 'POST /api/boards/:boardId/custom-field-groups' */
-    public function createInBoard(string $boardId, ?string $name = null, ?string $baseCustomFieldGroupId = null): CustomFieldGroupDto
+    public function createInBoard(string $boardId, ?string $name = null, ?string $baseCustomFieldGroupId = null, int $position = 65536): CustomFieldGroupDto
     {
         return $this->client->post(new CustomFieldGroupCreateInBoardAction(
             boardId: $boardId,
             name: $name,
             baseCustomFieldGroupId: $baseCustomFieldGroupId,
+            position: $position,
         ));
     }
 
     /** 'POST /api/cards/:cardId/custom-field-groups' */
-    public function createInCard(string $cardId, ?string $name = null, ?string $baseCustomFieldGroupId = null): CustomFieldGroupDto
+    public function createInCard(string $cardId, ?string $name = null, ?string $baseCustomFieldGroupId = null, int $position = 65536): CustomFieldGroupDto
     {
         return $this->client->post(new CustomFieldGroupCreateInCardAction(
             cardId: $cardId,
             name: $name,
             baseCustomFieldGroupId: $baseCustomFieldGroupId,
+            position: $position,
         ));
     }
 

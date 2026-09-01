@@ -19,8 +19,9 @@ final class CustomFieldGroupCreateInBoardAction implements ActionInterface, Resp
         private readonly string $boardId,
         ?string $name = null,
         ?string $baseCustomFieldGroupId = null,
+        int $position = 65536,
     ) {
-        $body = [];
+        $body = ['position' => $position];
 
         if (null !== $name) {
             $body['name'] = $name;
