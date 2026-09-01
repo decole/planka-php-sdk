@@ -31,7 +31,7 @@ final class ProjectManagerCreateAction implements ActionInterface, AuthenticateI
     public function getOptions(): array
     {
         return [
-            'body' => [
+            'json' => [
                 'userId' => $this->userId,
             ],
         ];

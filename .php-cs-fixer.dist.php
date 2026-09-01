@@ -13,7 +13,21 @@ return (new PhpCsFixer\Config())
     ->setCacheFile(__DIR__ . '/var/.php-cs-fixer.cache')
     ->setRules([
         '@Symfony' => true,
-        '@PER-CS2.0' => true,
+        '@PER-CS2x0' => true,
+        'indentation_type' => true,
+        'blank_line_before_statement' => [
+            'statements' => [
+                'if',
+                'return',
+                'try',
+                'for',
+                'foreach',
+                'do',
+                'while',
+                'switch',
+                'throw',
+            ],
+        ],
         'class_attributes_separation' => [
             'elements' => [
                 'const' => 'none',

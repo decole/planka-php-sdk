@@ -87,7 +87,7 @@ final class CardDtoFactory implements OutputInterface
             name: $item['name'],
             description: $item['description'],
             dueDate: $this->convertToDateTime($item['dueDate']),
-            isDueDateCompleted: $item['isDueDateCompleted'],
+            isDueDateCompleted: $item['isDueCompleted'] ?? $item['isDueDateCompleted'] ?? null,
             stopwatch: (new StopWatchDtoFactory())->create($item['stopwatch']),
             boardId: $item['boardId'],
             listId: $item['listId'],

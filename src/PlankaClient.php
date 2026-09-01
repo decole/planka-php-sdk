@@ -25,14 +25,22 @@ use Planka\Bridge\Controllers\Project;
 use Planka\Bridge\Controllers\Board;
 use Planka\Bridge\Controllers\Label;
 use Planka\Bridge\Controllers\Card;
+use Planka\Bridge\Controllers\BaseCustomFieldGroup;
+use Planka\Bridge\Controllers\CustomField;
+use Planka\Bridge\Controllers\CustomFieldGroup;
+use Planka\Bridge\Controllers\NotificationService;
+use Planka\Bridge\Controllers\SystemConfig;
 use Planka\Bridge\Controllers\User;
+use Planka\Bridge\Controllers\Webhook;
 
 /**
- * https://github.com/plankanban/planka/blob/master/server/config/routes.js.
+ * @see https://plankanban.github.io/planka/swagger-ui/
  */
 final class PlankaClient
 {
     public readonly Attachment $attachment;
+
+    public readonly BaseCustomFieldGroup $baseCustomFieldGroup;
 
     public readonly Board $board;
 
@@ -52,15 +60,25 @@ final class PlankaClient
 
     public readonly Comment $comment;
 
+    public readonly CustomField $customField;
+
+    public readonly CustomFieldGroup $customFieldGroup;
+
     public readonly Label $label;
 
     public readonly Notification $notification;
+
+    public readonly NotificationService $notificationService;
 
     public readonly Project $project;
 
     public readonly ProjectManager $projectManager;
 
+    public readonly SystemConfig $systemConfig;
+
     public readonly User $user;
+
+    public readonly Webhook $webhook;
 
     private readonly Client $client;
 
@@ -69,12 +87,13 @@ final class PlankaClient
         ?Client $client = null,
     ) {
         if (null === $client) {
-            $client = new Client($this->config->getBaseUri(), $this->config->getPort());
+            $client = new Client($this->config);
         }
 
         $this->client = $client;
 
         $this->attachment = new Attachment($config, $this->client);
+        $this->baseCustomFieldGroup = new BaseCustomFieldGroup($config, $this->client);
         $this->board = new Board($config, $this->client);
         $this->boardList = new BoardList($config, $this->client);
         $this->boardMembership = new BoardMembership($config, $this->client);
@@ -84,11 +103,16 @@ final class PlankaClient
         $this->cardMembership = new CardMembership($config, $this->client);
         $this->cardTask = new CardTask($config, $this->client);
         $this->comment = new Comment($config, $this->client);
+        $this->customField = new CustomField($config, $this->client);
+        $this->customFieldGroup = new CustomFieldGroup($config, $this->client);
         $this->label = new Label($config, $this->client);
         $this->notification = new Notification($config, $this->client);
+        $this->notificationService = new NotificationService($config, $this->client);
         $this->project = new Project($config, $this->client);
         $this->projectManager = new ProjectManager($config, $this->client);
+        $this->systemConfig = new SystemConfig($config, $this->client);
         $this->user = new User($config, $this->client);
+        $this->webhook = new Webhook($config, $this->client);
     }
 
     /**
@@ -118,7 +142,7 @@ final class PlankaClient
      */
     public function logout(): void
     {
-        $response = $this->client->delete(new LogoutAction(token: $this->config->getAuthToken()));
+        $response = $this->client->delete(new LogoutAction());
 
         $this->config->setAuthToken(null);
 

@@ -26,13 +26,17 @@ final class Card
     ) {}
 
     /** 'POST /api/lists/:listId/cards' */
-    public function create(string $listId, string $name, int $position): CardDto
-    {
+    public function create(
+        string $listId,
+        string $name,
+        int $position = 65536,
+        \Planka\Bridge\Enum\BoardDefaultCardTypeEnum $type = \Planka\Bridge\Enum\BoardDefaultCardTypeEnum::PROJECT,
+    ): CardDto {
         return $this->client->post(new CardCreateAction(
             listId: $listId,
             name: $name,
             position: $position,
-            token: $this->config->getAuthToken(),
+            type: $type,
         ));
     }
 
@@ -113,5 +117,28 @@ final class Card
             userId: $userId,
             token: $this->config->getAuthToken(),
         ));
+    }
+
+    /** 'POST /api/cards/:id/duplicate' */
+    public function duplicate(
+        string $cardId,
+        ?string $boardId = null,
+        ?string $listId = null,
+        int $position = 65536,
+        ?string $name = null,
+    ): CardDto {
+        return $this->client->post(new \Planka\Bridge\Actions\Card\CardDuplicateAction(
+            cardId: $cardId,
+            boardId: $boardId,
+            listId: $listId,
+            position: $position,
+            name: $name,
+        ));
+    }
+
+    /** 'POST /api/cards/:id/read-notifications' */
+    public function readNotifications(string $cardId): CardDto
+    {
+        return $this->client->post(new \Planka\Bridge\Actions\Card\CardReadNotificationsAction(cardId: $cardId));
     }
 }

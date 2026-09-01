@@ -31,7 +31,7 @@ final class CardUnsubscribeMembershipAction implements ActionInterface, Authenti
     public function getOptions(): array
     {
         return [
-            'body' => [
+            'json' => [
                 'userId' => $this->userId,
             ],
         ];

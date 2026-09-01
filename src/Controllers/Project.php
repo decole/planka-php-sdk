@@ -32,9 +32,16 @@ final class Project
     }
 
     /** 'POST /api/projects' */
-    public function create(string $name): ProjectDto
-    {
-        return $this->client->post(new ProjectCreateAction(name: $name, token: $this->config->getAuthToken()));
+    public function create(
+        string $name,
+        \Planka\Bridge\Enum\ProjectTypeEnum $type = \Planka\Bridge\Enum\ProjectTypeEnum::PRIVATE,
+        ?string $description = null,
+    ): ProjectDto {
+        return $this->client->post(new ProjectCreateAction(
+            name: $name,
+            type: $type,
+            description: $description,
+        ));
     }
 
     /** 'GET /api/projects/:id' */

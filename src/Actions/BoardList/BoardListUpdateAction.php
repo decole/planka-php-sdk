@@ -31,7 +31,7 @@ final class BoardListUpdateAction implements ActionInterface, AuthenticateInterf
     public function getOptions(): array
     {
         return [
-            'body' => [
+            'json' => [
                 'name' => $this->name,
             ],
         ];

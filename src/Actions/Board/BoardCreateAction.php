@@ -32,7 +32,7 @@ final class BoardCreateAction implements ActionInterface, AuthenticateInterface,
     public function getOptions(): array
     {
         return [
-            'body' => [
+            'json' => [
                 'name' => $this->name,
                 'position' => $this->position,
             ],

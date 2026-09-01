@@ -1,0 +1,1 @@
+{"item":{"id":"1854744391357302353","createdAt":"2026-09-01T20:26:01.191Z","updatedAt":null,"name":"Test Webhook v2","url":"https://example.com/webhook-test","accessToken":null,"events":["cardCreate","cardUpdate"],"excludedEvents":null,"boardId":null}}
