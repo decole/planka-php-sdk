@@ -30,6 +30,7 @@ abstract class AbstractUnitTestCase extends TestCase
     protected function createMockClient(string $fixturePath, int $statusCode = 200, array $headers = []): PlankaClient
     {
         $fullPath = __DIR__ . '/../Fixtures/' . ltrim($fixturePath, '/');
+
         if (!file_exists($fullPath)) {
             throw new \InvalidArgumentException("Fixture file not found: {$fullPath}");
         }
