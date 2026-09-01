@@ -9,10 +9,21 @@ use Planka\Bridge\Enum\BackgroundGradientEnum;
 use Planka\Bridge\Enum\BackgroundTypeEnum;
 use Planka\Bridge\Enum\LabelColorEnum;
 use Planka\Bridge\PlankaClient;
+use Planka\Bridge\Views\Dto\Attachment\AttachmentDto;
 use Planka\Bridge\Views\Dto\Background\BackgroundDto;
+use Planka\Bridge\Views\Dto\Board\BoardIncludedDto;
+use Planka\Bridge\Views\Dto\Board\BoardMembershipDto;
+use Planka\Bridge\Views\Dto\Card\CardDto;
+use Planka\Bridge\Views\Dto\Card\CardLabelDto;
+use Planka\Bridge\Views\Dto\Card\CardMembershipDto;
+use Planka\Bridge\Views\Dto\Card\CardTaskDto;
 use Planka\Bridge\Views\Dto\Card\StopWatchDto;
+use Planka\Bridge\Views\Dto\Label\LabelDto;
+use Planka\Bridge\Views\Dto\List\ListDto;
+use Planka\Bridge\Views\Dto\Project\ProjectDto;
 use Planka\Bridge\Views\Dto\User\UserDto;
 use Planka\Bridge\Views\Factory\Project\ProjectManagerDto;
+use Symfony\Component\HttpClient\Exception\ClientException;
 
 // copy config.example.php to config.php and setup for you
 $config = include __DIR__ . '/config.php';
@@ -357,6 +368,412 @@ $project = $client->project->get('1437009275900659095');
 //}
 
 //dump('User functionality check - success');
+
+//dump('Create test bpard "test-board"');
+
+//$board = $client->board->create($project->id, 'test-board', 0);
+
+//$boardGet = $client->board->get($board->item->id);
+
+//
+//if ($boardGet->item->name !== 'test-board') {
+//    dd('Test board has another name!');
+//}
+//
+//dump('Update board name to "Test board"');
+//
+//$board = $client->board->update($boardGet->item->id, 'Test board');
+//
+//if ($client->board->get($boardGet->item->id)->item->name !== 'Test board') {
+//    dd('Test board has another name!');
+//}
+//
+//dump('Board created and rename - successfuly');
+//
+//dump('
+//--- --- ---
+//');
+//
+//dump('Start card tests!');
+//
+//dump('
+//Create columns
+//');
+
+//$firstColumn = $client->boardList->create($board->item->id, 'First column', 1);
+//
+//dump('Create first column ' . $firstColumn->id); // 1451535592738260455
+//
+//$secondColumn = $client->boardList->create($board->item->id, 'Second column', 2);
+//
+//dump('Create second column ' . $secondColumn->id); // 1451535592947975656
+//
+//$thirdColumn = $client->boardList->create($board->item->id, 'Third column', 3);
+//
+//dump('Create third column ' . $thirdColumn->id); // 1451535593140913641
+
+//dump('Creating columns successfully');
+
+//dump('Test delete third column');
+
+//$client->boardList->delete($thirdColumn->id);
+//
+//try {
+//    $client->boardList->update($thirdColumn->id, 'Third column');
+//
+//    dd('Third column not deleted!');
+//} catch (ClientException $e) {
+//    dump('Third column delete successfully');
+//}
+
+//dump('
+//--- --- ---
+//');
+
+
+
+dump('Create cards');
+
+
+$board = $client->board->get('1451521574929696228'); // todo delete this
+dd($board);
+
+$board = $client->board->get($board->item->id);
+
+/**
+ * @param list<UserDto>            $users
+ * @param list<BoardMembershipDto> $boardMemberships
+ * @param list<LabelDto>           $labels
+ * @param list<ListDto>            $lists
+ * @param list<CardDto>            $cards
+ * @param list<CardMembershipDto>  $cardMemberships
+ * @param list<CardLabelDto>       $cardLabels
+ * @param list<CardTaskDto>        $tasks
+ * @param list<AttachmentDto>      $attachments
+ * @param list<ProjectDto>         $projects
+ */
+$included = $board->included;
+
+$firstColumn = $secondColumn = null;
+
+foreach ($included->lists as $item) {
+    if ($item->name === 'First column') {
+        $firstColumn = $item;
+    }
+
+    if ($item->name === 'Second column') {
+        $secondColumn = $item;
+    }
+
+//    if ($item->name === 'Third column') {
+//        dd('Third column not deleted');
+//    }
+}
+
+//if ($firstColumn === null || $secondColumn === null) {
+//    dd('First column or second column not defined');
+//}
+//
+//$card = $client->card->create($firstColumn->id, 'first card', 0);
+//$cardOne = $client->card->create($firstColumn->id, 'second card', 1);
+//
+//dump(
+//    sprintf('First card: %s, second card %s', $card->id, $cardOne->id),
+//);
+//
+//$client->card->delete($cardOne->id);
+//
+//try {
+//    $client->card->delete($cardOne->id);
+//
+//    dd('Card double deleting!');
+//} catch (ClientException $e) {
+//    dump('second card deleted');
+//}
+//
+//try {
+//    $client->card->get($cardOne->id);
+//
+//    dd('Card not deleted!');
+//} catch (ClientException $e) {
+//    dump('second card deleted successfully!');
+//}
+//
+//dump('Move card from first column to second column');
+//
+//$card->listId = $secondColumn->id;
+////$card->boardId;
+//$card->position = 100;
+//
+//$client1($card);
+//
+//$card = $client->card->get($card->id);
+//
+//if ($card->position !== 100) {
+//    dd('Position card wrong!');
+//}
+//
+//if ($card->listId !== $secondColumn->id) {
+//    dd('Card move uncorrect!');
+//}
+
+// Todo
+// get card ids and get list card
+// update abd delete second card
+// first card add - tasks, description, time track, and other
+
+dump('Resolve cards on board');
+
+$board = $client->board->get($board->item->id);
+
+/**
+ * @param list<UserDto>            $users
+ * @param list<BoardMembershipDto> $boardMemberships
+ * @param list<LabelDto>           $labels
+ * @param list<ListDto>            $lists
+ * @param list<CardDto>            $cards
+ * @param list<CardMembershipDto>  $cardMemberships
+ * @param list<CardLabelDto>       $cardLabels
+ * @param list<CardTaskDto>        $tasks
+ * @param list<AttachmentDto>      $attachments
+ * @param list<ProjectDto>         $projects
+ */
+$included = $board->included;
+
+$firstColumn = $secondColumn = null;
+
+foreach ($included->lists as $item) {
+    if ($item->name === 'First column') {
+        $firstColumn = $item;
+    }
+
+    if ($item->name === 'Second column') {
+        $secondColumn = $item;
+    }
+}
+
+if ($firstColumn === null || $secondColumn === null) {
+    dd('Columns not found');
+}
+
+$card = null;
+
+foreach($board->included->cards as $cardItem) {
+    if ($cardItem instanceof CardDto) {
+        if ($cardItem->name === 'first card' &&
+            $cardItem->boardId === $board->item->id &&
+            ($cardItem->listId === $firstColumn->id || $cardItem->listId === $secondColumn->id)
+        ) {
+            $card = $cardItem;
+        }
+    }
+}
+
+if ($card === null) {
+    dd('Cards not found');
+}
+
+dump('Move Card to column');
+
+$card->listId = $firstColumn->id;
+
+$client->card->moveCard($card);
+
+$card = $client->card->get($card->id);
+
+if ($card->listId !== $firstColumn->id) {
+    dd('Cards not moved to first column');
+}
+
+dump('Add discription to card');
+
+$description = 'Description test text';
+
+$card->description = $description;
+
+$client->card->update($card);
+
+$card = $client->card->get($card->id);
+
+if ($card->description !== $description) {
+    dd('Description not join');
+}
+
+dump('Discription add to caard - successfuly');
+
+
+dump('Add tasks to card');
+
+$firstTaskText = 'First task';
+$secondTaskText = 'Second task';
+$thirdTaskText = 'Third task';
+
+//$client->cardTask->create($card->id, $firstTaskText, 0);
+//$client->cardTask->create($card->id, $secondTaskText, 1);
+//$client->cardTask->create($card->id, $thirdTaskText, 2);
+
+$card = $client->card->get($card->id);
+
+$firstTask = null;
+$secondTask = null;
+$thirdTask = null;
+
+foreach ($card->included->tasks as $taskItem) {
+    if ($taskItem->name === $firstTaskText) {
+        $firstTask = $taskItem;
+
+//        if ($taskItem->position !== 0) {
+//            dd('First task position wrong. Expected 0, real is - ' . $taskItem->position);
+//        }
+    }
+
+    if ($taskItem->name === $secondTaskText) {
+        $secondTask = $taskItem;
+
+//        if ($taskItem->position !== 1) {
+//            dd('Second task position wrong. Expected 1, real is - ' . $taskItem->position);
+//        }
+    }
+
+    if ($taskItem->name === $thirdTaskText) {
+        $thirdTask = $taskItem;
+
+//        if ($taskItem->position !== 2) {
+//            dd('Third task position wrong. Expected 2, real is - ' . $taskItem->position);
+//        }
+    }
+}
+
+dump('Card tasks crete successfully');
+
+dump('Try "Is done" tsasks status changing');
+
+$firstTask->isCompleted = true;
+$secondTask->isCompleted = true;
+$thirdTask->isCompleted = true;
+
+$client->cardTask->update($firstTask);
+$client->cardTask->update($secondTask);
+$client->cardTask->update($thirdTask);
+
+
+$card = $client->card->get($card->id);
+
+$firstTask = null;
+$secondTask = null;
+$thirdTask = null;
+
+foreach ($card->included->tasks as $taskItem) {
+    if ($taskItem->name === $firstTaskText) {
+        $firstTask = $taskItem;
+
+//        if ($taskItem->position !== 0) {
+//            dd('First task position wrong. Expected 0, real is - ' . $taskItem->position);
+//        }
+    }
+
+    if ($taskItem->name === $secondTaskText) {
+        $secondTask = $taskItem;
+
+//        if ($taskItem->position !== 1) {
+//            dd('Second task position wrong. Expected 1, real is - ' . $taskItem->position);
+//        }
+    }
+
+    if ($taskItem->name === $thirdTaskText) {
+        $thirdTask = $taskItem;
+
+//        if ($taskItem->position !== 2) {
+//            dd('Third task position wrong. Expected 2, real is - ' . $taskItem->position);
+//        }
+    }
+}
+
+if ($firstTask->isCompleted !== true) {
+    dd('First task is not completed changing');
+}
+
+if ($secondTask->isCompleted !== true) {
+    dd('First task is not completed changing');
+}
+
+if ($thirdTask->isCompleted !== true) {
+    dd('First task is not completed changing');
+}
+
+
+dump('Try "Is done" tsasks status changing - successfuly');
+
+
+dump('Try "Is NOT done" tsasks status changing');
+
+$firstTask->isCompleted = false;
+$secondTask->isCompleted = false;
+$thirdTask->isCompleted = false;
+
+$client->cardTask->update($firstTask);
+$client->cardTask->update($secondTask);
+$client->cardTask->update($thirdTask);
+
+
+$card = $client->card->get($card->id);
+
+$firstTask = null;
+$secondTask = null;
+$thirdTask = null;
+
+foreach ($card->included->tasks as $taskItem) {
+    if ($taskItem->name === $firstTaskText) {
+        $firstTask = $taskItem;
+
+//        if ($taskItem->position !== 0) {
+//            dd('First task position wrong. Expected 0, real is - ' . $taskItem->position);
+//        }
+    }
+
+    if ($taskItem->name === $secondTaskText) {
+        $secondTask = $taskItem;
+
+//        if ($taskItem->position !== 1) {
+//            dd('Second task position wrong. Expected 1, real is - ' . $taskItem->position);
+//        }
+    }
+
+    if ($taskItem->name === $thirdTaskText) {
+        $thirdTask = $taskItem;
+
+//        if ($taskItem->position !== 2) {
+//            dd('Third task position wrong. Expected 2, real is - ' . $taskItem->position);
+//        }
+    }
+}
+
+if ($firstTask->isCompleted !== false) {
+    dd('First task is not completed changing');
+}
+
+if ($secondTask->isCompleted !== false) {
+    dd('First task is not completed changing');
+}
+
+if ($thirdTask->isCompleted !== false) {
+    dd('First task is not completed changing');
+}
+
+dump('Try "Is NOT done" tsasks status changing - successfuly');
+
+// todo delete tasks
+// card comment
+// card timelaps
+// labels
+// deadline
+// membership
+// attachment
+// subscribe
+
+// дубюлирование
+
+// delete card
 
 dd('---');
 
