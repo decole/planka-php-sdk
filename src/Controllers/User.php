@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Controllers;
 
+use Planka\Bridge\Actions\User\UserCreateApiKeyAction;
 use Planka\Bridge\Actions\User\UserUpdatePasswordAction;
 use Planka\Bridge\Actions\User\UserUpdateUsernameAction;
 use Planka\Bridge\Actions\User\UserUpdateAvatarAction;
@@ -100,5 +101,11 @@ final class User
     public function delete(UserDto $dto): UserDto
     {
         return $this->client->delete(new UserDeleteAction(user: $dto, token: $this->config->getAuthToken()));
+    }
+
+    /** 'POST /api/users/:id/api-key' */
+    public function createApiKey(string $userId): array
+    {
+        return $this->client->post(new UserCreateApiKeyAction($userId));
     }
 }

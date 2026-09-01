@@ -26,9 +26,10 @@ use Planka\Bridge\Controllers\Board;
 use Planka\Bridge\Controllers\Label;
 use Planka\Bridge\Controllers\Card;
 use Planka\Bridge\Controllers\User;
+use Planka\Bridge\Controllers\Webhook;
 
 /**
- * https://github.com/plankanban/planka/blob/master/server/config/routes.js.
+ * @see https://plankanban.github.io/planka/swagger-ui/
  */
 final class PlankaClient
 {
@@ -62,6 +63,8 @@ final class PlankaClient
 
     public readonly User $user;
 
+    public readonly Webhook $webhook;
+
     private readonly Client $client;
 
     public function __construct(
@@ -69,7 +72,7 @@ final class PlankaClient
         ?Client $client = null,
     ) {
         if (null === $client) {
-            $client = new Client($this->config->getBaseUri(), $this->config->getPort());
+            $client = new Client($this->config);
         }
 
         $this->client = $client;
@@ -89,6 +92,7 @@ final class PlankaClient
         $this->project = new Project($config, $this->client);
         $this->projectManager = new ProjectManager($config, $this->client);
         $this->user = new User($config, $this->client);
+        $this->webhook = new Webhook($config, $this->client);
     }
 
     /**
@@ -118,7 +122,7 @@ final class PlankaClient
      */
     public function logout(): void
     {
-        $response = $this->client->delete(new LogoutAction(token: $this->config->getAuthToken()));
+        $response = $this->client->delete(new LogoutAction());
 
         $this->config->setAuthToken(null);
 

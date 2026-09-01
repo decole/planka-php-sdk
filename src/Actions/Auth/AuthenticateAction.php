@@ -4,22 +4,19 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Actions\Auth;
 
-use Symfony\Component\Mime\Part\Multipart\FormDataPart;
 use Planka\Bridge\Contracts\Actions\ActionInterface;
 
 final class AuthenticateAction implements ActionInterface
 {
     private array $options = [];
 
-    public function __construct(string $username, string $password)
+    public function __construct(string $username, string $password, bool $withHttpOnlyToken = false)
     {
-        $formFields = [
+        $this->options['json'] = [
             'emailOrUsername' => $username,
             'password' => $password,
+            'withHttpOnlyToken' => $withHttpOnlyToken,
         ];
-        $formData = new FormDataPart($formFields);
-        $this->options['headers'] = $formData->getPreparedHeaders()->toArray();
-        $this->options['body'] = $formData->bodyToIterable();
     }
 
     public function url(): string

@@ -4,35 +4,30 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\TransportClients;
 
-use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
-use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Planka\Bridge\Config;
 use Planka\Bridge\Contracts\Actions\ActionInterface;
-use Symfony\Contracts\HttpClient\ResponseInterface;
+use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
+use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class Client
 {
-    private const URI_TEMPLATE = '%s:%u/%s';
-
     private HttpClientInterface $client;
 
     public function __construct(
-        private readonly string $baseUri,
-        private readonly int $port,
+        private readonly Config $config,
         ?HttpClientInterface $client = null,
     ) {
         $this->client = $client ?? HttpClient::create();
     }
 
-    /**
-     * check throw to auth, and return authNotAuth exception.
-     */
     public function get(ActionInterface $action): mixed
     {
         $response = $this->client->request(
             method: 'GET',
-            url: sprintf(self::URI_TEMPLATE, $this->baseUri, $this->port, $action->url()),
+            url: $this->buildUrl($action->url()),
             options: $this->compileOptions($action),
         );
 
@@ -43,7 +38,7 @@ final class Client
     {
         $response = $this->client->request(
             method: 'POST',
-            url: sprintf(self::URI_TEMPLATE, $this->baseUri, $this->port, $action->url()),
+            url: $this->buildUrl($action->url()),
             options: $this->compileOptions($action),
         );
 
@@ -54,7 +49,7 @@ final class Client
     {
         $response = $this->client->request(
             method: 'PATCH',
-            url: sprintf(self::URI_TEMPLATE, $this->baseUri, $this->port, $action->url()),
+            url: $this->buildUrl($action->url()),
             options: $this->compileOptions($action),
         );
 
@@ -65,11 +60,26 @@ final class Client
     {
         $response = $this->client->request(
             method: 'DELETE',
-            url: sprintf(self::URI_TEMPLATE, $this->baseUri, $this->port, $action->url()),
+            url: $this->buildUrl($action->url()),
             options: $this->compileOptions($action),
         );
 
         return $this->getResult($action, $response);
+    }
+
+    private function buildUrl(string $path): string
+    {
+        $base = rtrim($this->config->getBaseUri(), '/');
+
+        if (
+            80 !== $this->config->getPort()
+            && 443 !== $this->config->getPort()
+            && !str_contains($base, ':', 7)
+        ) {
+            $base .= ':' . $this->config->getPort();
+        }
+
+        return $base . '/' . ltrim($path, '/');
     }
 
     private function getResult(ActionInterface $action, ResponseInterface $response): mixed
@@ -85,7 +95,11 @@ final class Client
     {
         $options = $action->getOptions();
 
-        if ($action instanceof AuthenticateInterface) {
+        if (null !== $this->config->getApiKey()) {
+            $options['headers']['X-Api-Key'] = $this->config->getApiKey();
+        } elseif (null !== $this->config->getAuthToken()) {
+            $options['auth_bearer'] = $this->config->getAuthToken();
+        } elseif ($action instanceof AuthenticateInterface && null !== $action->getToken()) {
             $options['auth_bearer'] = $action->getToken();
         }
 
