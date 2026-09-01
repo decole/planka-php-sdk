@@ -6,7 +6,6 @@ declare(strict_types=1);
  * Tests for Planka v.2.
  */
 
-
 // Run after `composer install` in root directory
 
 use Planka\Bridge\Config;
@@ -73,22 +72,28 @@ $client = new PlankaClient($config);
 // 2. Ping Server
 dump('[1/13] Pinging Planka server...');
 $infoResponse = $client->getInfo();
+
 if (200 !== $infoResponse->getStatusCode()) {
     dd('ERROR: Planka server is not reachable!');
 }
+
 dump('Server connection OK');
 
 // 3. Authenticate (JWT)
 dump('[2/13] Authenticating via JWT (email/password)...');
+
 if (!$client->authenticate()) {
     dd('ERROR: Authentication failed!');
 }
+
 dump('JWT Authentication OK. Token acquired.');
 
 // 4. Test System Config
 dump('[3/13] Fetching System Config...');
+
 try {
     $sysConfig = $client->systemConfig->get();
+
     if ($sysConfig instanceof SystemConfigDto) {
         dump("System Config OK (id: {$sysConfig->id})");
     }
@@ -104,15 +109,18 @@ $project = $client->project->create($projectName);
 if (!$project instanceof ProjectDto || $project->name !== $projectName) {
     dd('ERROR: Failed to create project!');
 }
+
 assertCreated('projects', $project->id, $project, $createdTracker);
 dump("Project created OK (ID: {$project->id})");
 
 // 6. Base Custom Field Groups & Fields
 dump('[5/13] Testing Base Custom Field Group & Custom Fields...');
 $baseGroup = $client->baseCustomFieldGroup->create($project->id, 'Base Specs');
+
 if (!$baseGroup instanceof BaseCustomFieldGroupDto) {
     dd('ERROR: Base custom field group creation failed!');
 }
+
 assertCreated('baseCustomGroups', $baseGroup->id, $baseGroup, $createdTracker);
 dump("Base Custom Field Group created OK (ID: {$baseGroup->id})");
 
@@ -121,9 +129,11 @@ $customField = $client->customField->createInBaseGroup(
     name: 'Priority',
     showOnFrontOfCard: true,
 );
+
 if (!$customField instanceof CustomFieldDto) {
     dd('ERROR: Custom field creation failed!');
 }
+
 assertCreated('customFields', $customField->id, $customField, $createdTracker);
 dump("Custom Field created OK (ID: {$customField->id}, name: {$customField->name})");
 
@@ -135,6 +145,7 @@ $board = $client->board->create($project->id, $boardName, 0);
 if (!$board instanceof BoardDto || null === $board->item) {
     dd('ERROR: Failed to create board!');
 }
+
 $boardId = $board->item->id;
 assertCreated('boards', $boardId, $board, $createdTracker);
 dump("Board created OK (ID: {$boardId})");
@@ -145,9 +156,11 @@ dump('Board updated OK');
 
 // Custom Field Group on Board
 $boardGroup = $client->customFieldGroup->createInBoard($boardId, 'Board Fields');
+
 if (!$boardGroup instanceof CustomFieldGroupDto) {
     dd('ERROR: Custom field group on board creation failed!');
 }
+
 assertCreated('customGroups', $boardGroup->id, $boardGroup, $createdTracker);
 dump("Board Custom Field Group created OK (ID: {$boardGroup->id})");
 
@@ -183,6 +196,7 @@ try {
 // 9. Test Cards & Card v2 Operations
 dump('[8/13] Testing Cards (Create, Duplicate, Read Notifications)...');
 $card1 = $client->card->create($columnTodo->id, '[v2-test] Task 1', 1);
+
 if (!$card1 instanceof CardDto) {
     dd('ERROR: Failed to create card 1!');
 }
@@ -191,6 +205,7 @@ dump("Card created OK (ID: {$card1->id})");
 
 // Duplicate Card (Planka v2 Feature)
 $duplicatedCard = $client->card->duplicate($card1->id);
+
 if (!$duplicatedCard instanceof CardDto) {
     dd('ERROR: Card duplication failed!');
 }
@@ -204,6 +219,7 @@ dump('Card readNotifications OK');
 // 10. Card Tasks & Task Lists
 dump('[9/13] Testing Task Lists & Card Tasks (Create, Update, Delete)...');
 $taskList = $client->cardTask->createTaskList($card1->id, '[v2-test] Checklist');
+
 if (!$taskList instanceof TaskListDto) {
     dd('ERROR: Task list creation failed!');
 }
@@ -211,6 +227,7 @@ assertCreated('taskLists', $taskList->id, $taskList, $createdTracker);
 dump("Task List created OK (ID: {$taskList->id})");
 
 $task1 = $client->cardTask->create($taskList->id, '[v2-test] Subtask 1', 0);
+
 if (!$task1 instanceof CardTaskDto) {
     dd('ERROR: Card task creation failed!');
 }
@@ -243,12 +260,14 @@ try {
 
 // 11. Test Webhooks (Planka v2 Feature)
 dump('[10/13] Testing Webhooks (v2 Feature)...');
+
 try {
     $webhook = $client->webhook->create(
         name: 'Test Webhook v2',
         url: 'https://example.com/webhook-test',
         events: 'cardCreate,cardUpdate',
     );
+
     if ($webhook instanceof WebhookDto) {
         assertCreated('webhooks', $webhook->id, $webhook, $createdTracker);
         dump("Webhook created OK (ID: {$webhook->id})");
@@ -270,12 +289,14 @@ try {
 
 // 12. Test Notification Services (Planka v2 Feature)
 dump('[11/13] Testing Notification Services (v2 Feature)...');
+
 try {
     $notifService = $client->notificationService->createInBoard(
         boardId: $boardId,
         url: 'https://example.com/notif-test',
         format: NotificationServiceFormatEnum::TEXT,
     );
+
     if ($notifService instanceof NotificationServiceDto) {
         assertCreated('notificationServices', $notifService->id, $notifService, $createdTracker);
         dump("Notification Service created OK (ID: {$notifService->id})");
@@ -353,9 +374,11 @@ try {
 
 dump('[13/13] Checking tracker state after cleanup...');
 $remainingItems = array_sum(array_map('count', $createdTracker));
+
 if ($remainingItems > 0) {
     dd('WARNING: Some tracked test resources were not cleaned up!', $createdTracker);
 }
+
 dump('Tracker clean: 0 remaining items');
 
 dump('========================================');
