@@ -27,9 +27,10 @@ $card = $client->card->create(
 $card->description = 'Detailed description of OAuth2 integration';
 $updatedCard = $client->card->update($card);
 
-// 3. Add tasks to card
-$task1 = $client->cardTask->create($card->id, 'Design schema', 0);
-$task2 = $client->cardTask->create($card->id, 'Write endpoints', 1);
+// 3. Add task list and tasks to card
+$taskList = $client->cardTask->createTaskList($card->id, 'Checklist');
+$task1 = $client->cardTask->create($taskList->id, 'Design schema', 0);
+$task2 = $client->cardTask->create($taskList->id, 'Write endpoints', 1);
 
 // 4. Duplicate card (Planka v2 feature)
 $duplicatedCard = $client->card->duplicate($card->id);

@@ -125,23 +125,82 @@ All Planka API endpoints are organized into clean, strongly-typed controllers:
 - [Add & Manage Cards on Board](docs/ADD_NEW_CARD_ON_BOARD.md)
 - [Subscribe / Unsubscribe Users on Cards](docs/SUBSCRIBE_MEMBERSHIP_TO_CARD.md)
 
+> 💡 **Comprehensive Examples:** A complete end-to-end integration script demonstrating usage of all SDK controllers and API endpoints is available in [`tests/index.php`](tests/index.php).
+
 You can also run integration tests against your Planka instance:
 ```bash
 cp tests/config.example.php tests/config.php
 # Edit tests/config.php with your credentials
-php tests/index.php
+composer test-integration
 ```
 
 ---
 
 ## Testing & Quality
 
+### Unit Tests (Isolated, Mock-based)
+
+Unit tests run locally without needing a connection to a live Planka server. They verify DTO hydration, controller behaviors, and API payload compilation using real JSON response fixtures recorded from Planka v2.
+
+```bash
+composer test
+# Or directly via PHPUnit:
+vendor/bin/phpunit --testsuite=Unit
+```
+
+### Integration Tests (Live Server Verification)
+
+Integration tests perform full real-world SDK verification against a live Planka v2 instance (creating, updating, and safely cleaning up projects, boards, cards, task lists, custom fields, webhooks, and notification services).
+
+**Setup:**
+1. Copy the example configuration file:
+   ```bash
+   cp tests/config.example.php tests/config.php
+   ```
+2. Edit `tests/config.php` to specify your Planka server URI, port, login, and password:
+   ```php
+   return [
+       'uri' => 'http://192.168.1.100',
+       'port' => 3000,
+       'login' => 'user@example.com',
+       'password' => 'your_password',
+   ];
+   ```
+3. Run the integration test suite:
+   ```bash
+   composer test-integration
+   # Or directly via PHPUnit:
+   vendor/bin/phpunit --testsuite=Integration
+   ```
+
+### Code Quality & Formatting
+
 Static code analysis:
 ```bash
 ./vendor/bin/psalm --no-cache
 ```
 
-Code Style Fixer:
+Code style fixer:
 ```bash
 composer fix-cs
 ```
+
+---
+
+## Contributing & Support
+
+Contributions are very welcome! Whether you are fixing a bug, adding a new Planka v2 feature, or improving documentation:
+
+1. **Fork & Clone:** Fork the repository on GitHub and clone it locally.
+2. **Create a Branch:** `git checkout -b feature/my-feature` or `fix/bug-fix`.
+3. **Make Changes & Test:** Ensure all quality checks pass before pushing:
+   - `composer test` (Runs PHPUnit Unit tests)
+   - `./vendor/bin/psalm --no-cache` (Runs Psalm static analysis)
+   - `composer fix-cs` (Formats code style)
+4. **Submit a Pull Request:** Push your branch and open a PR against `master`.
+
+For more details, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+### Support & License
+- 🐛 **Bug Reports & Requests:** Please open an Issue on [GitHub Issues](https://github.com/decole/planka-php-sdk/issues).
+- 📄 **License:** Released under the [AGPL-3.0 License](LICENSE).
