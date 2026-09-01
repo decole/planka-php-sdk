@@ -7,3 +7,4 @@ config.php
 /.php-cs-fixer.cache
 /var/.php-cs-fixer.cache
 !tests/index.php
+/.phpunit.cache/

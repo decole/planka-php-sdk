@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /**
- * Tests for Planka v.2
+ * Tests for Planka v.2.
  */
 
 
