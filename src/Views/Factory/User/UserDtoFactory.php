@@ -35,24 +35,34 @@ final class UserDtoFactory implements OutputInterface
      */
     public function create(array $data): UserDto
     {
+        $isAdmin = isset($data['isAdmin'])
+            ? (bool) $data['isAdmin']
+            : ('admin' === ($data['role'] ?? null));
+
+        $avatarUrl = $data['avatarUrl'] ?? null;
+
+        if (null === $avatarUrl && is_array($data['avatar'] ?? null)) {
+            $avatarUrl = $data['avatar']['url'] ?? null;
+        }
+
         return new UserDto(
             id: $data['id'],
-            createdAt: $this->convertToDateTime($data['createdAt']),
-            updatedAt: $this->convertToDateTime($data['updatedAt']),
-            email: $data['email'],
-            isAdmin: (bool) $data['isAdmin'],
-            name: $data['name'],
-            username: $data['username'],
-            phone: $data['phone'],
-            organization: $data['organization'],
-            language: $data['language'],
-            subscribeToOwnCards: (bool) $data['subscribeToOwnCards'],
-            deletedAt: $this->convertToDateTime($data['deletedAt']),
+            createdAt: $this->convertToDateTime($data['createdAt'] ?? null),
+            updatedAt: $this->convertToDateTime($data['updatedAt'] ?? null),
+            email: $data['email'] ?? null,
+            isAdmin: $isAdmin,
+            name: $data['name'] ?? null,
+            username: $data['username'] ?? null,
+            phone: $data['phone'] ?? null,
+            organization: $data['organization'] ?? null,
+            language: $data['language'] ?? null,
+            subscribeToOwnCards: (bool) ($data['subscribeToOwnCards'] ?? false),
+            deletedAt: $this->convertToDateTime($data['deletedAt'] ?? null),
             isLocked: (bool) ($data['isLocked'] ?? false),
             isRoleLocked: (bool) ($data['isRoleLocked'] ?? false),
             isUsernameLocked: (bool) ($data['isUsernameLocked'] ?? false),
             isDeletionLocked: (bool) ($data['isDeletionLocked'] ?? false),
-            avatarUrl: $data['avatarUrl'] ?? null,
+            avatarUrl: $avatarUrl,
             _rawResponse: $data,
         );
     }

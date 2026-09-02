@@ -26,11 +26,11 @@ final class ListDtoFactory implements OutputInterface
     {
         return new ListDto(
             id: $data['id'],
-            boardId: $data['boardId'],
-            createdAt: $this->convertToDateTime($data['createdAt']),
-            updatedAt: $this->convertToDateTime($data['updatedAt']),
-            position: (int) $data['position'],
-            name: $data['name'],
+            boardId: $data['boardId'] ?? '',
+            createdAt: $this->convertToDateTime($data['createdAt'] ?? null),
+            updatedAt: $this->convertToDateTime($data['updatedAt'] ?? null),
+            position: (int) ($data['position'] ?? 0),
+            name: $data['name'] ?? null,
         );
     }
 }
