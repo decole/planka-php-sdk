@@ -59,6 +59,17 @@ function safeVerifyOwned(string $type, string $id, array &$tracker): void
     }
 }
 
+function inspectDto(object $dto, string $label): void
+{
+    dump("--- INSPECTING DTO: {$label} ---");
+    dump($dto);
+
+    if (property_exists($dto, '_rawResponse') && !empty($dto->_rawResponse)) {
+        dump("--- RAW RESPONSE FOR: {$label} ---");
+        dump($dto->_rawResponse);
+    }
+}
+
 // 1. Setup Client
 $config = new Config(
     user: $rawConfig['login'],
@@ -95,7 +106,7 @@ try {
     $sysConfig = $client->systemConfig->get();
 
     if ($sysConfig instanceof SystemConfigDto) {
-        dump("System Config OK (id: {$sysConfig->id})");
+        inspectDto($sysConfig, 'SystemConfigDto');
     }
 } catch (Throwable $e) {
     dump('System Config check skipped or unauthorized: ' . $e->getMessage());
@@ -111,7 +122,7 @@ if (!$project instanceof ProjectDto || $project->name !== $projectName) {
 }
 
 assertCreated('projects', $project->id, $project, $createdTracker);
-dump("Project created OK (ID: {$project->id})");
+inspectDto($project, 'ProjectDto (created)');
 
 // 6. Base Custom Field Groups & Fields
 dump('[5/13] Testing Base Custom Field Group & Custom Fields...');
@@ -122,7 +133,7 @@ if (!$baseGroup instanceof BaseCustomFieldGroupDto) {
 }
 
 assertCreated('baseCustomGroups', $baseGroup->id, $baseGroup, $createdTracker);
-dump("Base Custom Field Group created OK (ID: {$baseGroup->id})");
+inspectDto($baseGroup, 'BaseCustomFieldGroupDto');
 
 $customField = $client->customField->createInBaseGroup(
     baseGroupId: $baseGroup->id,
@@ -135,7 +146,7 @@ if (!$customField instanceof CustomFieldDto) {
 }
 
 assertCreated('customFields', $customField->id, $customField, $createdTracker);
-dump("Custom Field created OK (ID: {$customField->id}, name: {$customField->name})");
+inspectDto($customField, 'CustomFieldDto');
 
 // 7. Create Test Board
 dump('[6/13] Creating test Board...');
@@ -148,11 +159,11 @@ if (!$board instanceof BoardDto || null === $board->item) {
 
 $boardId = $board->item->id;
 assertCreated('boards', $boardId, $board, $createdTracker);
-dump("Board created OK (ID: {$boardId})");
+inspectDto($board, 'BoardDto');
 
 // Update board view settings
 $updatedBoard = $client->board->update($boardId, '[v2-test-DO-NOT-TOUCH] Board-Updated');
-dump('Board updated OK');
+inspectDto($updatedBoard, 'BoardDto (updated)');
 
 // Custom Field Group on Board
 $boardGroup = $client->customFieldGroup->createInBoard($boardId, 'Board Fields');
@@ -162,7 +173,7 @@ if (!$boardGroup instanceof CustomFieldGroupDto) {
 }
 
 assertCreated('customGroups', $boardGroup->id, $boardGroup, $createdTracker);
-dump("Board Custom Field Group created OK (ID: {$boardGroup->id})");
+inspectDto($boardGroup, 'CustomFieldGroupDto');
 
 // 8. Test Lists (Columns)
 dump('[7/13] Testing Board Lists (Create, Sort, Delete)...');
@@ -174,7 +185,7 @@ assertCreated('lists', $columnTodo->id, $columnTodo, $createdTracker);
 assertCreated('lists', $columnDone->id, $columnDone, $createdTracker);
 assertCreated('lists', $columnTemp->id, $columnTemp, $createdTracker);
 
-dump("Lists created: 'To Do' ({$columnTodo->id}), 'Done' ({$columnDone->id}), 'Temp' ({$columnTemp->id})");
+inspectDto($columnTodo, 'BoardListDto (To Do)');
 
 // Sort cards in list
 $client->boardList->sort($columnTodo->id, 'name', 'asc');
@@ -200,8 +211,9 @@ $card1 = $client->card->create($columnTodo->id, '[v2-test] Task 1', 1);
 if (!$card1 instanceof CardDto) {
     dd('ERROR: Failed to create card 1!');
 }
+
 assertCreated('cards', $card1->id, $card1, $createdTracker);
-dump("Card created OK (ID: {$card1->id})");
+inspectDto($card1, 'CardDto');
 
 // Duplicate Card (Planka v2 Feature)
 $duplicatedCard = $client->card->duplicate($card1->id);
@@ -209,8 +221,9 @@ $duplicatedCard = $client->card->duplicate($card1->id);
 if (!$duplicatedCard instanceof CardDto) {
     dd('ERROR: Card duplication failed!');
 }
+
 assertCreated('cards', $duplicatedCard->id, $duplicatedCard, $createdTracker);
-dump("Card duplicate OK (New Card ID: {$duplicatedCard->id})");
+inspectDto($duplicatedCard, 'CardDto (duplicated)');
 
 // Read Notifications for Card (Planka v2 Feature)
 $client->card->readNotifications($card1->id);
@@ -223,16 +236,18 @@ $taskList = $client->cardTask->createTaskList($card1->id, '[v2-test] Checklist')
 if (!$taskList instanceof TaskListDto) {
     dd('ERROR: Task list creation failed!');
 }
+
 assertCreated('taskLists', $taskList->id, $taskList, $createdTracker);
-dump("Task List created OK (ID: {$taskList->id})");
+inspectDto($taskList, 'TaskListDto');
 
 $task1 = $client->cardTask->create($taskList->id, '[v2-test] Subtask 1', 0);
 
 if (!$task1 instanceof CardTaskDto) {
     dd('ERROR: Card task creation failed!');
 }
+
 assertCreated('tasks', $task1->id, $task1, $createdTracker);
-dump("Card Task created OK (ID: {$task1->id})");
+inspectDto($task1, 'CardTaskDto');
 
 $task1->isCompleted = true;
 $client->cardTask->update($task1);
@@ -270,7 +285,7 @@ try {
 
     if ($webhook instanceof WebhookDto) {
         assertCreated('webhooks', $webhook->id, $webhook, $createdTracker);
-        dump("Webhook created OK (ID: {$webhook->id})");
+        inspectDto($webhook, 'WebhookDto');
 
         $webhooks = $client->webhook->list();
         dump('Webhook list OK (Count: ' . count($webhooks) . ')');
@@ -299,7 +314,7 @@ try {
 
     if ($notifService instanceof NotificationServiceDto) {
         assertCreated('notificationServices', $notifService->id, $notifService, $createdTracker);
-        dump("Notification Service created OK (ID: {$notifService->id})");
+        inspectDto($notifService, 'NotificationServiceDto');
 
         $client->notificationService->test($notifService->id);
         dump('Notification Service test call OK');
