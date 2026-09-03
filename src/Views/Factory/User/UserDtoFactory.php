@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Planka\Bridge\Views\Factory\User;
 
 use Planka\Bridge\Contracts\Factory\OutputInterface;
+use Planka\Bridge\Enum\UserRoleEnum;
 use Planka\Bridge\Traits\DateConverterTrait;
 use Planka\Bridge\Views\Dto\User\UserDto;
 
@@ -12,27 +13,6 @@ final class UserDtoFactory implements OutputInterface
 {
     use DateConverterTrait;
 
-    /**
-     * @param array{
-     *     id: string,
-     *     createdAt: string,
-     *     updatedAt: ?string,
-     *     email: string,
-     *     isAdmin: bool,
-     *     name: string,
-     *     username: string,
-     *     phone: ?string,
-     *     organization: ?string,
-     *     language: string,
-     *     subscribeToOwnCards: bool,
-     *     deletedAt: ?string,
-     *     isLocked: bool,
-     *     isRoleLocked: bool,
-     *     isUsernameLocked: bool,
-     *     isDeletionLocked: bool,
-     *     avatarUrl: ?string,
-     * } $data
-     */
     public function create(array $data): UserDto
     {
         $isAdmin = isset($data['isAdmin'])
@@ -43,6 +23,12 @@ final class UserDtoFactory implements OutputInterface
 
         if (null === $avatarUrl && is_array($data['avatar'] ?? null)) {
             $avatarUrl = $data['avatar']['url'] ?? null;
+        }
+
+        $roleEnum = null;
+
+        if (isset($data['role']) && is_string($data['role'])) {
+            $roleEnum = UserRoleEnum::tryFrom($data['role']);
         }
 
         return new UserDto(
@@ -63,6 +49,10 @@ final class UserDtoFactory implements OutputInterface
             isUsernameLocked: (bool) ($data['isUsernameLocked'] ?? false),
             isDeletionLocked: (bool) ($data['isDeletionLocked'] ?? false),
             avatarUrl: $avatarUrl,
+            role: $roleEnum,
+            isDeactivated: (bool) ($data['isDeactivated'] ?? false),
+            isSsoUser: (bool) ($data['isSsoUser'] ?? false),
+            lockedFieldNames: (array) ($data['lockedFieldNames'] ?? []),
             _rawResponse: $data,
         );
     }

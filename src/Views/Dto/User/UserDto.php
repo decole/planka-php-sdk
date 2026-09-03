@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Planka\Bridge\Views\Dto\User;
 
 use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
+use Planka\Bridge\Enum\UserRoleEnum;
 
 class UserDto implements OutputDtoInterface
 {
@@ -26,6 +27,10 @@ class UserDto implements OutputDtoInterface
         public bool $isUsernameLocked,
         public bool $isDeletionLocked,
         public ?string $avatarUrl,
+        public ?UserRoleEnum $role = null,
+        public bool $isDeactivated = false,
+        public bool $isSsoUser = false,
+        public array $lockedFieldNames = [],
         public readonly array $_rawResponse = [],
     ) {}
 }

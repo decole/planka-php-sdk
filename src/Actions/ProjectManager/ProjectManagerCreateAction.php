@@ -25,7 +25,7 @@ final class ProjectManagerCreateAction implements ActionInterface, AuthenticateI
 
     public function url(): string
     {
-        return "api/projects/{$this->projectId}/managers";
+        return "api/projects/{$this->projectId}/project-managers";
     }
 
     public function getOptions(): array

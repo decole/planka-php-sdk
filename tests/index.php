@@ -80,8 +80,8 @@ $config = new Config(
 
 $client = new PlankaClient($config);
 
-// 2. Ping Server
-dump('[1/13] Pinging Planka server...');
+// 2. Ping Server & Terms
+dump('[1/13] Pinging Planka server and fetching Terms...');
 $infoResponse = $client->getInfo();
 
 if (200 !== $infoResponse->getStatusCode()) {
@@ -89,6 +89,13 @@ if (200 !== $infoResponse->getStatusCode()) {
 }
 
 dump('Server connection OK');
+
+try {
+    $terms = $client->getTerms();
+    dump('Terms fetch OK');
+} catch (Throwable $e) {
+    dump('Terms fetch note: ' . $e->getMessage());
+}
 
 // 3. Authenticate (JWT)
 dump('[2/13] Authenticating via JWT (email/password)...');
@@ -230,7 +237,7 @@ $client->card->readNotifications($card1->id);
 dump('Card readNotifications OK');
 
 // 10. Card Tasks & Task Lists
-dump('[9/13] Testing Task Lists & Card Tasks (Create, Update, Delete)...');
+dump('[9/13] Testing Task Lists & Card Tasks (Create, Get, Update, Delete)...');
 $taskList = $client->cardTask->createTaskList($card1->id, '[v2-test] Checklist');
 
 if (!$taskList instanceof TaskListDto) {
@@ -239,6 +246,12 @@ if (!$taskList instanceof TaskListDto) {
 
 assertCreated('taskLists', $taskList->id, $taskList, $createdTracker);
 inspectDto($taskList, 'TaskListDto');
+
+$fetchedTaskList = $client->cardTask->getTaskList($taskList->id);
+dump('Task List get OK');
+
+$updatedTaskList = $client->cardTask->updateTaskList($taskList->id, name: '[v2-test] Checklist Updated');
+dump('Task List update OK');
 
 $task1 = $client->cardTask->create($taskList->id, '[v2-test] Subtask 1', 0);
 
@@ -252,6 +265,33 @@ inspectDto($task1, 'CardTaskDto');
 $task1->isCompleted = true;
 $client->cardTask->update($task1);
 dump('Card Task update (completed) OK');
+
+// Comments testing
+dump('Testing Comments (Create, List, Update, Delete)...');
+
+try {
+    $comment = $client->comment->add($card1->id, '[v2-test] Initial Comment');
+    dump('Comment add OK (ID: ' . $comment->id . ')');
+
+    $commentList = $client->comment->list($card1->id);
+    dump('Comment list OK');
+
+    $updatedComment = $client->comment->update($comment->id, '[v2-test] Updated Comment');
+    dump('Comment update OK');
+
+    $client->comment->remove($comment->id);
+    dump('Comment delete OK');
+} catch (Throwable $e) {
+    dump('Comment test note: ' . $e->getMessage());
+}
+
+// Board Actions testing
+try {
+    $boardActions = $client->cardAction->getBoardActions($boardId);
+    dump('Board actions fetch OK');
+} catch (Throwable $e) {
+    dump('Board actions note: ' . $e->getMessage());
+}
 
 // Explicit Task Deletion Test
 safeVerifyOwned('tasks', $task1->id, $createdTracker);

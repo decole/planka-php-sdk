@@ -31,6 +31,29 @@ final class CardTask
         ));
     }
 
+    /** 'GET /api/task-lists/:id' */
+    public function getTaskList(string $taskListId): TaskListDto
+    {
+        return $this->client->get(new \Planka\Bridge\Actions\CardTask\TaskListViewAction(id: $taskListId));
+    }
+
+    /** 'PATCH /api/task-lists/:id' */
+    public function updateTaskList(
+        string $taskListId,
+        ?string $name = null,
+        ?int $position = null,
+        ?bool $showOnFrontOfCard = null,
+        ?bool $hideCompletedTasks = null,
+    ): TaskListDto {
+        return $this->client->patch(new \Planka\Bridge\Actions\CardTask\TaskListUpdateAction(
+            id: $taskListId,
+            name: $name,
+            position: $position,
+            showOnFrontOfCard: $showOnFrontOfCard,
+            hideCompletedTasks: $hideCompletedTasks,
+        ));
+    }
+
     /** 'DELETE /api/task-lists/:id' */
     public function deleteTaskList(string $taskListId): TaskListDto
     {

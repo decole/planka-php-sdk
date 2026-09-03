@@ -26,14 +26,17 @@ final class CommentDtoFactory implements OutputInterface
      */
     public function create(array $data): CommentDto
     {
+        $text = $data['text'] ?? $data['data']['text'] ?? '';
+        $type = isset($data['type']) && is_string($data['type']) ? CommentTypeEnum::tryFrom($data['type']) : null;
+
         return new CommentDto(
             id: $data['id'],
-            createdAt: $this->convertToDateTime($data['createdAt']),
-            updatedAt: $this->convertToDateTime($data['updatedAt']),
-            cardId: $data['cardId'],
-            userId: $data['userId'],
-            type: CommentTypeEnum::from($data['type']),
-            dataText: $data['data']['text'],
+            createdAt: $this->convertToDateTime($data['createdAt'] ?? null),
+            updatedAt: $this->convertToDateTime($data['updatedAt'] ?? null),
+            cardId: $data['cardId'] ?? '',
+            userId: $data['userId'] ?? '',
+            type: $type,
+            dataText: $text,
         );
     }
 }

@@ -26,14 +26,17 @@ final class CardActionItemDtoFactory implements OutputInterface
      */
     public function create(array $data): CardActionItemDto
     {
+        $typeStr = $data['type'] ?? 'commentCard';
+        $type = CommentTypeEnum::tryFrom($typeStr) ?? CommentTypeEnum::COMMENT_CARD;
+
         return new CardActionItemDto(
             id: $data['id'],
-            createdAt: $this->convertToDateTime($data['createdAt']),
-            updatedAt: $this->convertToDateTime($data['updatedAt']),
-            type: CommentTypeEnum::from($data['type']),
-            dataText: $data['data']['text'] ?? '',
-            cardId: $data['cardId'],
-            userId: $data['userId'],
+            createdAt: $this->convertToDateTime($data['createdAt'] ?? null),
+            updatedAt: $this->convertToDateTime($data['updatedAt'] ?? null),
+            type: $type,
+            dataText: $data['data']['text'] ?? $data['text'] ?? '',
+            cardId: $data['cardId'] ?? '',
+            userId: $data['userId'] ?? '',
         );
     }
 }

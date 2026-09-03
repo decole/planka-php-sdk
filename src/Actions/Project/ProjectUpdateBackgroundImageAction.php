@@ -38,7 +38,7 @@ final class ProjectUpdateBackgroundImageAction implements
 
     public function url(): string
     {
-        return "api/projects/{$this->projectId}/background-image";
+        return "api/projects/{$this->projectId}/background-images";
     }
 
     public function getOptions(): array

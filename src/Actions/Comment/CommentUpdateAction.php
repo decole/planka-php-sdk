@@ -25,7 +25,7 @@ final class CommentUpdateAction implements ActionInterface, AuthenticateInterfac
 
     public function url(): string
     {
-        return "api/comment-actions/{$this->commentId}";
+        return "api/comments/{$this->commentId}";
     }
 
     public function getOptions(): array

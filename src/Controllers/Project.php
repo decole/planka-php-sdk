@@ -69,7 +69,7 @@ final class Project
     }
 
     /**
-     * 'POST /api/projects/:id/background-image'.
+     * 'POST /api/projects/:id/background-images'.
      *
      * @throws FileExistException
      */
@@ -78,6 +78,15 @@ final class Project
         return $this->client->post(new ProjectUpdateBackgroundImageAction(
             projectId: $projectId,
             file: $file,
+            token: $this->config->getAuthToken(),
+        ));
+    }
+
+    /** 'DELETE /api/background-images/:id' */
+    public function deleteBackgroundImage(string $imageId): array
+    {
+        return $this->client->delete(new \Planka\Bridge\Actions\Project\BackgroundImageDeleteAction(
+            imageId: $imageId,
             token: $this->config->getAuthToken(),
         ));
     }

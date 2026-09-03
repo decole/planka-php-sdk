@@ -18,7 +18,20 @@ final class Comment
         private readonly Client $client,
     ) {}
 
-    /** 'POST /api/cards/:cardId/comment-actions' */
+    /**
+     * 'GET /api/cards/:cardId/comments'.
+     *
+     * @return list<CommentDto>
+     */
+    public function list(string $cardId): array
+    {
+        return $this->client->get(new \Planka\Bridge\Actions\Comment\CommentListAction(
+            cardId: $cardId,
+            token: $this->config->getAuthToken(),
+        ));
+    }
+
+    /** 'POST /api/cards/:cardId/comments' */
     public function add(string $cardId, string $text): CommentDto
     {
         return $this->client->post(new CommentCreateAction(

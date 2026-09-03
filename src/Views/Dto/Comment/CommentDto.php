@@ -14,7 +14,7 @@ class CommentDto
         public readonly ?\DateTimeImmutable $updatedAt,
         public readonly string $cardId,
         public readonly string $userId,
-        public readonly CommentTypeEnum $type,
-        public string $dataText,
+        public readonly ?CommentTypeEnum $type = null,
+        public string $dataText = '',
     ) {}
 }

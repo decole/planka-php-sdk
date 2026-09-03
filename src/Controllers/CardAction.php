@@ -21,4 +21,14 @@ final class CardAction
     {
         return $this->client->get(new CardActionViewAction(cardId: $cardId, token: $this->config->getAuthToken()));
     }
+
+    /** 'GET /api/boards/:boardId/actions' */
+    public function getBoardActions(string $boardId, ?string $beforeId = null): CardActionListDto
+    {
+        return $this->client->get(new \Planka\Bridge\Actions\CardAction\BoardActionListAction(
+            boardId: $boardId,
+            beforeId: $beforeId,
+            token: $this->config->getAuthToken(),
+        ));
+    }
 }

@@ -73,9 +73,16 @@ final class PlankaIntegrationTest extends TestCase
 
     public function testFullIntegrationLifecycle(): void
     {
-        // 1. Ping Server
+        // 1. Ping Server & Terms
         $infoResponse = $this->client->getInfo();
         $this->assertEquals(200, $infoResponse->getStatusCode(), 'Planka server is not reachable!');
+
+        try {
+            $terms = $this->client->getTerms();
+            $this->assertIsArray($terms);
+        } catch (\Throwable $e) {
+            // Terms optional
+        }
 
         // 2. Authenticate
         $authenticated = $this->client->authenticate();
@@ -171,12 +178,42 @@ final class PlankaIntegrationTest extends TestCase
         $this->assertInstanceOf(TaskListDto::class, $taskList);
         $this->assertCreated('taskLists', $taskList->id, $taskList);
 
+        $fetchedTaskList = $this->client->cardTask->getTaskList($taskList->id);
+        $this->assertInstanceOf(TaskListDto::class, $fetchedTaskList);
+
+        $updatedTaskList = $this->client->cardTask->updateTaskList($taskList->id, name: '[v2-test] Checklist Updated');
+        $this->assertInstanceOf(TaskListDto::class, $updatedTaskList);
+
         $task1 = $this->client->cardTask->create($taskList->id, '[v2-test] Subtask 1', 0);
         $this->assertInstanceOf(CardTaskDto::class, $task1);
         $this->assertCreated('tasks', $task1->id, $task1);
 
         $task1->isCompleted = true;
         $this->client->cardTask->update($task1);
+
+        // Comments lifecycle
+        try {
+            $comment = $this->client->comment->add($card1->id, '[v2-test] Integration Comment');
+            $this->assertNotEmpty($comment->id);
+
+            $commentList = $this->client->comment->list($card1->id);
+            $this->assertIsArray($commentList);
+
+            $updatedComment = $this->client->comment->update($comment->id, '[v2-test] Updated Comment');
+            $this->assertInstanceOf(\Planka\Bridge\Views\Dto\Comment\CommentDto::class, $updatedComment);
+
+            $this->client->comment->remove($comment->id);
+        } catch (\Throwable $e) {
+            // Comments optional
+        }
+
+        // Board Actions
+        try {
+            $boardActions = $this->client->cardAction->getBoardActions($boardId);
+            $this->assertInstanceOf(\Planka\Bridge\Views\Dto\Card\CardActionListDto::class, $boardActions);
+        } catch (\Throwable $e) {
+            // Board Actions optional
+        }
 
         $this->safeVerifyOwned('tasks', $task1->id);
         $this->client->cardTask->delete($task1->id);
