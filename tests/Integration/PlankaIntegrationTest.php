@@ -61,7 +61,39 @@ final class PlankaIntegrationTest extends TestCase
 
     private function assertCreated(string $type, string $id, object $dto): void
     {
+        $this->assertRawResponseMappedToDto($dto);
         $this->createdTracker[$type][$id] = $dto;
+    }
+
+    private function assertRawResponseMappedToDto(object $dto): void
+    {
+        if (property_exists($dto, 'item') && is_object($dto->item)) {
+            $this->assertRawResponseMappedToDto($dto->item);
+
+            return;
+        }
+
+        if (!property_exists($dto, '_rawResponse') || !is_array($dto->_rawResponse)) {
+            return;
+        }
+
+        $ref = new \ReflectionClass($dto);
+        $properties = array_map(fn($p) => $p->getName(), $ref->getProperties());
+
+        $targetData = isset($dto->_rawResponse['item']) && is_array($dto->_rawResponse['item'])
+            ? $dto->_rawResponse['item']
+            : $dto->_rawResponse;
+
+        foreach ($targetData as $key => $val) {
+            if (in_array($key, ['item', 'items', 'included'], true)) {
+                continue;
+            }
+            $this->assertContains(
+                $key,
+                $properties,
+                sprintf("Field '%s' from raw response is missing in %s DTO properties", $key, get_class($dto)),
+            );
+        }
     }
 
     private function safeVerifyOwned(string $type, string $id): void
@@ -78,8 +110,8 @@ final class PlankaIntegrationTest extends TestCase
         $this->assertEquals(200, $infoResponse->getStatusCode(), 'Planka server is not reachable!');
 
         try {
-            $terms = $this->client->getTerms();
-            $this->assertIsArray($terms);
+            $terms = $this->client->terms->get();
+            $this->assertInstanceOf(\Planka\Bridge\Views\Dto\Terms\TermsDto::class, $terms);
         } catch (\Throwable $e) {
             // Terms optional
         }

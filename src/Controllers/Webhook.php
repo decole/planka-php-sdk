@@ -8,16 +8,12 @@ use Planka\Bridge\Actions\Webhook\WebhookCreateAction;
 use Planka\Bridge\Actions\Webhook\WebhookDeleteAction;
 use Planka\Bridge\Actions\Webhook\WebhookListAction;
 use Planka\Bridge\Actions\Webhook\WebhookUpdateAction;
-use Planka\Bridge\Config;
 use Planka\Bridge\TransportClients\Client;
 use Planka\Bridge\Views\Dto\Webhook\WebhookDto;
 
 final class Webhook
 {
-    public function __construct(
-        private readonly Config $config,
-        private readonly Client $client,
-    ) {}
+    public function __construct(private readonly Client $client) {}
 
     /**
      * 'GET /api/webhooks'.

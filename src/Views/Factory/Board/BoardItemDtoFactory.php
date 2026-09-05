@@ -26,6 +26,7 @@ final class BoardItemDtoFactory implements OutputInterface
             limitCardTypesToDefaultOne: (bool) ($data['limitCardTypesToDefaultOne'] ?? false),
             alwaysDisplayCardCreator: (bool) ($data['alwaysDisplayCardCreator'] ?? false),
             expandTaskListsByDefault: (bool) ($data['expandTaskListsByDefault'] ?? false),
+            displayCardAges: (bool) ($data['displayCardAges'] ?? false),
             createdAt: $this->convertToDateTime($data['createdAt'] ?? null),
             updatedAt: $this->convertToDateTime($data['updatedAt'] ?? null),
             _rawResponse: $data,

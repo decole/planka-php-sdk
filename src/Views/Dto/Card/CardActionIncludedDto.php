@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace Planka\Bridge\Views\Dto\Card;
 
 use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
+use Planka\Bridge\Views\Dto\User\UserDto;
 
-class CardActionListDto implements OutputDtoInterface
+class CardActionIncludedDto implements OutputDtoInterface
 {
     /**
-     * @param list<CardActionItemDto> $items
+     * @param list<UserDto> $users
      */
     public function __construct(
-        public readonly array $items,
-        public readonly CardActionIncludedDto $included,
+        public readonly array $users = [],
         public readonly array $_rawResponse = [],
     ) {}
 }

@@ -20,6 +20,7 @@ final class BoardItemDto implements OutputDtoInterface
         public readonly bool $limitCardTypesToDefaultOne = false,
         public readonly bool $alwaysDisplayCardCreator = false,
         public readonly bool $expandTaskListsByDefault = false,
+        public readonly bool $displayCardAges = false,
         public readonly ?\DateTimeImmutable $createdAt = null,
         public readonly ?\DateTimeImmutable $updatedAt = null,
         public readonly array $_rawResponse = [],

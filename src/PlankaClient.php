@@ -120,7 +120,7 @@ final class PlankaClient
         $this->systemConfig = new SystemConfig($config, $this->client);
         $this->terms = new Terms($this->client);
         $this->user = new User($config, $this->client);
-        $this->webhook = new Webhook($config, $this->client);
+        $this->webhook = new Webhook($this->client);
     }
 
     /**

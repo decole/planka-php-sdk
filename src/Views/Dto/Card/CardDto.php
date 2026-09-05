@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Planka\Bridge\Views\Dto\Card;
 
 use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
+use Planka\Bridge\Enum\BoardDefaultCardTypeEnum;
 
 class CardDto implements OutputDtoInterface
 {
@@ -24,6 +25,12 @@ class CardDto implements OutputDtoInterface
         public ?string $coverAttachmentId,
         public bool $isSubscribed,
         public readonly CardIncludedDto $included,
+        public ?BoardDefaultCardTypeEnum $type = null,
+        public ?string $prevListId = null,
+        public int $commentsTotal = 0,
+        public bool $isClosed = false,
+        public ?\DateTimeImmutable $listChangedAt = null,
+        public readonly ?bool $isDueCompleted = null,
         public readonly array $_rawResponse = [],
     ) {}
 }
