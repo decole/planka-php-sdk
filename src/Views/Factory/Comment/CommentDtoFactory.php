@@ -37,6 +37,7 @@ final class CommentDtoFactory implements OutputInterface
             userId: $data['userId'] ?? '',
             type: $type,
             dataText: $text,
+            _rawResponse: $data,
         );
     }
 }

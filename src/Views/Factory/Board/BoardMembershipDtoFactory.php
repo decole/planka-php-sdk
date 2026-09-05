@@ -34,6 +34,7 @@ final class BoardMembershipDtoFactory implements OutputInterface
             canComment: (bool) $data['canComment'],
             role: BoardMembershipRoleEnum::from($data['role']),
             boardId: $data['boardId'],
+            _rawResponse: $data,
         );
     }
 }

@@ -41,6 +41,7 @@ final class SystemConfigDtoFactory implements OutputInterface
             smtpFrom: $data['smtpFrom'] ?? null,
             createdAt: $this->convertToDateTime($data['createdAt'] ?? null),
             updatedAt: $this->convertToDateTime($data['updatedAt'] ?? null),
+            _rawResponse: $data,
         );
     }
 }

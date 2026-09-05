@@ -39,5 +39,6 @@ final class BoardIncludedDto
         public array $tasks,
         public array $attachments,
         public array $projects,
+        public readonly array $_rawResponse = [],
     ) {}
 }

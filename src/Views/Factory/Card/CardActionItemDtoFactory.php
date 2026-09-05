@@ -37,6 +37,7 @@ final class CardActionItemDtoFactory implements OutputInterface
             dataText: $data['data']['text'] ?? $data['text'] ?? '',
             cardId: $data['cardId'] ?? '',
             userId: $data['userId'] ?? '',
+            _rawResponse: $data,
         );
     }
 }

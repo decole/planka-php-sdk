@@ -12,6 +12,6 @@ class ProjectListDto
     public function __construct(
         public readonly array $items,
         public readonly ProjectIncludedDto $included,
-        public readonly array $_rawResponse,
+        public readonly array $_rawResponse = [],
     ) {}
 }

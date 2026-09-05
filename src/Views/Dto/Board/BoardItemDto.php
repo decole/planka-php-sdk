@@ -22,5 +22,6 @@ final class BoardItemDto implements OutputDtoInterface
         public readonly bool $expandTaskListsByDefault = false,
         public readonly ?\DateTimeImmutable $createdAt = null,
         public readonly ?\DateTimeImmutable $updatedAt = null,
+        public readonly array $_rawResponse = [],
     ) {}
 }

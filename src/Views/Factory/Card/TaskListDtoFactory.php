@@ -35,6 +35,7 @@ final class TaskListDtoFactory implements OutputInterface
             hideCompletedTasks: (bool) ($data['hideCompletedTasks'] ?? false),
             createdAt: $this->convertToDateTime($data['createdAt'] ?? null),
             updatedAt: $this->convertToDateTime($data['updatedAt'] ?? null),
+            _rawResponse: $data,
         );
     }
 }

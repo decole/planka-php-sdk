@@ -31,6 +31,7 @@ final class BoardListDtoFactory implements OutputInterface
             position: (int) $data['position'],
             name: $data['name'],
             boardId: $data['boardId'],
+            _rawResponse: $data,
         );
     }
 }

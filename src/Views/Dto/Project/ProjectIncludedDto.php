@@ -22,5 +22,6 @@ class ProjectIncludedDto
         public array $projectManagers,
         public array $boards,
         public array $boardMemberships,
+        public readonly array $_rawResponse = [],
     ) {}
 }

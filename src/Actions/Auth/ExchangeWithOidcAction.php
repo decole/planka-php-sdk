@@ -6,10 +6,12 @@ namespace Planka\Bridge\Actions\Auth;
 
 use Planka\Bridge\Contracts\Actions\ActionInterface;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
-use Symfony\Contracts\HttpClient\ResponseInterface;
+use Planka\Bridge\Traits\AccessTokenHydrateTrait;
 
 final class ExchangeWithOidcAction implements ActionInterface, ResponseResultInterface
 {
+    use AccessTokenHydrateTrait;
+
     public function __construct(
         private readonly string $code,
         private readonly string $nonce,
@@ -30,10 +32,5 @@ final class ExchangeWithOidcAction implements ActionInterface, ResponseResultInt
                 'withHttpOnlyToken' => $this->withHttpOnlyToken,
             ],
         ];
-    }
-
-    public function hydrate(ResponseInterface $response): array
-    {
-        return $response->toArray();
     }
 }

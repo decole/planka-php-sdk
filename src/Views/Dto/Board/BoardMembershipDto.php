@@ -17,5 +17,6 @@ final class BoardMembershipDto implements OutputDtoInterface
         public bool $canComment,
         public BoardMembershipRoleEnum $role,
         public string $boardId,
+        public readonly array $_rawResponse = [],
     ) {}
 }

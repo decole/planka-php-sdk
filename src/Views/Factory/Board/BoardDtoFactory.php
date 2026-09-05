@@ -14,6 +14,7 @@ final class BoardDtoFactory implements OutputInterface
         return new BoardDto(
             item: (new BoardItemDtoFactory())->create($data['item']),
             included: (new BoardIncludedDtoFactory())->create($data['included'] ?? null),
+            _rawResponse: $data,
         );
     }
 }

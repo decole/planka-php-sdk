@@ -16,5 +16,6 @@ class CardActionItemDto
         public readonly string $dataText,
         public readonly string $cardId,
         public readonly string $userId,
+        public readonly array $_rawResponse = [],
     ) {}
 }

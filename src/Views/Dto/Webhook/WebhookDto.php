@@ -19,5 +19,6 @@ class WebhookDto implements OutputDtoInterface
         public ?array $excludedEvents,
         public ?\DateTimeImmutable $createdAt,
         public ?\DateTimeImmutable $updatedAt,
+        public readonly array $_rawResponse = [],
     ) {}
 }

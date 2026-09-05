@@ -17,5 +17,6 @@ class TaskListDto implements OutputDtoInterface
         public bool $hideCompletedTasks,
         public ?\DateTimeImmutable $createdAt,
         public ?\DateTimeImmutable $updatedAt,
+        public readonly array $_rawResponse = [],
     ) {}
 }

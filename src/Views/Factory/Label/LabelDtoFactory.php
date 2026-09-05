@@ -34,6 +34,7 @@ final class LabelDtoFactory implements OutputInterface
             position: (int) $data['position'],
             name: $data['name'],
             color: LabelColorEnum::tryFrom($data['color']),
+            _rawResponse: $data,
         );
     }
 }

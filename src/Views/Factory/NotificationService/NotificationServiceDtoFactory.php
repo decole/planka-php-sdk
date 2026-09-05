@@ -34,6 +34,7 @@ final class NotificationServiceDtoFactory implements OutputInterface
             format: NotificationServiceFormatEnum::from($data['format']),
             createdAt: $this->convertToDateTime($data['createdAt'] ?? null),
             updatedAt: $this->convertToDateTime($data['updatedAt'] ?? null),
+            _rawResponse: $data,
         );
     }
 }

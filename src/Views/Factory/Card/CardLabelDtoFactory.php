@@ -29,6 +29,7 @@ final class CardLabelDtoFactory implements OutputInterface
             updatedAt: $this->convertToDateTime($data['updatedAt']),
             cardId: $data['cardId'],
             labelId: $data['labelId'],
+            _rawResponse: $data,
         );
     }
 }

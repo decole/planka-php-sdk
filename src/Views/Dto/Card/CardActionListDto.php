@@ -9,5 +9,6 @@ class CardActionListDto
     public function __construct(
         public readonly array $items,
         public readonly array $included,
+        public readonly array $_rawResponse = [],
     ) {}
 }

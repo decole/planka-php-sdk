@@ -14,5 +14,6 @@ class NotificationItemDto
         public readonly string $userId,
         public readonly string $cardId,
         public readonly string $actionId,
+        public readonly array $_rawResponse = [],
     ) {}
 }

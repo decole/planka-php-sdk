@@ -49,6 +49,7 @@ final class CardActionListDtoFactory implements OutputInterface
         return new CardActionListDto(
             items: $this->getItems($data),
             included: $this->getIncluded($data),
+            _rawResponse: $data,
         );
     }
 

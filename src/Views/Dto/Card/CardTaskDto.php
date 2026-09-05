@@ -18,5 +18,6 @@ class CardTaskDto implements OutputDtoInterface
         public bool $isCompleted,
         public ?\DateTimeImmutable $createdAt = null,
         public ?\DateTimeImmutable $updatedAt = null,
+        public readonly array $_rawResponse = [],
     ) {}
 }

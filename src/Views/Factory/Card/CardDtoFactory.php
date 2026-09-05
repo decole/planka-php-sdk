@@ -95,6 +95,7 @@ final class CardDtoFactory implements OutputInterface
             coverAttachmentId: $item['coverAttachmentId'],
             isSubscribed: (bool) ($item['isSubscribed'] ?? false),
             included: $this->getIncluded($data),
+            _rawResponse: $data,
         );
     }
 
@@ -114,6 +115,7 @@ final class CardDtoFactory implements OutputInterface
             cardLabels: map($data['included']['cardLabels'] ?? [], fn(array $item) => (new CardLabelDtoFactory())->create($item)),
             tasks: map($data['included']['tasks'] ?? [], fn(array $item) => (new CardTaskDtoFactory())->create($item)),
             attachments: map($data['included']['attachments'] ?? [], fn(array $item) => (new AttachmentDtoFactory())->create($item)),
+            _rawResponse: $data['included'],
         );
     }
 }

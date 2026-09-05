@@ -24,6 +24,7 @@ final class CardTaskDtoFactory implements OutputInterface
             isCompleted: (bool) ($data['isCompleted'] ?? false),
             createdAt: $this->convertToDateTime($data['createdAt'] ?? null),
             updatedAt: $this->convertToDateTime($data['updatedAt'] ?? null),
+            _rawResponse: $data,
         );
     }
 }

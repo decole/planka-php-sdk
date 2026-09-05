@@ -18,5 +18,6 @@ class AttachmentDto
         public readonly ?\DateTimeImmutable $updatedAt = null,
         public readonly ?string $coverUrl = null,
         public readonly ?ImageDto $image = null,
+        public readonly array $_rawResponse = [],
     ) {}
 }

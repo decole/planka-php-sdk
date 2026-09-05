@@ -30,6 +30,7 @@ final class NotificationIncludedDtoFactory implements OutputInterface
             users: $this->getUsers($data),
             cards: $this->getCards($data),
             actions: $this->getActions($data),
+            _rawResponse: $data,
         );
     }
 

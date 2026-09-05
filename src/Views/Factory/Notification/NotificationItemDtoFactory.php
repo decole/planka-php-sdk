@@ -33,6 +33,7 @@ final class NotificationItemDtoFactory implements OutputInterface
             userId: $data['userId'],
             cardId: $data['cardId'],
             actionId: $data['actionId'],
+            _rawResponse: $data,
         );
     }
 }

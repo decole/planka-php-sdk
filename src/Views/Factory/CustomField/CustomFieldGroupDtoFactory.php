@@ -35,6 +35,7 @@ final class CustomFieldGroupDtoFactory implements OutputInterface
             name: $data['name'] ?? null,
             createdAt: $this->convertToDateTime($data['createdAt'] ?? null),
             updatedAt: $this->convertToDateTime($data['updatedAt'] ?? null),
+            _rawResponse: $data,
         );
     }
 }

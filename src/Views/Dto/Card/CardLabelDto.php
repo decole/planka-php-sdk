@@ -14,5 +14,6 @@ class CardLabelDto implements OutputDtoInterface
         public readonly ?\DateTimeImmutable $updatedAt,
         public readonly string $cardId,
         public ?string $labelId,
+        public readonly array $_rawResponse = [],
     ) {}
 }

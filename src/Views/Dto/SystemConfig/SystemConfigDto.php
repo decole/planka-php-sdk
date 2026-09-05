@@ -20,5 +20,6 @@ class SystemConfigDto implements OutputDtoInterface
         public ?string $smtpFrom,
         public ?\DateTimeImmutable $createdAt,
         public ?\DateTimeImmutable $updatedAt,
+        public readonly array $_rawResponse = [],
     ) {}
 }

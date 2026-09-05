@@ -35,6 +35,7 @@ final class WebhookDtoFactory implements OutputInterface
             excludedEvents: $data['excludedEvents'] ?? null,
             createdAt: $this->convertToDateTime($data['createdAt'] ?? null),
             updatedAt: $this->convertToDateTime($data['updatedAt'] ?? null),
+            _rawResponse: $data,
         );
     }
 }

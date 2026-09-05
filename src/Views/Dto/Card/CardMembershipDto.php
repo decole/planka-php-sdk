@@ -14,5 +14,6 @@ class CardMembershipDto implements OutputDtoInterface
         public readonly ?\DateTimeImmutable $updatedAt,
         public readonly string $cardId,
         public readonly string $userId,
+        public readonly array $_rawResponse = [],
     ) {}
 }

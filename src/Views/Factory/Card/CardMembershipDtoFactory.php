@@ -29,6 +29,7 @@ final class CardMembershipDtoFactory implements OutputInterface
             updatedAt: $this->convertToDateTime($data['updatedAt']),
             cardId: $data['cardId'],
             userId: $data['userId'],
+            _rawResponse: $data,
         );
     }
 }

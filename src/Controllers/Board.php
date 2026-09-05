@@ -8,7 +8,9 @@ use Planka\Bridge\Actions\Board\BoardCreateAction;
 use Planka\Bridge\Actions\Board\BoardDeleteAction;
 use Planka\Bridge\Actions\Board\BoardUpdateAction;
 use Planka\Bridge\Actions\Board\BoardViewAction;
+use Planka\Bridge\Actions\CardAction\BoardActionListAction;
 use Planka\Bridge\Views\Dto\Board\BoardDto;
+use Planka\Bridge\Views\Dto\Card\CardActionListDto;
 use Planka\Bridge\TransportClients\Client;
 use Planka\Bridge\Config;
 
@@ -50,5 +52,15 @@ final class Board
     public function delete(string $boardId): BoardDto
     {
         return $this->client->delete(new BoardDeleteAction(boardId: $boardId, token: $this->config->getAuthToken()));
+    }
+
+    /** 'GET /api/boards/:boardId/actions' */
+    public function getActions(string $boardId, ?string $beforeId = null): CardActionListDto
+    {
+        return $this->client->get(new BoardActionListAction(
+            boardId: $boardId,
+            beforeId: $beforeId,
+            token: $this->config->getAuthToken(),
+        ));
     }
 }

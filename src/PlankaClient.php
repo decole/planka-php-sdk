@@ -4,18 +4,15 @@ declare(strict_types=1);
 
 namespace Planka\Bridge;
 
-use Planka\Bridge\Actions\Auth\AcceptTermsAction;
-use Planka\Bridge\Actions\Auth\ExchangeWithOidcAction;
-use Planka\Bridge\Actions\Auth\GetTermsAction;
-use Planka\Bridge\Actions\Auth\RevokePendingTokenAction;
-use Planka\Bridge\Enum\LanguageEnum;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Planka\Bridge\Exceptions\AuthenticateException;
 use Planka\Bridge\Actions\Auth\AuthenticateAction;
 use Planka\Bridge\Actions\Common\GetInfoAction;
+use Planka\Bridge\Controllers\AccessToken;
 use Planka\Bridge\Controllers\BoardMembership;
 use Planka\Bridge\Controllers\CardMembership;
 use Planka\Bridge\Controllers\ProjectManager;
+use Planka\Bridge\Controllers\Terms;
 use Planka\Bridge\Exceptions\LogoutException;
 use Planka\Bridge\Actions\Auth\LogoutAction;
 use Planka\Bridge\Controllers\Notification;
@@ -43,6 +40,8 @@ use Planka\Bridge\Controllers\Webhook;
  */
 final class PlankaClient
 {
+    public readonly AccessToken $accessToken;
+
     public readonly Attachment $attachment;
 
     public readonly BaseCustomFieldGroup $baseCustomFieldGroup;
@@ -81,6 +80,8 @@ final class PlankaClient
 
     public readonly SystemConfig $systemConfig;
 
+    public readonly Terms $terms;
+
     public readonly User $user;
 
     public readonly Webhook $webhook;
@@ -97,6 +98,7 @@ final class PlankaClient
 
         $this->client = $client;
 
+        $this->accessToken = new AccessToken($this->client);
         $this->attachment = new Attachment($config, $this->client);
         $this->baseCustomFieldGroup = new BaseCustomFieldGroup($config, $this->client);
         $this->board = new Board($config, $this->client);
@@ -116,6 +118,7 @@ final class PlankaClient
         $this->project = new Project($config, $this->client);
         $this->projectManager = new ProjectManager($config, $this->client);
         $this->systemConfig = new SystemConfig($config, $this->client);
+        $this->terms = new Terms($this->client);
         $this->user = new User($config, $this->client);
         $this->webhook = new Webhook($config, $this->client);
     }
@@ -154,30 +157,6 @@ final class PlankaClient
         if (200 !== $response->getStatusCode()) {
             throw new LogoutException($response->getContent());
         }
-    }
-
-    /** 'POST /api/access-tokens/exchange-with-oidc' */
-    public function exchangeWithOidc(string $code, string $nonce, bool $withHttpOnlyToken = false): array
-    {
-        return $this->client->post(new ExchangeWithOidcAction($code, $nonce, $withHttpOnlyToken));
-    }
-
-    /** 'POST /api/access-tokens/revoke-pending-token' */
-    public function revokePendingToken(string $pendingToken): array
-    {
-        return $this->client->post(new RevokePendingTokenAction($pendingToken));
-    }
-
-    /** 'POST /api/access-tokens/accept-terms' */
-    public function acceptTerms(string $pendingToken, string $signature, ?LanguageEnum $initialLanguage = null): array
-    {
-        return $this->client->post(new AcceptTermsAction($pendingToken, $signature, $initialLanguage));
-    }
-
-    /** 'GET /api/terms' */
-    public function getTerms(?LanguageEnum $language = null): array
-    {
-        return $this->client->get(new GetTermsAction($language));
     }
 
     /** 'GET /' - for ping Planka */

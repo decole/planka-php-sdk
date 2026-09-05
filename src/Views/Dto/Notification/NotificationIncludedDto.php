@@ -10,5 +10,6 @@ class NotificationIncludedDto
         public readonly array $users,
         public readonly array $cards,
         public readonly array $actions,
+        public readonly array $_rawResponse = [],
     ) {}
 }

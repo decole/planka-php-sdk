@@ -35,6 +35,7 @@ final class CustomFieldDtoFactory implements OutputInterface
             showOnFrontOfCard: (bool) ($data['showOnFrontOfCard'] ?? false),
             createdAt: $this->convertToDateTime($data['createdAt'] ?? null),
             updatedAt: $this->convertToDateTime($data['updatedAt'] ?? null),
+            _rawResponse: $data,
         );
     }
 }

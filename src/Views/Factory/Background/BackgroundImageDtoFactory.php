@@ -24,6 +24,7 @@ final class BackgroundImageDtoFactory implements OutputInterface
         return new BackgroundImageDto(
             url: $data['url'],
             coverUrl: $data['coverUrl'],
+            _rawResponse: $data,
         );
     }
 }

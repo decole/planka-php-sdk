@@ -26,6 +26,7 @@ final class BackgroundDtoFactory implements OutputInterface
         return new BackgroundDto(
             type: BackgroundTypeEnum::from($data['type']),
             name: BackgroundGradientEnum::tryFrom($data['name'] ?? ''),
+            _rawResponse: $data,
         );
     }
 }

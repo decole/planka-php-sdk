@@ -9,5 +9,6 @@ class StopWatchDto
     public function __construct(
         public ?\DateTimeImmutable $startedAt,
         public int $total,
+        public readonly array $_rawResponse = [],
     ) {}
 }

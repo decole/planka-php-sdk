@@ -13,5 +13,6 @@ class BoardListDto
         public readonly int $position,
         public readonly string $name,
         public readonly string $boardId,
+        public readonly array $_rawResponse = [],
     ) {}
 }

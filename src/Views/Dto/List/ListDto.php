@@ -13,5 +13,6 @@ class ListDto
         public readonly ?\DateTimeImmutable $updatedAt,
         public int $position,
         public ?string $name = null,
+        public readonly array $_rawResponse = [],
     ) {}
 }

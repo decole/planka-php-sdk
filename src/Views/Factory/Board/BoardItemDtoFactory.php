@@ -28,6 +28,7 @@ final class BoardItemDtoFactory implements OutputInterface
             expandTaskListsByDefault: (bool) ($data['expandTaskListsByDefault'] ?? false),
             createdAt: $this->convertToDateTime($data['createdAt'] ?? null),
             updatedAt: $this->convertToDateTime($data['updatedAt'] ?? null),
+            _rawResponse: $data,
         );
     }
 }

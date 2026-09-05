@@ -16,5 +16,6 @@ class CommentDto
         public readonly string $userId,
         public readonly ?CommentTypeEnum $type = null,
         public string $dataText = '',
+        public readonly array $_rawResponse = [],
     ) {}
 }
