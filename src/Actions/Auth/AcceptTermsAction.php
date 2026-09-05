@@ -7,10 +7,12 @@ namespace Planka\Bridge\Actions\Auth;
 use Planka\Bridge\Contracts\Actions\ActionInterface;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
 use Planka\Bridge\Enum\LanguageEnum;
-use Symfony\Contracts\HttpClient\ResponseInterface;
+use Planka\Bridge\Traits\AccessTokenHydrateTrait;
 
 final class AcceptTermsAction implements ActionInterface, ResponseResultInterface
 {
+    use AccessTokenHydrateTrait;
+
     public function __construct(
         private readonly string $pendingToken,
         private readonly string $signature,
@@ -36,10 +38,5 @@ final class AcceptTermsAction implements ActionInterface, ResponseResultInterfac
         return [
             'json' => $json,
         ];
-    }
-
-    public function hydrate(ResponseInterface $response): array
-    {
-        return $response->toArray();
     }
 }
