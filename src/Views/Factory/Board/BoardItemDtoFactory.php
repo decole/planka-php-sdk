@@ -14,6 +14,22 @@ final class BoardItemDtoFactory implements OutputInterface
 {
     use DateConverterTrait;
 
+    /**
+     * @param array{
+     *     id: string,
+     *     projectId: string,
+     *     position: int|float,
+     *     name: string,
+     *     defaultView?: ?string,
+     *     defaultCardType?: ?string,
+     *     limitCardTypesToDefaultOne?: ?bool,
+     *     alwaysDisplayCardCreator?: ?bool,
+     *     expandTaskListsByDefault?: ?bool,
+     *     displayCardAges?: ?bool,
+     *     createdAt?: ?string,
+     *     updatedAt?: ?string
+     * } $data
+     */
     public function create(array $data): BoardItemDto
     {
         return new BoardItemDto(

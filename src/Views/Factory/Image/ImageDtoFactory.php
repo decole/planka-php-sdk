@@ -9,6 +9,12 @@ use Planka\Bridge\Views\Dto\Image\ImageDto;
 
 final class ImageDtoFactory implements OutputInterface
 {
+    /**
+     * @param array{
+     *     height: int,
+     *     width: int
+     * }|null $data
+     */
     public function create(?array $data): ?ImageDto
     {
         if (empty($data)) {

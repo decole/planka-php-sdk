@@ -7,12 +7,16 @@ namespace Planka\Bridge\Controllers;
 use Planka\Bridge\Actions\Comment\CommentCreateAction;
 use Planka\Bridge\Actions\Comment\CommentDeleteAction;
 use Planka\Bridge\Actions\Comment\CommentUpdateAction;
-use Planka\Bridge\Views\Dto\Comment\CommentDto;
-use Planka\Bridge\TransportClients\Client;
+use Planka\Bridge\Actions\Common\CommonPatchAction;
 use Planka\Bridge\Config;
+use Planka\Bridge\Traits\CommentHydrateTrait;
+use Planka\Bridge\TransportClients\Client;
+use Planka\Bridge\Views\Dto\Comment\CommentDto;
 
 final class Comment
 {
+    use CommentHydrateTrait;
+
     public function __construct(
         private readonly Config $config,
         private readonly Client $client,
@@ -48,6 +52,23 @@ final class Comment
             commentId: $commentId,
             text: $text,
             token: $this->config->getAuthToken(),
+        ));
+    }
+
+    /**
+     * 'PATCH /api/comment-actions/:id' - Partially updates comment properties.
+     *
+     * @param string $commentId Comment ID
+     * @param array{
+     *   text?: string
+     * } $map Associative array of fields to update
+     */
+    public function patching(string $commentId, array $map): CommentDto
+    {
+        return $this->client->patch(new CommonPatchAction(
+            urlPath: "api/comment-actions/{$commentId}",
+            data: $map,
+            hydrateCallback: fn($response) => $this->hydrate($response),
         ));
     }
 

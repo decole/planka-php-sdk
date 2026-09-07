@@ -9,6 +9,14 @@ use Planka\Bridge\Views\Dto\Terms\TermsDto;
 
 final class TermsDtoFactory implements OutputInterface
 {
+    /**
+     * @param array{
+     *     language?: ?string,
+     *     content?: ?string,
+     *     signature?: ?string,
+     *     item?: array
+     * } $data
+     */
     public function create(array $data): TermsDto
     {
         $item = $data['item'] ?? $data;

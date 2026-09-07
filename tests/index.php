@@ -47,8 +47,54 @@ $createdTracker = [
     'notificationServices' => [],
 ];
 
-function assertCreated(string $type, string $id, object $dto, array &$tracker): void
+function assertRawResponseMappedToDto(object $dto, string $label): void
 {
+    $targetDto = $dto;
+
+    if (property_exists($dto, 'item') && is_object($dto->item)) {
+        $targetDto = $dto->item;
+    }
+
+    if (!property_exists($targetDto, '_rawResponse') || !is_array($targetDto->_rawResponse) || empty($targetDto->_rawResponse)) {
+        dump("--- CHECK MAPPING FOR {$label}: No _rawResponse found ---");
+
+        return;
+    }
+
+    $ref = new ReflectionClass($targetDto);
+    $properties = array_map(fn ($p) => $p->getName(), $ref->getProperties());
+
+    $raw = isset($targetDto->_rawResponse['item']) && is_array($targetDto->_rawResponse['item'])
+        ? $targetDto->_rawResponse['item']
+        : $targetDto->_rawResponse;
+
+    $missingProperties = [];
+    $mappedCount = 0;
+
+    foreach ($raw as $key => $val) {
+        if (in_array($key, ['item', 'items', 'included'], true)) {
+            continue;
+        }
+
+        if (!in_array($key, $properties, true)) {
+            $missingProperties[] = $key;
+        } else {
+            ++$mappedCount;
+        }
+    }
+
+    if (!empty($missingProperties)) {
+        dd('ERROR: DTO ' . get_class($targetDto) . " for '{$label}' missing properties for raw response keys: " . implode(', ', $missingProperties));
+    }
+
+    dump("✅ MAPPING VERIFIED for {$label} (" . get_class($targetDto) . "): {$mappedCount} raw keys matched DTO properties");
+}
+
+function assertCreated(string $type, string $id, object $dto, array &$tracker, string $label = ''): void
+{
+    if ('' !== $label) {
+        assertRawResponseMappedToDto($dto, $label);
+    }
     $tracker[$type][$id] = $dto;
 }
 
@@ -91,8 +137,9 @@ if (200 !== $infoResponse->getStatusCode()) {
 dump('Server connection OK');
 
 try {
-    $terms = $client->getTerms();
+    $terms = $client->terms->get();
     dump('Terms fetch OK');
+    assertRawResponseMappedToDto($terms, 'TermsDto');
 } catch (Throwable $e) {
     dump('Terms fetch note: ' . $e->getMessage());
 }
@@ -114,6 +161,7 @@ try {
 
     if ($sysConfig instanceof SystemConfigDto) {
         inspectDto($sysConfig, 'SystemConfigDto');
+        assertRawResponseMappedToDto($sysConfig, 'SystemConfigDto');
     }
 } catch (Throwable $e) {
     dump('System Config check skipped or unauthorized: ' . $e->getMessage());
@@ -128,7 +176,7 @@ if (!$project instanceof ProjectDto || $project->name !== $projectName) {
     dd('ERROR: Failed to create project!');
 }
 
-assertCreated('projects', $project->id, $project, $createdTracker);
+assertCreated('projects', $project->id, $project, $createdTracker, 'ProjectDto (created)');
 inspectDto($project, 'ProjectDto (created)');
 
 // 6. Base Custom Field Groups & Fields
@@ -139,7 +187,7 @@ if (!$baseGroup instanceof BaseCustomFieldGroupDto) {
     dd('ERROR: Base custom field group creation failed!');
 }
 
-assertCreated('baseCustomGroups', $baseGroup->id, $baseGroup, $createdTracker);
+assertCreated('baseCustomGroups', $baseGroup->id, $baseGroup, $createdTracker, 'BaseCustomFieldGroupDto');
 inspectDto($baseGroup, 'BaseCustomFieldGroupDto');
 
 $customField = $client->customField->createInBaseGroup(
@@ -152,7 +200,7 @@ if (!$customField instanceof CustomFieldDto) {
     dd('ERROR: Custom field creation failed!');
 }
 
-assertCreated('customFields', $customField->id, $customField, $createdTracker);
+assertCreated('customFields', $customField->id, $customField, $createdTracker, 'CustomFieldDto');
 inspectDto($customField, 'CustomFieldDto');
 
 // 7. Create Test Board
@@ -165,7 +213,7 @@ if (!$board instanceof BoardDto || null === $board->item) {
 }
 
 $boardId = $board->item->id;
-assertCreated('boards', $boardId, $board, $createdTracker);
+assertCreated('boards', $boardId, $board, $createdTracker, 'BoardDto');
 inspectDto($board, 'BoardDto');
 
 // Update board view settings
@@ -179,7 +227,7 @@ if (!$boardGroup instanceof CustomFieldGroupDto) {
     dd('ERROR: Custom field group on board creation failed!');
 }
 
-assertCreated('customGroups', $boardGroup->id, $boardGroup, $createdTracker);
+assertCreated('customGroups', $boardGroup->id, $boardGroup, $createdTracker, 'CustomFieldGroupDto');
 inspectDto($boardGroup, 'CustomFieldGroupDto');
 
 // 8. Test Lists (Columns)
@@ -188,9 +236,9 @@ $columnTodo = $client->boardList->create($boardId, '[v2-test] To Do', 1);
 $columnDone = $client->boardList->create($boardId, '[v2-test] Done', 2);
 $columnTemp = $client->boardList->create($boardId, '[v2-test] Temporary Column', 3);
 
-assertCreated('lists', $columnTodo->id, $columnTodo, $createdTracker);
-assertCreated('lists', $columnDone->id, $columnDone, $createdTracker);
-assertCreated('lists', $columnTemp->id, $columnTemp, $createdTracker);
+assertCreated('lists', $columnTodo->id, $columnTodo, $createdTracker, 'BoardListDto (To Do)');
+assertCreated('lists', $columnDone->id, $columnDone, $createdTracker, 'BoardListDto (Done)');
+assertCreated('lists', $columnTemp->id, $columnTemp, $createdTracker, 'BoardListDto (Temp)');
 
 inspectDto($columnTodo, 'BoardListDto (To Do)');
 
@@ -219,7 +267,7 @@ if (!$card1 instanceof CardDto) {
     dd('ERROR: Failed to create card 1!');
 }
 
-assertCreated('cards', $card1->id, $card1, $createdTracker);
+assertCreated('cards', $card1->id, $card1, $createdTracker, 'CardDto');
 inspectDto($card1, 'CardDto');
 
 // Duplicate Card (Planka v2 Feature)
@@ -229,7 +277,7 @@ if (!$duplicatedCard instanceof CardDto) {
     dd('ERROR: Card duplication failed!');
 }
 
-assertCreated('cards', $duplicatedCard->id, $duplicatedCard, $createdTracker);
+assertCreated('cards', $duplicatedCard->id, $duplicatedCard, $createdTracker, 'CardDto (duplicated)');
 inspectDto($duplicatedCard, 'CardDto (duplicated)');
 
 // Read Notifications for Card (Planka v2 Feature)
@@ -244,7 +292,7 @@ if (!$taskList instanceof TaskListDto) {
     dd('ERROR: Task list creation failed!');
 }
 
-assertCreated('taskLists', $taskList->id, $taskList, $createdTracker);
+assertCreated('taskLists', $taskList->id, $taskList, $createdTracker, 'TaskListDto');
 inspectDto($taskList, 'TaskListDto');
 
 $fetchedTaskList = $client->cardTask->getTaskList($taskList->id);
@@ -259,7 +307,7 @@ if (!$task1 instanceof CardTaskDto) {
     dd('ERROR: Card task creation failed!');
 }
 
-assertCreated('tasks', $task1->id, $task1, $createdTracker);
+assertCreated('tasks', $task1->id, $task1, $createdTracker, 'CardTaskDto');
 inspectDto($task1, 'CardTaskDto');
 
 $task1->isCompleted = true;
@@ -272,6 +320,7 @@ dump('Testing Comments (Create, List, Update, Delete)...');
 try {
     $comment = $client->comment->add($card1->id, '[v2-test] Initial Comment');
     dump('Comment add OK (ID: ' . $comment->id . ')');
+    assertRawResponseMappedToDto($comment, 'CommentDto');
 
     $commentList = $client->comment->list($card1->id);
     dump('Comment list OK');
@@ -324,7 +373,7 @@ try {
     );
 
     if ($webhook instanceof WebhookDto) {
-        assertCreated('webhooks', $webhook->id, $webhook, $createdTracker);
+        assertCreated('webhooks', $webhook->id, $webhook, $createdTracker, 'WebhookDto');
         inspectDto($webhook, 'WebhookDto');
 
         $webhooks = $client->webhook->list();
@@ -353,7 +402,7 @@ try {
     );
 
     if ($notifService instanceof NotificationServiceDto) {
-        assertCreated('notificationServices', $notifService->id, $notifService, $createdTracker);
+        assertCreated('notificationServices', $notifService->id, $notifService, $createdTracker, 'NotificationServiceDto');
         inspectDto($notifService, 'NotificationServiceDto');
 
         $client->notificationService->test($notifService->id);

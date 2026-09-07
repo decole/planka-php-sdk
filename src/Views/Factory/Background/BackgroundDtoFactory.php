@@ -4,16 +4,19 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Views\Factory\Background;
 
-use Planka\Bridge\Views\Dto\Background\BackgroundDto;
 use Planka\Bridge\Contracts\Factory\OutputInterface;
 use Planka\Bridge\Enum\BackgroundGradientEnum;
 use Planka\Bridge\Enum\BackgroundTypeEnum;
+use Planka\Bridge\Views\Dto\Background\BackgroundDto;
 
 final class BackgroundDtoFactory implements OutputInterface
 {
     /**
      * @param array{
-     *     type: string,
+     *     type?: ?string,
+     *     backgroundType?: ?string,
+     *     gradient?: ?string,
+     *     backgroundGradient?: ?string,
      *     name?: ?string
      * }|null $data
      */
@@ -23,9 +26,16 @@ final class BackgroundDtoFactory implements OutputInterface
             return null;
         }
 
+        $typeRaw = $data['type'] ?? $data['backgroundType'] ?? null;
+        $gradientRaw = $data['gradient'] ?? $data['backgroundGradient'] ?? $data['name'] ?? null;
+
+        $type = is_string($typeRaw) ? BackgroundTypeEnum::tryFrom($typeRaw) : null;
+        $gradient = is_string($gradientRaw) ? BackgroundGradientEnum::tryFrom($gradientRaw) : null;
+
         return new BackgroundDto(
-            type: BackgroundTypeEnum::from($data['type']),
-            name: BackgroundGradientEnum::tryFrom($data['name'] ?? ''),
+            type: $type,
+            gradient: $gradient,
+            name: $gradient,
             _rawResponse: $data,
         );
     }

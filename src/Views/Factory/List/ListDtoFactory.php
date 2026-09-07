@@ -14,6 +14,18 @@ final class ListDtoFactory implements OutputInterface
 {
     use DateConverterTrait;
 
+    /**
+     * @param array{
+     *     id: string,
+     *     boardId: string,
+     *     type?: ?string,
+     *     position?: ?int,
+     *     name?: ?string,
+     *     color?: ?string,
+     *     createdAt?: ?string,
+     *     updatedAt?: ?string
+     * } $data
+     */
     public function create(array $data): ListDto
     {
         $typeEnum = isset($data['type']) && is_string($data['type']) ? ListTypeEnum::tryFrom($data['type']) : null;

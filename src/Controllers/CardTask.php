@@ -9,13 +9,23 @@ use Planka\Bridge\Actions\CardTask\CardTaskDeleteAction;
 use Planka\Bridge\Actions\CardTask\CardTaskUpdateAction;
 use Planka\Bridge\Actions\CardTask\TaskListCreateAction;
 use Planka\Bridge\Actions\CardTask\TaskListDeleteAction;
+use Planka\Bridge\Actions\Common\CommonPatchAction;
 use Planka\Bridge\Config;
+use Planka\Bridge\Traits\CardTaskHydrateTrait;
+use Planka\Bridge\Traits\TaskListHydrateTrait;
 use Planka\Bridge\TransportClients\Client;
 use Planka\Bridge\Views\Dto\Card\CardTaskDto;
 use Planka\Bridge\Views\Dto\Card\TaskListDto;
 
 final class CardTask
 {
+    use CardTaskHydrateTrait;
+    use TaskListHydrateTrait {
+        TaskListHydrateTrait::hydrate insteadof CardTaskHydrateTrait;
+        TaskListHydrateTrait::hydrate as hydrateTaskList;
+        CardTaskHydrateTrait::hydrate as hydrateCardTask;
+    }
+
     public function __construct(
         private readonly Config $config,
         private readonly Client $client,
@@ -54,6 +64,26 @@ final class CardTask
         ));
     }
 
+    /**
+     * 'PATCH /api/task-lists/:id' - Partially updates task list properties.
+     *
+     * @param string $taskListId Task list ID
+     * @param array{
+     *   name?: string,
+     *   position?: int,
+     *   showOnFrontOfCard?: bool,
+     *   hideCompletedTasks?: bool
+     * } $map Associative array of fields to update
+     */
+    public function patchingTaskList(string $taskListId, array $map): TaskListDto
+    {
+        return $this->client->patch(new CommonPatchAction(
+            urlPath: "api/task-lists/{$taskListId}",
+            data: $map,
+            hydrateCallback: fn($response) => $this->hydrateTaskList($response),
+        ));
+    }
+
     /** 'DELETE /api/task-lists/:id' */
     public function deleteTaskList(string $taskListId): TaskListDto
     {
@@ -74,6 +104,27 @@ final class CardTask
     public function update(CardTaskDto $task): CardTaskDto
     {
         return $this->client->patch(new CardTaskUpdateAction(task: $task));
+    }
+
+    /**
+     * 'PATCH /api/tasks/:id' - Partially updates task properties.
+     *
+     * @param string $taskId Task ID
+     * @param array{
+     *   name?: string,
+     *   position?: int,
+     *   isCompleted?: bool,
+     *   linkedCardId?: string|null,
+     *   assigneeUserId?: string|null
+     * } $map Associative array of fields to update
+     */
+    public function patching(string $taskId, array $map): CardTaskDto
+    {
+        return $this->client->patch(new CommonPatchAction(
+            urlPath: "api/tasks/{$taskId}",
+            data: $map,
+            hydrateCallback: fn($response) => $this->hydrateCardTask($response),
+        ));
     }
 
     /** 'DELETE /api/tasks/:id' */

@@ -27,6 +27,7 @@ class UserDto implements OutputDtoInterface
         public bool $isUsernameLocked,
         public bool $isDeletionLocked,
         public ?string $avatarUrl,
+        public ?array $avatar = null,
         public ?UserRoleEnum $role = null,
         public bool $isDeactivated = false,
         public bool $isSsoUser = false,

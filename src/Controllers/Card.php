@@ -4,22 +4,27 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Controllers;
 
-use Planka\Bridge\Actions\Card\CardUnsubscribeMembershipAction;
-use Planka\Bridge\Actions\Card\CardSubscribeMembershipAction;
 use Planka\Bridge\Actions\Card\CardClearDueDateAction;
-use Planka\Bridge\Views\Dto\Card\CardMembershipDto;
 use Planka\Bridge\Actions\Card\CardCreateAction;
 use Planka\Bridge\Actions\Card\CardDeleteAction;
-use Planka\Bridge\Actions\Card\CardUpdateAction;
-use Planka\Bridge\Actions\Card\CardTimerAction;
 use Planka\Bridge\Actions\Card\CardMoveAction;
+use Planka\Bridge\Actions\Card\CardSubscribeMembershipAction;
+use Planka\Bridge\Actions\Card\CardTimerAction;
+use Planka\Bridge\Actions\Card\CardUnsubscribeMembershipAction;
+use Planka\Bridge\Actions\Card\CardUpdateAction;
 use Planka\Bridge\Actions\Card\CardViewAction;
+use Planka\Bridge\Actions\Common\CommonPatchAction;
+use Planka\Bridge\Config;
+use Planka\Bridge\Enum\BoardDefaultCardTypeEnum;
+use Planka\Bridge\Traits\CardHydrateTrait;
 use Planka\Bridge\TransportClients\Client;
 use Planka\Bridge\Views\Dto\Card\CardDto;
-use Planka\Bridge\Config;
+use Planka\Bridge\Views\Dto\Card\CardMembershipDto;
 
 final class Card
 {
+    use CardHydrateTrait;
+
     public function __construct(
         private readonly Config $config,
         private readonly Client $client,
@@ -30,7 +35,7 @@ final class Card
         string $listId,
         string $name,
         int $position = 65536,
-        \Planka\Bridge\Enum\BoardDefaultCardTypeEnum $type = \Planka\Bridge\Enum\BoardDefaultCardTypeEnum::PROJECT,
+        BoardDefaultCardTypeEnum $type = BoardDefaultCardTypeEnum::PROJECT,
     ): CardDto {
         return $this->client->post(new CardCreateAction(
             listId: $listId,
@@ -52,6 +57,39 @@ final class Card
         return $this->client->patch(new CardUpdateAction(
             card: $card,
             token: $this->config->getAuthToken(),
+        ));
+    }
+
+    /**
+     * 'PATCH /api/cards/:id' - Partially updates card properties.
+     *
+     * @param string $cardId Card ID
+     * @param array{
+     *   name?: string,
+     *   description?: string|null,
+     *   dueDate?: string|\DateTimeInterface|null,
+     *   isDueCompleted?: bool,
+     *   position?: int,
+     *   listId?: string,
+     *   isClosed?: bool,
+     *   type?: 'project'|'story'|BoardDefaultCardTypeEnum,
+     *   stopwatch?: array{startedAt?: string|null, total?: int}|null
+     * } $map Associative array of fields to update
+     */
+    public function patching(string $cardId, array $map): CardDto
+    {
+        if (isset($map['dueDate']) && $map['dueDate'] instanceof \DateTimeInterface) {
+            $map['dueDate'] = $map['dueDate']->format('Y-m-d\TH:i:s.v\Z');
+        }
+
+        if (isset($map['type']) && $map['type'] instanceof BoardDefaultCardTypeEnum) {
+            $map['type'] = $map['type']->value;
+        }
+
+        return $this->client->patch(new CommonPatchAction(
+            urlPath: "api/cards/{$cardId}",
+            data: $map,
+            hydrateCallback: fn($response) => $this->hydrate($response),
         ));
     }
 

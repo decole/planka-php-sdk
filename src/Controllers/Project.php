@@ -4,20 +4,26 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Controllers;
 
-use Planka\Bridge\Actions\Project\ProjectUpdateBackgroundImageAction;
-use Planka\Bridge\Actions\Project\ProjectUpdateAction;
+use Planka\Bridge\Actions\Common\CommonPatchAction;
 use Planka\Bridge\Actions\Project\ProjectCreateAction;
 use Planka\Bridge\Actions\Project\ProjectDeleteAction;
 use Planka\Bridge\Actions\Project\ProjectListAction;
+use Planka\Bridge\Actions\Project\ProjectUpdateAction;
+use Planka\Bridge\Actions\Project\ProjectUpdateBackgroundImageAction;
 use Planka\Bridge\Actions\Project\ProjectViewAction;
-use Planka\Bridge\Views\Dto\Project\ProjectListDto;
-use Planka\Bridge\Exceptions\FileExistException;
-use Planka\Bridge\Views\Dto\Project\ProjectDto;
-use Planka\Bridge\TransportClients\Client;
 use Planka\Bridge\Config;
+use Planka\Bridge\Enum\BackgroundGradientEnum;
+use Planka\Bridge\Enum\BackgroundTypeEnum;
+use Planka\Bridge\Exceptions\FileExistException;
+use Planka\Bridge\Traits\ProjectHydrateTrait;
+use Planka\Bridge\TransportClients\Client;
+use Planka\Bridge\Views\Dto\Project\ProjectDto;
+use Planka\Bridge\Views\Dto\Project\ProjectListDto;
 
 final class Project
 {
+    use ProjectHydrateTrait;
+
     public function __construct(
         private readonly Config $config,
         private readonly Client $client,
@@ -56,6 +62,36 @@ final class Project
         return $this->client->patch(new ProjectUpdateAction(
             project: $project,
             token: $this->config->getAuthToken(),
+        ));
+    }
+
+    /**
+     * 'PATCH /api/projects/:id' - Partially updates project properties.
+     *
+     * @param string $projectId Project ID
+     * @param array{
+     *   name?: string,
+     *   description?: string|null,
+     *   backgroundType?: 'gradient'|'image'|BackgroundTypeEnum|null,
+     *   backgroundGradient?: string|BackgroundGradientEnum|null,
+     *   backgroundImageId?: string|null,
+     *   isHidden?: bool
+     * } $map Associative array of fields to update
+     */
+    public function patching(string $projectId, array $map): ProjectDto
+    {
+        if (isset($map['backgroundType']) && $map['backgroundType'] instanceof BackgroundTypeEnum) {
+            $map['backgroundType'] = $map['backgroundType']->value;
+        }
+
+        if (isset($map['backgroundGradient']) && $map['backgroundGradient'] instanceof BackgroundGradientEnum) {
+            $map['backgroundGradient'] = $map['backgroundGradient']->value;
+        }
+
+        return $this->client->patch(new CommonPatchAction(
+            urlPath: "api/projects/{$projectId}",
+            data: $map,
+            hydrateCallback: fn($response) => $this->hydrate($response),
         ));
     }
 

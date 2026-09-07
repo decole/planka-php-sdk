@@ -13,6 +13,33 @@ final class UserDtoFactory implements OutputInterface
 {
     use DateConverterTrait;
 
+    /**
+     * @param array{
+     *     id: string,
+     *     email?: ?string,
+     *     role?: ?string,
+     *     name?: ?string,
+     *     username?: ?string,
+     *     avatar?: ?array{url: string, thumbnailUrls: array},
+     *     avatarUrl?: ?string,
+     *     phone?: ?string,
+     *     organization?: ?string,
+     *     language?: ?string,
+     *     subscribeToOwnCards?: ?bool,
+     *     subscribeToCardWhenCommenting?: ?bool,
+     *     turnOffRecentCardHighlighting?: ?bool,
+     *     enableFavoritesByDefault?: ?bool,
+     *     defaultEditorMode?: ?string,
+     *     defaultHomeView?: ?string,
+     *     defaultProjectsOrder?: ?string,
+     *     isSsoUser?: ?bool,
+     *     isDeactivated?: ?bool,
+     *     isDefaultAdmin?: ?bool,
+     *     lockedFieldNames?: array,
+     *     createdAt?: ?string,
+     *     updatedAt?: ?string
+     * } $data
+     */
     public function create(array $data): UserDto
     {
         $isAdmin = isset($data['isAdmin'])
@@ -49,6 +76,7 @@ final class UserDtoFactory implements OutputInterface
             isUsernameLocked: (bool) ($data['isUsernameLocked'] ?? false),
             isDeletionLocked: (bool) ($data['isDeletionLocked'] ?? false),
             avatarUrl: $avatarUrl,
+            avatar: is_array($data['avatar'] ?? null) ? $data['avatar'] : null,
             role: $roleEnum,
             isDeactivated: (bool) ($data['isDeactivated'] ?? false),
             isSsoUser: (bool) ($data['isSsoUser'] ?? false),

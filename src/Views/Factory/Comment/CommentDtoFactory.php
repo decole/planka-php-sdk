@@ -13,6 +13,17 @@ final class CommentDtoFactory implements OutputInterface
 {
     use DateConverterTrait;
 
+    /**
+     * @param array{
+     *     id: string,
+     *     cardId: string,
+     *     userId?: ?string,
+     *     text?: ?string,
+     *     type?: ?string,
+     *     createdAt?: ?string,
+     *     updatedAt?: ?string
+     * } $data
+     */
     public function create(array $data): CommentDto
     {
         $text = $data['text'] ?? $data['data']['text'] ?? '';

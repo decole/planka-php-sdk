@@ -7,7 +7,7 @@ namespace Planka\Bridge\Controllers;
 use Planka\Bridge\Actions\ProjectManager\ProjectManagerCreateAction;
 use Planka\Bridge\Actions\ProjectManager\ProjectManagerDeleteAction;
 use Symfony\Component\HttpClient\Exception\ClientException;
-use Planka\Bridge\Views\Factory\Project\ProjectManagerDto;
+use Planka\Bridge\Views\Dto\Project\ProjectManagerDto;
 use Planka\Bridge\Exceptions\ResponseException;
 use Planka\Bridge\Exceptions\ValidateException;
 use Planka\Bridge\TransportClients\Client;

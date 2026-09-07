@@ -33,6 +33,8 @@ final class WebhookDtoFactory implements OutputInterface
             accessToken: $data['accessToken'] ?? null,
             events: $data['events'] ?? null,
             excludedEvents: $data['excludedEvents'] ?? null,
+            boardId: $data['boardId'] ?? null,
+            projectManagerId: $data['projectManagerId'] ?? null,
             createdAt: $this->convertToDateTime($data['createdAt'] ?? null),
             updatedAt: $this->convertToDateTime($data['updatedAt'] ?? null),
             _rawResponse: $data,

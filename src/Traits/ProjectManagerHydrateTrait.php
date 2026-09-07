@@ -10,7 +10,7 @@ use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Planka\Bridge\Views\Factory\Project\ProjectManagerDtoFactory;
-use Planka\Bridge\Views\Factory\Project\ProjectManagerDto;
+use Planka\Bridge\Views\Dto\Project\ProjectManagerDto;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Planka\Bridge\Exceptions\ResponseException;
 

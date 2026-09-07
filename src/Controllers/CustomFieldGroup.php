@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Controllers;
 
+use Planka\Bridge\Actions\Common\CommonPatchAction;
 use Planka\Bridge\Actions\CustomField\CustomFieldGroupCreateInBoardAction;
 use Planka\Bridge\Actions\CustomField\CustomFieldGroupCreateInCardAction;
 use Planka\Bridge\Actions\CustomField\CustomFieldGroupDeleteAction;
 use Planka\Bridge\Actions\CustomField\CustomFieldGroupUpdateAction;
 use Planka\Bridge\Config;
+use Planka\Bridge\Exceptions\ResponseException;
 use Planka\Bridge\TransportClients\Client;
 use Planka\Bridge\Views\Dto\CustomField\CustomFieldGroupDto;
+use Planka\Bridge\Views\Factory\CustomField\CustomFieldGroupDtoFactory;
 
 final class CustomFieldGroup
 {
@@ -48,6 +51,32 @@ final class CustomFieldGroup
             id: $id,
             name: $name,
             position: $position,
+        ));
+    }
+
+    /**
+     * 'PATCH /api/custom-field-groups/:id' - Partially updates custom field group properties.
+     *
+     * @param string $id Custom field group ID
+     * @param array{
+     *   name?: string|null,
+     *   position?: int
+     * } $map Associative array of fields to update
+     */
+    public function patching(string $id, array $map): CustomFieldGroupDto
+    {
+        return $this->client->patch(new CommonPatchAction(
+            urlPath: "api/custom-field-groups/{$id}",
+            data: $map,
+            hydrateCallback: function ($response): CustomFieldGroupDto {
+                $result = $response->toArray();
+
+                if (array_key_exists('item', $result)) {
+                    return (new CustomFieldGroupDtoFactory())->create($result['item']);
+                }
+
+                throw new ResponseException($response->getContent());
+            },
         ));
     }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Controllers;
 
+use Planka\Bridge\Actions\Common\CommonPatchAction;
 use Planka\Bridge\Actions\NotificationService\NotificationServiceCreateInBoardAction;
 use Planka\Bridge\Actions\NotificationService\NotificationServiceCreateInUserAction;
 use Planka\Bridge\Actions\NotificationService\NotificationServiceDeleteAction;
@@ -11,11 +12,14 @@ use Planka\Bridge\Actions\NotificationService\NotificationServiceTestAction;
 use Planka\Bridge\Actions\NotificationService\NotificationServiceUpdateAction;
 use Planka\Bridge\Config;
 use Planka\Bridge\Enum\NotificationServiceFormatEnum;
+use Planka\Bridge\Traits\NotificationServiceHydrateTrait;
 use Planka\Bridge\TransportClients\Client;
 use Planka\Bridge\Views\Dto\NotificationService\NotificationServiceDto;
 
 final class NotificationService
 {
+    use NotificationServiceHydrateTrait;
+
     public function __construct(
         private readonly Config $config,
         private readonly Client $client,
@@ -48,6 +52,28 @@ final class NotificationService
             id: $id,
             url: $url,
             format: $format,
+        ));
+    }
+
+    /**
+     * 'PATCH /api/notification-services/:id' - Partially updates notification service properties.
+     *
+     * @param string $id Notification service ID
+     * @param array{
+     *   url?: string,
+     *   format?: 'text'|'markdown'|'html'|NotificationServiceFormatEnum
+     * } $map Associative array of fields to update
+     */
+    public function patching(string $id, array $map): NotificationServiceDto
+    {
+        if (isset($map['format']) && $map['format'] instanceof NotificationServiceFormatEnum) {
+            $map['format'] = $map['format']->value;
+        }
+
+        return $this->client->patch(new CommonPatchAction(
+            urlPath: "api/notification-services/{$id}",
+            data: $map,
+            hydrateCallback: fn($response) => $this->hydrate($response),
         ));
     }
 

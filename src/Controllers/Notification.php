@@ -4,16 +4,20 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Controllers;
 
-use Planka\Bridge\Actions\Notification\NotificationUpdateAction;
+use Planka\Bridge\Actions\Common\CommonPatchAction;
 use Planka\Bridge\Actions\Notification\NotificationListAction;
+use Planka\Bridge\Actions\Notification\NotificationUpdateAction;
 use Planka\Bridge\Actions\Notification\NotificationVewAction;
+use Planka\Bridge\Config;
+use Planka\Bridge\Traits\NotificationHydrateTrait;
+use Planka\Bridge\TransportClients\Client;
 use Planka\Bridge\Views\Dto\Notification\NotificationItemDto;
 use Planka\Bridge\Views\Dto\Notification\NotificationListDto;
-use Planka\Bridge\TransportClients\Client;
-use Planka\Bridge\Config;
 
 final class Notification
 {
+    use NotificationHydrateTrait;
+
     public function __construct(
         private readonly Config $config,
         private readonly Client $client,
@@ -61,6 +65,23 @@ final class Notification
             notifyIdList: $notifyIdList,
             isRead: false,
             token: $this->config->getAuthToken(),
+        ));
+    }
+
+    /**
+     * 'PATCH /api/notifications/:id' - Partially updates notification properties.
+     *
+     * @param string $notifyId Notification ID
+     * @param array{
+     *   isRead?: bool
+     * } $map Associative array of fields to update
+     */
+    public function patching(string $notifyId, array $map): NotificationItemDto
+    {
+        return $this->client->patch(new CommonPatchAction(
+            urlPath: "api/notifications/{$notifyId}",
+            data: $map,
+            hydrateCallback: fn($response) => $this->hydrate($response),
         ));
     }
 

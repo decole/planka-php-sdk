@@ -22,6 +22,7 @@ final class BoardMembershipDtoFactory implements OutputInterface
      *     canComment: ?bool,
      *     boardId: string,
      *     userId: string,
+     *     projectId?: ?string,
      * } $data
      */
     public function create(array $data): BoardMembershipDto
@@ -34,6 +35,7 @@ final class BoardMembershipDtoFactory implements OutputInterface
             canComment: (bool) $data['canComment'],
             role: BoardMembershipRoleEnum::from($data['role']),
             boardId: $data['boardId'],
+            projectId: $data['projectId'] ?? null,
             _rawResponse: $data,
         );
     }

@@ -10,12 +10,16 @@ use Planka\Bridge\Actions\BoardList\BoardListDeleteAction;
 use Planka\Bridge\Actions\BoardList\BoardListMoveCardsAction;
 use Planka\Bridge\Actions\BoardList\BoardListSortAction;
 use Planka\Bridge\Actions\BoardList\BoardListUpdateAction;
+use Planka\Bridge\Actions\Common\CommonPatchAction;
 use Planka\Bridge\Config;
+use Planka\Bridge\Traits\BoardListHydrateTrait;
 use Planka\Bridge\TransportClients\Client;
 use Planka\Bridge\Views\Dto\Board\BoardListDto;
 
 final class BoardList
 {
+    use BoardListHydrateTrait;
+
     public function __construct(
         private readonly Config $config,
         private readonly Client $client,
@@ -43,6 +47,26 @@ final class BoardList
             listId: $listId,
             name: $name,
             token: $this->config->getAuthToken(),
+        ));
+    }
+
+    /**
+     * 'PATCH /api/lists/:id' - Partially updates list properties.
+     *
+     * @param string $listId List ID
+     * @param array{
+     *   name?: string,
+     *   position?: int,
+     *   type?: 'active'|'closed'|'archive'|'trash',
+     *   color?: string|null
+     * } $map Associative array of fields to update
+     */
+    public function patching(string $listId, array $map): BoardListDto
+    {
+        return $this->client->patch(new CommonPatchAction(
+            urlPath: "api/lists/{$listId}",
+            data: $map,
+            hydrateCallback: fn($response) => $this->hydrate($response),
         ));
     }
 

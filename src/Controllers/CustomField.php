@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Controllers;
 
+use Planka\Bridge\Actions\Common\CommonPatchAction;
 use Planka\Bridge\Actions\CustomField\CustomFieldCreateInBaseGroupAction;
 use Planka\Bridge\Actions\CustomField\CustomFieldCreateInGroupAction;
 use Planka\Bridge\Actions\CustomField\CustomFieldDeleteAction;
 use Planka\Bridge\Actions\CustomField\CustomFieldUpdateAction;
 use Planka\Bridge\Config;
+use Planka\Bridge\Exceptions\ResponseException;
 use Planka\Bridge\TransportClients\Client;
 use Planka\Bridge\Views\Dto\CustomField\CustomFieldDto;
+use Planka\Bridge\Views\Factory\CustomField\CustomFieldDtoFactory;
 
 final class CustomField
 {
@@ -49,6 +52,33 @@ final class CustomField
             name: $name,
             position: $position,
             showOnFrontOfCard: $showOnFrontOfCard,
+        ));
+    }
+
+    /**
+     * 'PATCH /api/custom-fields/:id' - Partially updates custom field properties.
+     *
+     * @param string $id Custom field ID
+     * @param array{
+     *   name?: string,
+     *   position?: int,
+     *   showOnFrontOfCard?: bool
+     * } $map Associative array of fields to update
+     */
+    public function patching(string $id, array $map): CustomFieldDto
+    {
+        return $this->client->patch(new CommonPatchAction(
+            urlPath: "api/custom-fields/{$id}",
+            data: $map,
+            hydrateCallback: function ($response): CustomFieldDto {
+                $result = $response->toArray();
+
+                if (array_key_exists('item', $result)) {
+                    return (new CustomFieldDtoFactory())->create($result['item']);
+                }
+
+                throw new ResponseException($response->getContent());
+            },
         ));
     }
 

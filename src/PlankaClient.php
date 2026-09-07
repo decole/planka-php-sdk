@@ -36,55 +36,61 @@ use Planka\Bridge\Controllers\User;
 use Planka\Bridge\Controllers\Webhook;
 
 /**
+ * @property AccessToken          $accessToken
+ * @property Attachment           $attachment
+ * @property BaseCustomFieldGroup $baseCustomFieldGroup
+ * @property Board                $board
+ * @property BoardList            $boardList
+ * @property BoardMembership      $boardMembership
+ * @property Card                 $card
+ * @property CardAction           $cardAction
+ * @property CardLabel            $cardLabel
+ * @property CardTask             $cardTask
+ * @property CardMembership       $cardMembership
+ * @property Comment              $comment
+ * @property CustomField          $customField
+ * @property CustomFieldGroup     $customFieldGroup
+ * @property Label                $label
+ * @property Notification         $notification
+ * @property NotificationService  $notificationService
+ * @property Project              $project
+ * @property ProjectManager       $projectManager
+ * @property SystemConfig         $systemConfig
+ * @property Terms                $terms
+ * @property User                 $user
+ * @property Webhook              $webhook
+ *
  * @see https://plankanban.github.io/planka/swagger-ui/
  */
 final class PlankaClient
 {
-    public readonly AccessToken $accessToken;
+    private array $controllers = [];
 
-    public readonly Attachment $attachment;
-
-    public readonly BaseCustomFieldGroup $baseCustomFieldGroup;
-
-    public readonly Board $board;
-
-    public readonly BoardList $boardList;
-
-    public readonly BoardMembership $boardMembership;
-
-    public readonly Card $card;
-
-    public readonly CardAction $cardAction;
-
-    public readonly CardLabel $cardLabel;
-
-    public readonly CardTask $cardTask;
-
-    public readonly CardMembership $cardMembership;
-
-    public readonly Comment $comment;
-
-    public readonly CustomField $customField;
-
-    public readonly CustomFieldGroup $customFieldGroup;
-
-    public readonly Label $label;
-
-    public readonly Notification $notification;
-
-    public readonly NotificationService $notificationService;
-
-    public readonly Project $project;
-
-    public readonly ProjectManager $projectManager;
-
-    public readonly SystemConfig $systemConfig;
-
-    public readonly Terms $terms;
-
-    public readonly User $user;
-
-    public readonly Webhook $webhook;
+    private const CONTROLLER_MAP = [
+        'accessToken' => AccessToken::class,
+        'attachment' => Attachment::class,
+        'baseCustomFieldGroup' => BaseCustomFieldGroup::class,
+        'board' => Board::class,
+        'boardList' => BoardList::class,
+        'boardMembership' => BoardMembership::class,
+        'card' => Card::class,
+        'cardAction' => CardAction::class,
+        'cardLabel' => CardLabel::class,
+        'cardTask' => CardTask::class,
+        'cardMembership' => CardMembership::class,
+        'comment' => Comment::class,
+        'customField' => CustomField::class,
+        'customFieldGroup' => CustomFieldGroup::class,
+        'label' => Label::class,
+        'notification' => Notification::class,
+        'notificationService' => NotificationService::class,
+        'project' => Project::class,
+        'projectManager' => ProjectManager::class,
+        'systemConfig' => SystemConfig::class,
+        'terms' => Terms::class,
+        'user' => User::class,
+        'webhook' => Webhook::class,
+    ];
 
     private readonly Client $client;
 
@@ -92,35 +98,28 @@ final class PlankaClient
         private readonly Config $config,
         ?Client $client = null,
     ) {
-        if (null === $client) {
-            $client = new Client($this->config);
+        $this->client = $client ?? new Client($this->config);
+    }
+
+    public function __get(string $name): object
+    {
+        if (!isset(self::CONTROLLER_MAP[$name])) {
+            throw new \InvalidArgumentException(sprintf("Controller '%s' does not exist on PlankaClient.", $name));
         }
 
-        $this->client = $client;
+        return $this->controllers[$name] ??= $this->createController(self::CONTROLLER_MAP[$name]);
+    }
 
-        $this->accessToken = new AccessToken($this->client);
-        $this->attachment = new Attachment($config, $this->client);
-        $this->baseCustomFieldGroup = new BaseCustomFieldGroup($config, $this->client);
-        $this->board = new Board($config, $this->client);
-        $this->boardList = new BoardList($config, $this->client);
-        $this->boardMembership = new BoardMembership($config, $this->client);
-        $this->card = new Card($config, $this->client);
-        $this->cardAction = new CardAction($config, $this->client);
-        $this->cardLabel = new CardLabel($config, $this->client);
-        $this->cardMembership = new CardMembership($config, $this->client);
-        $this->cardTask = new CardTask($config, $this->client);
-        $this->comment = new Comment($config, $this->client);
-        $this->customField = new CustomField($config, $this->client);
-        $this->customFieldGroup = new CustomFieldGroup($config, $this->client);
-        $this->label = new Label($config, $this->client);
-        $this->notification = new Notification($config, $this->client);
-        $this->notificationService = new NotificationService($config, $this->client);
-        $this->project = new Project($config, $this->client);
-        $this->projectManager = new ProjectManager($config, $this->client);
-        $this->systemConfig = new SystemConfig($config, $this->client);
-        $this->terms = new Terms($this->client);
-        $this->user = new User($config, $this->client);
-        $this->webhook = new Webhook($this->client);
+    private function createController(string $className): object
+    {
+        if (is_a($className, AccessToken::class, true)
+            || is_a($className, Terms::class, true)
+            || is_a($className, Webhook::class, true)
+        ) {
+            return new $className($this->client);
+        }
+
+        return new $className($this->config, $this->client);
     }
 
     /**

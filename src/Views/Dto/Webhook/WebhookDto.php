@@ -17,8 +17,10 @@ class WebhookDto implements OutputDtoInterface
         public ?array $events,
         /** @var list<string>|null */
         public ?array $excludedEvents,
-        public ?\DateTimeImmutable $createdAt,
-        public ?\DateTimeImmutable $updatedAt,
+        public ?string $boardId = null,
+        public ?string $projectManagerId = null,
+        public ?\DateTimeImmutable $createdAt = null,
+        public ?\DateTimeImmutable $updatedAt = null,
         public readonly array $_rawResponse = [],
     ) {}
 }
