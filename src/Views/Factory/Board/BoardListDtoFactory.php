@@ -15,19 +15,23 @@ final class BoardListDtoFactory implements OutputInterface
     use DateConverterTrait;
 
     /**
-     * @param array{
-     *     id: string,
-     *     createdAt: string,
-     *     updatedAt: ?string,
-     *     position: int,
-     *     name: string,
-     *     boardId: string,
-     *     type?: ?string,
-     *     color?: ?string
-     * } $data
+     * @param array<string, mixed> $data
+     *
+     * @see Payload structure:
+     *      array{
+     *          id: string,
+     *          createdAt: string,
+     *          updatedAt: ?string,
+     *          position: int,
+     *          name: string,
+     *          boardId: string,
+     *          type?: ?string,
+     *          color?: ?string
+     *      }
      */
     public function create(array $data): BoardListDto
     {
+        $data = $data['item'] ?? $data;
         $typeEnum = isset($data['type']) && is_string($data['type']) ? ListTypeEnum::tryFrom($data['type']) : null;
         $colorEnum = isset($data['color']) && is_string($data['color']) ? ListColorEnum::tryFrom($data['color']) : null;
 

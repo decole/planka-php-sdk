@@ -4,26 +4,20 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Actions\BoardMembership;
 
-use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
-use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
-use Planka\Bridge\Traits\BoardMembershipHydrateTrait;
 use Planka\Bridge\Contracts\Actions\ActionInterface;
+use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
+use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
+use Planka\Bridge\Contracts\Factory\OutputInterface;
 use Planka\Bridge\Enum\BoardMembershipRoleEnum;
-use Planka\Bridge\Traits\AuthenticateTrait;
+use Planka\Bridge\Views\Factory\Board\BoardMembershipDtoFactory;
 
 final class BoardMembershipAddAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait;
-    use BoardMembershipHydrateTrait;
-
     public function __construct(
         private readonly string $boardId,
         private readonly string $userId,
         private readonly BoardMembershipRoleEnum $role,
-        string $token,
-    ) {
-        $this->setToken($token);
-    }
+    ) {}
 
     public function url(): string
     {
@@ -33,10 +27,15 @@ final class BoardMembershipAddAction implements ActionInterface, AuthenticateInt
     public function getOptions(): array
     {
         return [
-            'body' => [
-                'role' => $this->role->value,
+            'json' => [
                 'userId' => $this->userId,
+                'role' => $this->role->value,
             ],
         ];
+    }
+
+    public function getFactory(): OutputInterface
+    {
+        return new BoardMembershipDtoFactory();
     }
 }

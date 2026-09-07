@@ -10,19 +10,16 @@ use Planka\Bridge\Actions\NotificationService\NotificationServiceCreateInUserAct
 use Planka\Bridge\Actions\NotificationService\NotificationServiceDeleteAction;
 use Planka\Bridge\Actions\NotificationService\NotificationServiceTestAction;
 use Planka\Bridge\Actions\NotificationService\NotificationServiceUpdateAction;
-use Planka\Bridge\Config;
 use Planka\Bridge\Enum\NotificationServiceFormatEnum;
-use Planka\Bridge\Traits\NotificationServiceHydrateTrait;
-use Planka\Bridge\TransportClients\Client;
+use Planka\Bridge\TransportClients\TransportClientInterface;
+use Planka\Bridge\Views\Dto\Common\TestResultDto;
 use Planka\Bridge\Views\Dto\NotificationService\NotificationServiceDto;
+use Planka\Bridge\Views\Factory\NotificationService\NotificationServiceDtoFactory;
 
 final class NotificationService
 {
-    use NotificationServiceHydrateTrait;
-
     public function __construct(
-        private readonly Config $config,
-        private readonly Client $client,
+        private readonly TransportClientInterface $client,
     ) {}
 
     /** 'POST /api/boards/:boardId/notification-services' */
@@ -48,10 +45,19 @@ final class NotificationService
     /** 'PATCH /api/notification-services/:id' */
     public function update(string $id, ?string $url = null, ?NotificationServiceFormatEnum $format = null): NotificationServiceDto
     {
+        $data = [];
+
+        if (null !== $url) {
+            $data['url'] = $url;
+        }
+
+        if (null !== $format) {
+            $data['format'] = $format->value;
+        }
+
         return $this->client->patch(new NotificationServiceUpdateAction(
-            id: $id,
-            url: $url,
-            format: $format,
+            serviceId: $id,
+            data: $data,
         ));
     }
 
@@ -73,19 +79,19 @@ final class NotificationService
         return $this->client->patch(new CommonPatchAction(
             urlPath: "api/notification-services/{$id}",
             data: $map,
-            hydrateCallback: fn($response) => $this->hydrate($response),
+            hydrateCallback: new NotificationServiceDtoFactory(),
         ));
     }
 
     /** 'DELETE /api/notification-services/:id' */
     public function delete(string $id): NotificationServiceDto
     {
-        return $this->client->delete(new NotificationServiceDeleteAction(id: $id));
+        return $this->client->delete(new NotificationServiceDeleteAction(serviceId: $id));
     }
 
     /** 'POST /api/notification-services/:id/test' */
-    public function test(string $id): array
+    public function test(string $id): TestResultDto
     {
-        return $this->client->post(new NotificationServiceTestAction(id: $id));
+        return $this->client->post(new NotificationServiceTestAction(serviceId: $id));
     }
 }

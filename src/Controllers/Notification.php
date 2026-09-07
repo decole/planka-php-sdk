@@ -6,27 +6,24 @@ namespace Planka\Bridge\Controllers;
 
 use Planka\Bridge\Actions\Common\CommonPatchAction;
 use Planka\Bridge\Actions\Notification\NotificationListAction;
+use Planka\Bridge\Actions\Notification\NotificationReadAllAction;
 use Planka\Bridge\Actions\Notification\NotificationUpdateAction;
 use Planka\Bridge\Actions\Notification\NotificationVewAction;
-use Planka\Bridge\Config;
-use Planka\Bridge\Traits\NotificationHydrateTrait;
-use Planka\Bridge\TransportClients\Client;
+use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\Notification\NotificationItemDto;
 use Planka\Bridge\Views\Dto\Notification\NotificationListDto;
+use Planka\Bridge\Views\Factory\Notification\NotificationItemDtoFactory;
 
 final class Notification
 {
-    use NotificationHydrateTrait;
-
     public function __construct(
-        private readonly Config $config,
-        private readonly Client $client,
+        private readonly TransportClientInterface $client,
     ) {}
 
     /** 'GET /api/notifications' */
     public function list(): NotificationListDto
     {
-        return $this->client->get(new NotificationListAction(token: $this->config->getAuthToken()));
+        return $this->client->get(new NotificationListAction());
     }
 
     /**
@@ -35,36 +32,33 @@ final class Notification
     public function getOne(string $notifyId): NotificationItemDto
     {
         return $this->client->get(new NotificationVewAction(
-            notifyId: $notifyId,
-            token: $this->config->getAuthToken(),
+            notificationId: $notifyId,
         ));
     }
 
     /**
-     * 'PATCH /api/notifications/:ids'.
+     * 'PATCH /api/notifications/:id'.
      *
      * @return list<NotificationItemDto>
      */
-    public function markIsRead(array $notifyIdList): array
+    public function markIsRead(string $notifyId): array
     {
         return $this->client->patch(new NotificationUpdateAction(
-            notifyIdList: $notifyIdList,
+            notificationId: $notifyId,
             isRead: true,
-            token: $this->config->getAuthToken(),
         ));
     }
 
     /**
-     * 'PATCH /api/notifications/:ids'.
+     * 'PATCH /api/notifications/:id'.
      *
      * @return list<NotificationItemDto>
      */
-    public function markIsNotRead(array $notifyIdList): array
+    public function markIsNotRead(string $notifyId): array
     {
         return $this->client->patch(new NotificationUpdateAction(
-            notifyIdList: $notifyIdList,
+            notificationId: $notifyId,
             isRead: false,
-            token: $this->config->getAuthToken(),
         ));
     }
 
@@ -81,13 +75,13 @@ final class Notification
         return $this->client->patch(new CommonPatchAction(
             urlPath: "api/notifications/{$notifyId}",
             data: $map,
-            hydrateCallback: fn($response) => $this->hydrate($response),
+            hydrateCallback: new NotificationItemDtoFactory(),
         ));
     }
 
     /** 'POST /api/notifications/read-all' */
-    public function readAll(): array
+    public function readAll(): NotificationListDto
     {
-        return $this->client->post(new \Planka\Bridge\Actions\Notification\NotificationReadAllAction());
+        return $this->client->post(new NotificationReadAllAction());
     }
 }

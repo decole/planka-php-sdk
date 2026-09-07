@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Planka\Bridge\Actions\Common;
 
 use Planka\Bridge\Contracts\Actions\ActionInterface;
+use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
-use Symfony\Contracts\HttpClient\ResponseInterface;
+use Planka\Bridge\Contracts\Factory\OutputInterface;
 
-final class CommonPatchAction implements ActionInterface, ResponseResultInterface
+final class CommonPatchAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
     /**
-     * @param callable(ResponseInterface): mixed $hydrateCallback
+     * @param OutputInterface|callable $hydrateCallback
      */
     public function __construct(
         private readonly string $urlPath,
@@ -31,8 +32,8 @@ final class CommonPatchAction implements ActionInterface, ResponseResultInterfac
         ];
     }
 
-    public function hydrate(ResponseInterface $response): mixed
+    public function getFactory(): OutputInterface|callable
     {
-        return ($this->hydrateCallback)($response);
+        return $this->hydrateCallback;
     }
 }

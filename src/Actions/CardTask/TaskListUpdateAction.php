@@ -5,50 +5,34 @@ declare(strict_types=1);
 namespace Planka\Bridge\Actions\CardTask;
 
 use Planka\Bridge\Contracts\Actions\ActionInterface;
+use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
-use Planka\Bridge\Traits\TaskListHydrateTrait;
+use Planka\Bridge\Contracts\Factory\OutputInterface;
+use Planka\Bridge\Views\Factory\Card\TaskListDtoFactory;
 
-final class TaskListUpdateAction implements ActionInterface, ResponseResultInterface
+final class TaskListUpdateAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use TaskListHydrateTrait;
-
     private array $options = [];
 
     public function __construct(
-        private readonly string $id,
-        ?string $name = null,
-        ?int $position = null,
-        ?bool $showOnFrontOfCard = null,
-        ?bool $hideCompletedTasks = null,
+        private readonly string $taskListId,
+        array $data,
     ) {
-        $body = [];
-
-        if (null !== $name) {
-            $body['name'] = $name;
-        }
-
-        if (null !== $position) {
-            $body['position'] = $position;
-        }
-
-        if (null !== $showOnFrontOfCard) {
-            $body['showOnFrontOfCard'] = $showOnFrontOfCard;
-        }
-
-        if (null !== $hideCompletedTasks) {
-            $body['hideCompletedTasks'] = $hideCompletedTasks;
-        }
-
-        $this->options['json'] = $body;
+        $this->options['json'] = $data;
     }
 
     public function url(): string
     {
-        return "api/task-lists/{$this->id}";
+        return "api/task-lists/{$this->taskListId}";
     }
 
     public function getOptions(): array
     {
         return $this->options;
+    }
+
+    public function getFactory(): OutputInterface
+    {
+        return new TaskListDtoFactory();
     }
 }

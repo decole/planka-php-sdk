@@ -14,6 +14,8 @@ final class CardTaskDtoFactory implements OutputInterface
 
     public function create(array $data): CardTaskDto
     {
+        $data = $data['item'] ?? $data;
+
         return new CardTaskDto(
             id: $data['id'],
             taskListId: $data['taskListId'],

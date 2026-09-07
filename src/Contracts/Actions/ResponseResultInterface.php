@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Contracts\Actions;
 
-use Symfony\Contracts\HttpClient\ResponseInterface;
+use Planka\Bridge\Contracts\Factory\OutputInterface;
 
 interface ResponseResultInterface
 {
-    public function hydrate(ResponseInterface $response): mixed;
+    public function getFactory(): OutputInterface|callable;
 }

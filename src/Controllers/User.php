@@ -15,20 +15,17 @@ use Planka\Bridge\Actions\User\UserUpdateEmailAction;
 use Planka\Bridge\Actions\User\UserUpdatePasswordAction;
 use Planka\Bridge\Actions\User\UserUpdateUsernameAction;
 use Planka\Bridge\Actions\User\UserViewAction;
-use Planka\Bridge\Config;
 use Planka\Bridge\Enum\UserRoleEnum;
 use Planka\Bridge\Exceptions\FileExistException;
-use Planka\Bridge\Traits\UserHydrateTrait;
-use Planka\Bridge\TransportClients\Client;
+use Planka\Bridge\TransportClients\TransportClientInterface;
+use Planka\Bridge\Views\Dto\User\ApiKeyDto;
 use Planka\Bridge\Views\Dto\User\UserDto;
+use Planka\Bridge\Views\Factory\User\UserDtoFactory;
 
 final class User
 {
-    use UserHydrateTrait;
-
     public function __construct(
-        private readonly Config $config,
-        private readonly Client $client,
+        private readonly TransportClientInterface $client,
     ) {}
 
     /**
@@ -38,7 +35,7 @@ final class User
      */
     public function list(): array
     {
-        return $this->client->get(new UserListAction($this->config->getAuthToken()));
+        return $this->client->get(new UserListAction());
     }
 
     /** 'POST /api/users' */
@@ -49,20 +46,19 @@ final class User
             name: $name,
             password: $password,
             username: $username,
-            token: $this->config->getAuthToken(),
         ));
     }
 
     /** 'GET /api/users/:id' */
     public function get(string $id): UserDto
     {
-        return $this->client->get(new UserViewAction(id: $id, token: $this->config->getAuthToken()));
+        return $this->client->get(new UserViewAction(userId: $id));
     }
 
     /** 'PATCH /api/users/:id' */
     public function update(UserDto $dto): UserDto
     {
-        return $this->client->patch(new UserUpdateAction(user: $dto, token: $this->config->getAuthToken()));
+        return $this->client->patch(new UserUpdateAction(userId: $dto->id, data: $dto->toArray()));
     }
 
     /**
@@ -86,14 +82,14 @@ final class User
         return $this->client->patch(new CommonPatchAction(
             urlPath: "api/users/{$userId}",
             data: $map,
-            hydrateCallback: fn($response) => $this->hydrate($response),
+            hydrateCallback: new UserDtoFactory(),
         ));
     }
 
     /** 'PATCH /api/users/:id/email' */
     public function updateEmail(UserDto $dto): UserDto
     {
-        return $this->client->patch(new UserUpdateEmailAction(user: $dto, token: $this->config->getAuthToken()));
+        return $this->client->patch(new UserUpdateEmailAction(userId: $dto->id, email: $dto->email));
     }
 
     /** 'PATCH /api/users/:id/password' */
@@ -101,16 +97,15 @@ final class User
     {
         return $this->client->patch(new UserUpdatePasswordAction(
             userId: $id,
-            current: $current,
-            new: $new,
-            token: $this->config->getAuthToken(),
+            password: $new,
+            currentPassword: $current,
         ));
     }
 
     /** 'PATCH /api/users/:id/username' */
     public function updateUsername(UserDto $dto): UserDto
     {
-        return $this->client->patch(new UserUpdateUsernameAction(user: $dto, token: $this->config->getAuthToken()));
+        return $this->client->patch(new UserUpdateUsernameAction(userId: $dto->id, username: $dto->username));
     }
 
     /**
@@ -121,20 +116,19 @@ final class User
     public function updateAvatar(UserDto $dto, string $file): UserDto
     {
         return $this->client->post(new UserUpdateAvatarAction(
-            user: $dto,
+            userId: $dto->id,
             file: $file,
-            token: $this->config->getAuthToken(),
         ));
     }
 
     /** 'DELETE /api/users/:id' */
     public function delete(UserDto $dto): UserDto
     {
-        return $this->client->delete(new UserDeleteAction(user: $dto, token: $this->config->getAuthToken()));
+        return $this->client->delete(new UserDeleteAction(userId: $dto->id));
     }
 
     /** 'POST /api/users/:id/api-key' */
-    public function createApiKey(string $userId): array
+    public function createApiKey(string $userId): ApiKeyDto
     {
         return $this->client->post(new UserCreateApiKeyAction($userId));
     }

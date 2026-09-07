@@ -14,25 +14,30 @@ final class AttachmentDtoFactory implements OutputInterface
     use DateConverterTrait;
 
     /**
-     * @param array{
-     *     id: string,
-     *     createdAt: string,
-     *     updatedAt: ?string,
-     *     name: string,
-     *     cardId: string,
-     *     url?: ?string,
-     *     coverUrl?: ?string,
-     *     creatorUserId?: ?string,
-     *     type?: ?string,
-     *     data?: array,
-     *     image?: array{height: int, width: int}
-     * }|null $data
+     * @param array<string, mixed>|null $data
+     *
+     * @see Payload structure:
+     *      array{
+     *          id: string,
+     *          createdAt: string,
+     *          updatedAt: ?string,
+     *          name: string,
+     *          cardId: string,
+     *          url?: ?string,
+     *          coverUrl?: ?string,
+     *          creatorUserId?: ?string,
+     *          type?: ?string,
+     *          data?: array,
+     *          image?: array{height: int, width: int}
+     *      }
      */
     public function create(?array $data): ?AttachmentDto
     {
         if (empty($data)) {
             return null;
         }
+
+        $data = $data['item'] ?? $data;
 
         return new AttachmentDto(
             id: $data['id'],

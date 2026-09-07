@@ -18,28 +18,31 @@ final class CardDtoFactory implements OutputInterface
     use DateConverterTrait;
 
     /**
-     * @param array{
-     *     id: string,
-     *     boardId: string,
-     *     listId: string,
-     *     creatorUserId?: ?string,
-     *     prevListId?: ?string,
-     *     coverAttachmentId?: ?string,
-     *     type?: ?string,
-     *     position?: ?int,
-     *     name: string,
-     *     description?: ?string,
-     *     dueDate?: ?string,
-     *     isDueCompleted?: ?bool,
-     *     stopwatch?: ?array{startedAt?: string, total?: int},
-     *     commentsTotal?: int,
-     *     isClosed?: bool,
-     *     listChangedAt?: ?string,
-     *     createdAt?: ?string,
-     *     updatedAt?: ?string,
-     *     item?: array,
-     *     included?: array
-     * } $data
+     * @param array<string, mixed> $data
+     *
+     * @see Payload structure:
+     *      array{
+     *          id: string,
+     *          boardId: string,
+     *          listId: string,
+     *          creatorUserId?: ?string,
+     *          prevListId?: ?string,
+     *          coverAttachmentId?: ?string,
+     *          type?: ?string,
+     *          position?: ?int,
+     *          name: string,
+     *          description?: ?string,
+     *          dueDate?: ?string,
+     *          isDueCompleted?: ?bool,
+     *          stopwatch?: ?array{startedAt?: string, total?: int},
+     *          commentsTotal?: int,
+     *          isClosed?: bool,
+     *          listChangedAt?: ?string,
+     *          createdAt?: ?string,
+     *          updatedAt?: ?string,
+     *          item?: array,
+     *          included?: array
+     *      }
      */
     public function create(array $data): CardDto
     {

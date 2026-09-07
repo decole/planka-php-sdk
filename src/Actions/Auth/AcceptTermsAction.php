@@ -6,13 +6,12 @@ namespace Planka\Bridge\Actions\Auth;
 
 use Planka\Bridge\Contracts\Actions\ActionInterface;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
+use Planka\Bridge\Contracts\Factory\OutputInterface;
 use Planka\Bridge\Enum\LanguageEnum;
-use Planka\Bridge\Traits\AccessTokenHydrateTrait;
+use Planka\Bridge\Views\Factory\AccessToken\AccessTokenDtoFactory;
 
 final class AcceptTermsAction implements ActionInterface, ResponseResultInterface
 {
-    use AccessTokenHydrateTrait;
-
     public function __construct(
         private readonly string $pendingToken,
         private readonly string $signature,
@@ -38,5 +37,10 @@ final class AcceptTermsAction implements ActionInterface, ResponseResultInterfac
         return [
             'json' => $json,
         ];
+    }
+
+    public function getFactory(): OutputInterface
+    {
+        return new AccessTokenDtoFactory();
     }
 }

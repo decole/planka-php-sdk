@@ -7,23 +7,16 @@ namespace Planka\Bridge\Actions\Project;
 use Planka\Bridge\Contracts\Actions\ActionInterface;
 use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
-use Planka\Bridge\Traits\AuthenticateTrait;
-use Symfony\Contracts\HttpClient\ResponseInterface;
+use Planka\Bridge\Contracts\Factory\OutputInterface;
+use Planka\Bridge\Views\Factory\Background\BackgroundImageDtoFactory;
 
 final class BackgroundImageDeleteAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait;
-
-    public function __construct(
-        private readonly string $imageId,
-        string $token = '',
-    ) {
-        $this->setToken($token);
-    }
+    public function __construct(private readonly string $projectId) {}
 
     public function url(): string
     {
-        return "api/background-images/{$this->imageId}";
+        return "api/projects/{$this->projectId}/background-image";
     }
 
     public function getOptions(): array
@@ -31,8 +24,8 @@ final class BackgroundImageDeleteAction implements ActionInterface, Authenticate
         return [];
     }
 
-    public function hydrate(ResponseInterface $response): array
+    public function getFactory(): OutputInterface
     {
-        return $response->toArray();
+        return new BackgroundImageDtoFactory();
     }
 }

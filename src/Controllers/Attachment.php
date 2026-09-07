@@ -8,19 +8,15 @@ use Planka\Bridge\Actions\Attachment\AttachmentCreateAction;
 use Planka\Bridge\Actions\Attachment\AttachmentDeleteAction;
 use Planka\Bridge\Actions\Attachment\AttachmentUpdateAction;
 use Planka\Bridge\Actions\Common\CommonPatchAction;
-use Planka\Bridge\Config;
 use Planka\Bridge\Exceptions\FileExistException;
-use Planka\Bridge\Traits\AttachmentHydrateTrait;
-use Planka\Bridge\TransportClients\Client;
+use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\Attachment\AttachmentDto;
+use Planka\Bridge\Views\Factory\Attachment\AttachmentDtoFactory;
 
 final class Attachment
 {
-    use AttachmentHydrateTrait;
-
     public function __construct(
-        private readonly Config $config,
-        private readonly Client $client,
+        private readonly TransportClientInterface $client,
     ) {}
 
     /**
@@ -33,7 +29,6 @@ final class Attachment
         return $this->client->post(new AttachmentCreateAction(
             cardId: $cardId,
             file: $file,
-            token: $this->config->getAuthToken(),
         ));
     }
 
@@ -43,7 +38,6 @@ final class Attachment
         return $this->client->patch(new AttachmentUpdateAction(
             attachmentId: $attachmentId,
             name: $name,
-            token: $this->config->getAuthToken(),
         ));
     }
 
@@ -60,7 +54,7 @@ final class Attachment
         return $this->client->patch(new CommonPatchAction(
             urlPath: "api/attachments/{$attachmentId}",
             data: $map,
-            hydrateCallback: fn($response) => $this->hydrate($response),
+            hydrateCallback: new AttachmentDtoFactory(),
         ));
     }
 
@@ -69,7 +63,6 @@ final class Attachment
     {
         return $this->client->delete(new AttachmentDeleteAction(
             attachmentId: $attachmentId,
-            token: $this->config->getAuthToken(),
         ));
     }
 }

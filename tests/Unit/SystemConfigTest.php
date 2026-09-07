@@ -11,7 +11,7 @@ final class SystemConfigTest extends AbstractUnitTestCase
     public function testGetSystemConfig(): void
     {
         $client = $this->createMockClient('System/system_config.json');
-        $config = $client->systemConfig->get();
+        $config = $client->systemConfig()->get();
 
         $this->assertInstanceOf(SystemConfigDto::class, $config);
         $this->assertNotEmpty($config->id);

@@ -6,12 +6,11 @@ namespace Planka\Bridge\Actions\Auth;
 
 use Planka\Bridge\Contracts\Actions\ActionInterface;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
-use Planka\Bridge\Traits\AccessTokenHydrateTrait;
+use Planka\Bridge\Contracts\Factory\OutputInterface;
+use Planka\Bridge\Views\Factory\AccessToken\AccessTokenDtoFactory;
 
 final class ExchangeWithOidcAction implements ActionInterface, ResponseResultInterface
 {
-    use AccessTokenHydrateTrait;
-
     public function __construct(
         private readonly string $code,
         private readonly string $nonce,
@@ -32,5 +31,10 @@ final class ExchangeWithOidcAction implements ActionInterface, ResponseResultInt
                 'withHttpOnlyToken' => $this->withHttpOnlyToken,
             ],
         ];
+    }
+
+    public function getFactory(): OutputInterface
+    {
+        return new AccessTokenDtoFactory();
     }
 }

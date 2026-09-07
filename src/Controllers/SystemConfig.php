@@ -8,34 +8,31 @@ use Planka\Bridge\Actions\Common\CommonPatchAction;
 use Planka\Bridge\Actions\SystemConfig\SystemConfigGetAction;
 use Planka\Bridge\Actions\SystemConfig\SystemConfigTestSmtpAction;
 use Planka\Bridge\Actions\SystemConfig\SystemConfigUpdateAction;
-use Planka\Bridge\Config;
-use Planka\Bridge\Traits\SystemConfigHydrateTrait;
-use Planka\Bridge\TransportClients\Client;
+use Planka\Bridge\TransportClients\TransportClientInterface;
+use Planka\Bridge\Views\Dto\Common\TestResultDto;
 use Planka\Bridge\Views\Dto\SystemConfig\SystemConfigDto;
+use Planka\Bridge\Views\Factory\SystemConfig\SystemConfigDtoFactory;
 
 final class SystemConfig
 {
-    use SystemConfigHydrateTrait;
-
     public function __construct(
-        private readonly Config $config,
-        private readonly Client $client,
+        private readonly TransportClientInterface $client,
     ) {}
 
-    /** 'GET /api/config' */
+    /** 'GET /api/system-settings' */
     public function get(): SystemConfigDto
     {
         return $this->client->get(new SystemConfigGetAction());
     }
 
-    /** 'PATCH /api/config' */
+    /** 'PATCH /api/system-settings' */
     public function update(array $configData): SystemConfigDto
     {
         return $this->client->patch(new SystemConfigUpdateAction($configData));
     }
 
     /**
-     * 'PATCH /api/config' - Partially updates system config properties.
+     * 'PATCH /api/system-settings' - Partially updates system config properties.
      *
      * @param array{
      *   smtpHost?: string|null,
@@ -51,15 +48,15 @@ final class SystemConfig
     public function patching(array $map): SystemConfigDto
     {
         return $this->client->patch(new CommonPatchAction(
-            urlPath: 'api/config',
+            urlPath: 'api/system-settings',
             data: $map,
-            hydrateCallback: fn($response) => $this->hydrate($response),
+            hydrateCallback: new SystemConfigDtoFactory(),
         ));
     }
 
-    /** 'POST /api/config/test-smtp' */
-    public function testSmtp(): array
+    /** 'POST /api/system-settings/test-smtp' */
+    public function testSmtp(string $toEmail, ?array $smtpSettings = null): TestResultDto
     {
-        return $this->client->post(new SystemConfigTestSmtpAction());
+        return $this->client->post(new SystemConfigTestSmtpAction(toEmail: $toEmail, smtpSettings: $smtpSettings));
     }
 }

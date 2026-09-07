@@ -12,22 +12,27 @@ final class BackgroundImageDtoFactory implements OutputInterface
     use \Planka\Bridge\Traits\DateConverterTrait;
 
     /**
-     * @param array{
-     *     id?: ?string,
-     *     projectId?: ?string,
-     *     size?: ?string,
-     *     url?: ?string,
-     *     coverUrl?: ?string,
-     *     thumbnailUrls?: array,
-     *     createdAt?: ?string,
-     *     updatedAt?: ?string,
-     * }|null $data
+     * @param array<string, mixed>|null $data
+     *
+     * @see Payload structure:
+     *      array{
+     *          id?: ?string,
+     *          projectId?: ?string,
+     *          size?: ?string,
+     *          url?: ?string,
+     *          coverUrl?: ?string,
+     *          thumbnailUrls?: array,
+     *          createdAt?: ?string,
+     *          updatedAt?: ?string
+     *      }
      */
     public function create(?array $data): ?BackgroundImageDto
     {
         if (empty($data)) {
             return null;
         }
+
+        $data = $data['item'] ?? $data;
 
         return new BackgroundImageDto(
             id: $data['id'] ?? null,

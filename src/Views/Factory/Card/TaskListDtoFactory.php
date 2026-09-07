@@ -13,19 +13,24 @@ final class TaskListDtoFactory implements OutputInterface
     use DateConverterTrait;
 
     /**
-     * @param array{
-     *     id: string,
-     *     cardId: string,
-     *     position: int,
-     *     name: string,
-     *     showOnFrontOfCard?: bool,
-     *     hideCompletedTasks?: bool,
-     *     createdAt?: ?string,
-     *     updatedAt?: ?string
-     * } $data
+     * @param array<string, mixed> $data
+     *
+     * @see Payload structure:
+     *      array{
+     *          id: string,
+     *          cardId: string,
+     *          position: int,
+     *          name: string,
+     *          showOnFrontOfCard?: bool,
+     *          hideCompletedTasks?: bool,
+     *          createdAt?: ?string,
+     *          updatedAt?: ?string
+     *      }
      */
     public function create(array $data): TaskListDto
     {
+        $data = $data['item'] ?? $data;
+
         return new TaskListDto(
             id: $data['id'],
             cardId: $data['cardId'],

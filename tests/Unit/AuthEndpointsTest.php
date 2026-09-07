@@ -21,7 +21,7 @@ final class AuthEndpointsTest extends AbstractUnitTestCase
         ]);
 
         $client = $this->createMockClientWithResponse($mockJson);
-        $terms = $client->terms->get(LanguageEnum::EN_US);
+        $terms = $client->terms()->get(LanguageEnum::EN_US);
 
         $this->assertInstanceOf(TermsDto::class, $terms);
         $this->assertEquals('en-US', $terms->language);
@@ -36,7 +36,7 @@ final class AuthEndpointsTest extends AbstractUnitTestCase
         ]);
 
         $client = $this->createMockClientWithResponse($mockJson);
-        $result = $client->terms->acceptTerms('pending_token_123', 'signature_hash_123', LanguageEnum::EN_US);
+        $result = $client->terms()->acceptTerms('pending_token_123', 'signature_hash_123', LanguageEnum::EN_US);
 
         $this->assertInstanceOf(AccessTokenDto::class, $result);
         $this->assertEquals('access_token_jwt_token', $result->token);
@@ -47,7 +47,7 @@ final class AuthEndpointsTest extends AbstractUnitTestCase
         $mockJson = json_encode(['item' => null]);
 
         $client = $this->createMockClientWithResponse($mockJson);
-        $result = $client->accessToken->revokePendingToken('pending_token_123');
+        $result = $client->accessToken()->revokePendingToken('pending_token_123');
 
         $this->assertInstanceOf(AccessTokenDto::class, $result);
         $this->assertNull($result->token);
@@ -60,7 +60,7 @@ final class AuthEndpointsTest extends AbstractUnitTestCase
         ]);
 
         $client = $this->createMockClientWithResponse($mockJson);
-        $result = $client->accessToken->exchangeWithOidc('oidc_code_123', 'nonce_123');
+        $result = $client->accessToken()->exchangeWithOidc('oidc_code_123', 'nonce_123');
 
         $this->assertInstanceOf(AccessTokenDto::class, $result);
         $this->assertEquals('access_token_oidc_jwt', $result->token);

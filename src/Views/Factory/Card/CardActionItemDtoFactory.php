@@ -14,16 +14,19 @@ final class CardActionItemDtoFactory implements OutputInterface
     use DateConverterTrait;
 
     /**
-     * @param array{
-     *     id: string,
-     *     createdAt?: ?string,
-     *     updatedAt?: ?string,
-     *     type?: string,
-     *     data?: array,
-     *     cardId?: ?string,
-     *     userId?: ?string,
-     *     boardId?: ?string
-     * } $data
+     * @param array<string, mixed> $data
+     *
+     * @see Payload structure:
+     *      array{
+     *          id: string,
+     *          createdAt?: ?string,
+     *          updatedAt?: ?string,
+     *          type?: string,
+     *          data?: array,
+     *          cardId?: ?string,
+     *          userId?: ?string,
+     *          boardId?: ?string
+     *      }
      */
     public function create(array $data): CardActionItemDto
     {

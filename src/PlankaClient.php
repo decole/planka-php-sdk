@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Planka\Bridge;
 
-use Symfony\Contracts\HttpClient\ResponseInterface;
 use Planka\Bridge\Exceptions\AuthenticateException;
 use Planka\Bridge\Actions\Auth\AuthenticateAction;
 use Planka\Bridge\Actions\Common\GetInfoAction;
@@ -17,6 +16,7 @@ use Planka\Bridge\Exceptions\LogoutException;
 use Planka\Bridge\Actions\Auth\LogoutAction;
 use Planka\Bridge\Controllers\Notification;
 use Planka\Bridge\TransportClients\Client;
+use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Controllers\Attachment;
 use Planka\Bridge\Controllers\CardAction;
 use Planka\Bridge\Controllers\BoardList;
@@ -36,90 +36,134 @@ use Planka\Bridge\Controllers\User;
 use Planka\Bridge\Controllers\Webhook;
 
 /**
- * @property AccessToken          $accessToken
- * @property Attachment           $attachment
- * @property BaseCustomFieldGroup $baseCustomFieldGroup
- * @property Board                $board
- * @property BoardList            $boardList
- * @property BoardMembership      $boardMembership
- * @property Card                 $card
- * @property CardAction           $cardAction
- * @property CardLabel            $cardLabel
- * @property CardTask             $cardTask
- * @property CardMembership       $cardMembership
- * @property Comment              $comment
- * @property CustomField          $customField
- * @property CustomFieldGroup     $customFieldGroup
- * @property Label                $label
- * @property Notification         $notification
- * @property NotificationService  $notificationService
- * @property Project              $project
- * @property ProjectManager       $projectManager
- * @property SystemConfig         $systemConfig
- * @property Terms                $terms
- * @property User                 $user
- * @property Webhook              $webhook
- *
  * @see https://plankanban.github.io/planka/swagger-ui/
  */
 final class PlankaClient
 {
     private array $controllers = [];
 
-    private const CONTROLLER_MAP = [
-        'accessToken' => AccessToken::class,
-        'attachment' => Attachment::class,
-        'baseCustomFieldGroup' => BaseCustomFieldGroup::class,
-        'board' => Board::class,
-        'boardList' => BoardList::class,
-        'boardMembership' => BoardMembership::class,
-        'card' => Card::class,
-        'cardAction' => CardAction::class,
-        'cardLabel' => CardLabel::class,
-        'cardTask' => CardTask::class,
-        'cardMembership' => CardMembership::class,
-        'comment' => Comment::class,
-        'customField' => CustomField::class,
-        'customFieldGroup' => CustomFieldGroup::class,
-        'label' => Label::class,
-        'notification' => Notification::class,
-        'notificationService' => NotificationService::class,
-        'project' => Project::class,
-        'projectManager' => ProjectManager::class,
-        'systemConfig' => SystemConfig::class,
-        'terms' => Terms::class,
-        'user' => User::class,
-        'webhook' => Webhook::class,
-    ];
-
-    private readonly Client $client;
+    private readonly TransportClientInterface $client;
 
     public function __construct(
         private readonly Config $config,
-        ?Client $client = null,
+        ?TransportClientInterface $client = null,
     ) {
         $this->client = $client ?? new Client($this->config);
     }
 
-    public function __get(string $name): object
+    public function accessToken(): AccessToken
     {
-        if (!isset(self::CONTROLLER_MAP[$name])) {
-            throw new \InvalidArgumentException(sprintf("Controller '%s' does not exist on PlankaClient.", $name));
-        }
-
-        return $this->controllers[$name] ??= $this->createController(self::CONTROLLER_MAP[$name]);
+        return $this->controllers['accessToken'] ??= new AccessToken($this->client);
     }
 
-    private function createController(string $className): object
+    public function attachment(): Attachment
     {
-        if (is_a($className, AccessToken::class, true)
-            || is_a($className, Terms::class, true)
-            || is_a($className, Webhook::class, true)
-        ) {
-            return new $className($this->client);
-        }
+        return $this->controllers['attachment'] ??= new Attachment($this->client);
+    }
 
-        return new $className($this->config, $this->client);
+    public function baseCustomFieldGroup(): BaseCustomFieldGroup
+    {
+        return $this->controllers['baseCustomFieldGroup'] ??= new BaseCustomFieldGroup($this->client);
+    }
+
+    public function board(): Board
+    {
+        return $this->controllers['board'] ??= new Board($this->client);
+    }
+
+    public function boardList(): BoardList
+    {
+        return $this->controllers['boardList'] ??= new BoardList($this->client);
+    }
+
+    public function boardMembership(): BoardMembership
+    {
+        return $this->controllers['boardMembership'] ??= new BoardMembership($this->client);
+    }
+
+    public function card(): Card
+    {
+        return $this->controllers['card'] ??= new Card($this->client);
+    }
+
+    public function cardAction(): CardAction
+    {
+        return $this->controllers['cardAction'] ??= new CardAction($this->client);
+    }
+
+    public function cardLabel(): CardLabel
+    {
+        return $this->controllers['cardLabel'] ??= new CardLabel($this->client);
+    }
+
+    public function cardTask(): CardTask
+    {
+        return $this->controllers['cardTask'] ??= new CardTask($this->client);
+    }
+
+    public function cardMembership(): CardMembership
+    {
+        return $this->controllers['cardMembership'] ??= new CardMembership($this->client);
+    }
+
+    public function comment(): Comment
+    {
+        return $this->controllers['comment'] ??= new Comment($this->client);
+    }
+
+    public function customField(): CustomField
+    {
+        return $this->controllers['customField'] ??= new CustomField($this->client);
+    }
+
+    public function customFieldGroup(): CustomFieldGroup
+    {
+        return $this->controllers['customFieldGroup'] ??= new CustomFieldGroup($this->client);
+    }
+
+    public function label(): Label
+    {
+        return $this->controllers['label'] ??= new Label($this->client);
+    }
+
+    public function notification(): Notification
+    {
+        return $this->controllers['notification'] ??= new Notification($this->client);
+    }
+
+    public function notificationService(): NotificationService
+    {
+        return $this->controllers['notificationService'] ??= new NotificationService($this->client);
+    }
+
+    public function project(): Project
+    {
+        return $this->controllers['project'] ??= new Project($this->client);
+    }
+
+    public function projectManager(): ProjectManager
+    {
+        return $this->controllers['projectManager'] ??= new ProjectManager($this->client);
+    }
+
+    public function systemConfig(): SystemConfig
+    {
+        return $this->controllers['systemConfig'] ??= new SystemConfig($this->client);
+    }
+
+    public function terms(): Terms
+    {
+        return $this->controllers['terms'] ??= new Terms($this->client);
+    }
+
+    public function user(): User
+    {
+        return $this->controllers['user'] ??= new User($this->client);
+    }
+
+    public function webhook(): Webhook
+    {
+        return $this->controllers['webhook'] ??= new Webhook($this->client);
     }
 
     /**
@@ -159,7 +203,7 @@ final class PlankaClient
     }
 
     /** 'GET /' - for ping Planka */
-    public function getInfo(): ResponseInterface
+    public function getInfo(): Views\Dto\Common\ServerInfoDto
     {
         return $this->client->get(new GetInfoAction());
     }

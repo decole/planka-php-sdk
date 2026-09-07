@@ -4,62 +4,36 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Actions\Notification;
 
-use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
-use Planka\Bridge\Views\Factory\Notification\NotificationItemDtoFactory;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
-use Planka\Bridge\Views\Dto\Notification\NotificationItemDto;
-use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
-use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ActionInterface;
-use Symfony\Contracts\HttpClient\ResponseInterface;
-use Planka\Bridge\Traits\AuthenticateTrait;
-
-use function Fp\Collection\map;
+use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
+use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
+use Planka\Bridge\Contracts\Factory\OutputInterface;
+use Planka\Bridge\Views\Factory\ItemDtoListFactory;
+use Planka\Bridge\Views\Factory\Notification\NotificationItemDtoFactory;
 
 final class NotificationUpdateAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait;
+    private array $options = [];
 
     public function __construct(
-        private readonly array $notifyIdList,
-        private readonly bool $isRead,
-        string $token,
+        private readonly string $notificationId,
+        bool $isRead,
     ) {
-        $this->setToken($token);
+        $this->options['json'] = ['isRead' => $isRead];
     }
 
     public function url(): string
     {
-        $list = implode(',', $this->notifyIdList);
-
-        return "api/notifications/{$list}";
+        return "api/notifications/{$this->notificationId}";
     }
 
     public function getOptions(): array
     {
-        return [
-            'body' => [
-                'isRead' => $this->isRead,
-            ],
-        ];
+        return $this->options;
     }
 
-    /**
-     * @return list<NotificationItemDto>
-     *
-     * @throws ClientExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws TransportExceptionInterface
-     */
-    public function hydrate(ResponseInterface $response): array
+    public function getFactory(): OutputInterface
     {
-        $data = $response->toArray();
-
-        return map($data['items'] ?? [], fn(array $item) => (new NotificationItemDtoFactory())->create($item));
+        return new ItemDtoListFactory(new NotificationItemDtoFactory());
     }
 }

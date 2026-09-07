@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Tests\Unit;
 
+use Planka\Bridge\Views\Dto\Background\BackgroundImageDto;
+
 final class ProjectBackgroundImageTest extends AbstractUnitTestCase
 {
     public function testDeleteBackgroundImage(): void
@@ -18,9 +20,9 @@ final class ProjectBackgroundImageTest extends AbstractUnitTestCase
         ]);
 
         $client = $this->createMockClientWithResponse($mockJson);
-        $result = $client->project->deleteBackgroundImage('img123');
+        $result = $client->project()->deleteBackgroundImage('img123');
 
-        $this->assertIsArray($result);
-        $this->assertEquals('img123', $result['item']['id']);
+        $this->assertInstanceOf(BackgroundImageDto::class, $result);
+        $this->assertEquals('img123', $result->id);
     }
 }

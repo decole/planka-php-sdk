@@ -12,21 +12,42 @@ final class NotificationItemDtoFactory implements OutputInterface
 {
     use DateConverterTrait;
 
+    /**
+     * @param array<string, mixed> $data
+     *
+     * @see Payload structure:
+     *      array{
+     *          id: string,
+     *          createdAt?: ?string,
+     *          updatedAt?: ?string,
+     *          isRead?: bool,
+     *          userId?: string,
+     *          cardId?: ?string,
+     *          actionId?: ?string,
+     *          creatorUserId?: ?string,
+     *          boardId?: ?string,
+     *          commentId?: ?string,
+     *          type?: ?string,
+     *          data?: array
+     *      }
+     */
     public function create(array $data): NotificationItemDto
     {
+        $item = $data['item'] ?? $data;
+
         return new NotificationItemDto(
-            id: $data['id'],
-            createdAt: $this->convertToDateTime($data['createdAt'] ?? null),
-            updatedAt: $this->convertToDateTime($data['updatedAt'] ?? null),
-            isRead: (bool) ($data['isRead'] ?? false),
-            userId: $data['userId'] ?? '',
-            cardId: $data['cardId'] ?? null,
-            actionId: $data['actionId'] ?? null,
-            creatorUserId: $data['creatorUserId'] ?? null,
-            boardId: $data['boardId'] ?? null,
-            commentId: $data['commentId'] ?? null,
-            type: $data['type'] ?? null,
-            data: is_array($data['data'] ?? null) ? $data['data'] : [],
+            id: $item['id'],
+            createdAt: $this->convertToDateTime($item['createdAt'] ?? null),
+            updatedAt: $this->convertToDateTime($item['updatedAt'] ?? null),
+            isRead: (bool) ($item['isRead'] ?? false),
+            userId: $item['userId'] ?? '',
+            cardId: $item['cardId'] ?? null,
+            actionId: $item['actionId'] ?? null,
+            creatorUserId: $item['creatorUserId'] ?? null,
+            boardId: $item['boardId'] ?? null,
+            commentId: $item['commentId'] ?? null,
+            type: $item['type'] ?? null,
+            data: is_array($item['data'] ?? null) ? $item['data'] : [],
             _rawResponse: $data,
         );
     }

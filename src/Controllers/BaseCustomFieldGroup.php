@@ -8,17 +8,15 @@ use Planka\Bridge\Actions\Common\CommonPatchAction;
 use Planka\Bridge\Actions\CustomField\BaseCustomFieldGroupCreateAction;
 use Planka\Bridge\Actions\CustomField\BaseCustomFieldGroupDeleteAction;
 use Planka\Bridge\Actions\CustomField\BaseCustomFieldGroupUpdateAction;
-use Planka\Bridge\Config;
 use Planka\Bridge\Exceptions\ResponseException;
-use Planka\Bridge\TransportClients\Client;
+use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\CustomField\BaseCustomFieldGroupDto;
 use Planka\Bridge\Views\Factory\CustomField\BaseCustomFieldGroupDtoFactory;
 
 final class BaseCustomFieldGroup
 {
     public function __construct(
-        private readonly Config $config,
-        private readonly Client $client,
+        private readonly TransportClientInterface $client,
     ) {}
 
     /** 'POST /api/projects/:projectId/base-custom-field-groups' */

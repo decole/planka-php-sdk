@@ -5,46 +5,20 @@ declare(strict_types=1);
 namespace Planka\Bridge\Actions\Webhook;
 
 use Planka\Bridge\Contracts\Actions\ActionInterface;
+use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
-use Planka\Bridge\Traits\WebhookHydrateTrait;
+use Planka\Bridge\Contracts\Factory\OutputInterface;
+use Planka\Bridge\Views\Factory\Webhook\WebhookDtoFactory;
 
-final class WebhookUpdateAction implements ActionInterface, ResponseResultInterface
+final class WebhookUpdateAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use WebhookHydrateTrait;
-
     private array $options = [];
 
     public function __construct(
         private readonly string $webhookId,
-        ?string $name = null,
-        ?string $url = null,
-        ?string $accessToken = null,
-        ?string $events = null,
-        ?string $excludedEvents = null,
+        array $data,
     ) {
-        $body = [];
-
-        if (null !== $name) {
-            $body['name'] = $name;
-        }
-
-        if (null !== $url) {
-            $body['url'] = $url;
-        }
-
-        if (null !== $accessToken) {
-            $body['accessToken'] = $accessToken;
-        }
-
-        if (null !== $events) {
-            $body['events'] = $events;
-        }
-
-        if (null !== $excludedEvents) {
-            $body['excludedEvents'] = $excludedEvents;
-        }
-
-        $this->options['json'] = $body;
+        $this->options['json'] = $data;
     }
 
     public function url(): string
@@ -55,5 +29,10 @@ final class WebhookUpdateAction implements ActionInterface, ResponseResultInterf
     public function getOptions(): array
     {
         return $this->options;
+    }
+
+    public function getFactory(): OutputInterface
+    {
+        return new WebhookDtoFactory();
     }
 }

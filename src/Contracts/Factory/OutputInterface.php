@@ -6,5 +6,6 @@ namespace Planka\Bridge\Contracts\Factory;
 
 interface OutputInterface
 {
+    /** @param array<string, mixed> $data */
     public function create(array $data): mixed;
 }

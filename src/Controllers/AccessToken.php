@@ -6,12 +6,12 @@ namespace Planka\Bridge\Controllers;
 
 use Planka\Bridge\Actions\Auth\ExchangeWithOidcAction;
 use Planka\Bridge\Actions\Auth\RevokePendingTokenAction;
-use Planka\Bridge\TransportClients\Client;
+use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\AccessToken\AccessTokenDto;
 
 final class AccessToken
 {
-    public function __construct(private readonly Client $client) {}
+    public function __construct(private readonly TransportClientInterface $client) {}
 
     /** 'POST /api/access-tokens/exchange-with-oidc' */
     public function exchangeWithOidc(string $code, string $nonce, bool $withHttpOnlyToken = false): AccessTokenDto

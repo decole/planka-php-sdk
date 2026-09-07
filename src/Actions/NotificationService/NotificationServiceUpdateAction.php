@@ -5,41 +5,34 @@ declare(strict_types=1);
 namespace Planka\Bridge\Actions\NotificationService;
 
 use Planka\Bridge\Contracts\Actions\ActionInterface;
+use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
-use Planka\Bridge\Enum\NotificationServiceFormatEnum;
-use Planka\Bridge\Traits\NotificationServiceHydrateTrait;
+use Planka\Bridge\Contracts\Factory\OutputInterface;
+use Planka\Bridge\Views\Factory\NotificationService\NotificationServiceDtoFactory;
 
-final class NotificationServiceUpdateAction implements ActionInterface, ResponseResultInterface
+final class NotificationServiceUpdateAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use NotificationServiceHydrateTrait;
-
     private array $options = [];
 
     public function __construct(
-        private readonly string $id,
-        ?string $url = null,
-        ?NotificationServiceFormatEnum $format = null,
+        private readonly string $serviceId,
+        array $data,
     ) {
-        $body = [];
-
-        if (null !== $url) {
-            $body['url'] = $url;
-        }
-
-        if (null !== $format) {
-            $body['format'] = $format->value;
-        }
-
-        $this->options['json'] = $body;
+        $this->options['json'] = $data;
     }
 
     public function url(): string
     {
-        return "api/notification-services/{$this->id}";
+        return "api/notification-services/{$this->serviceId}";
     }
 
     public function getOptions(): array
     {
         return $this->options;
+    }
+
+    public function getFactory(): OutputInterface
+    {
+        return new NotificationServiceDtoFactory();
     }
 }

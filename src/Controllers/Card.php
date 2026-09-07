@@ -7,27 +7,26 @@ namespace Planka\Bridge\Controllers;
 use Planka\Bridge\Actions\Card\CardClearDueDateAction;
 use Planka\Bridge\Actions\Card\CardCreateAction;
 use Planka\Bridge\Actions\Card\CardDeleteAction;
+use Planka\Bridge\Actions\Card\CardDuplicateAction;
 use Planka\Bridge\Actions\Card\CardMoveAction;
+use Planka\Bridge\Actions\Card\CardReadNotificationsAction;
 use Planka\Bridge\Actions\Card\CardSubscribeMembershipAction;
 use Planka\Bridge\Actions\Card\CardTimerAction;
 use Planka\Bridge\Actions\Card\CardUnsubscribeMembershipAction;
 use Planka\Bridge\Actions\Card\CardUpdateAction;
 use Planka\Bridge\Actions\Card\CardViewAction;
 use Planka\Bridge\Actions\Common\CommonPatchAction;
-use Planka\Bridge\Config;
 use Planka\Bridge\Enum\BoardDefaultCardTypeEnum;
-use Planka\Bridge\Traits\CardHydrateTrait;
-use Planka\Bridge\TransportClients\Client;
+use Planka\Bridge\Inputs\PatchInputInterface;
+use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\Card\CardDto;
 use Planka\Bridge\Views\Dto\Card\CardMembershipDto;
+use Planka\Bridge\Views\Factory\Card\CardDtoFactory;
 
 final class Card
 {
-    use CardHydrateTrait;
-
     public function __construct(
-        private readonly Config $config,
-        private readonly Client $client,
+        private readonly TransportClientInterface $client,
     ) {}
 
     /** 'POST /api/lists/:listId/cards' */
@@ -48,48 +47,40 @@ final class Card
     /** 'GET /api/cards/:id' */
     public function get(string $cardId): CardDto
     {
-        return $this->client->get(new CardViewAction(cardId: $cardId, token: $this->config->getAuthToken()));
+        return $this->client->get(new CardViewAction(cardId: $cardId));
     }
 
     /** 'PATCH /api/cards/:id' */
     public function update(CardDto $card): CardDto
     {
         return $this->client->patch(new CardUpdateAction(
-            card: $card,
-            token: $this->config->getAuthToken(),
+            cardId: $card->id,
+            data: $card->toArray(),
         ));
     }
 
     /**
      * 'PATCH /api/cards/:id' - Partially updates card properties.
      *
-     * @param string $cardId Card ID
-     * @param array{
-     *   name?: string,
-     *   description?: string|null,
-     *   dueDate?: string|\DateTimeInterface|null,
-     *   isDueCompleted?: bool,
-     *   position?: int,
-     *   listId?: string,
-     *   isClosed?: bool,
-     *   type?: 'project'|'story'|BoardDefaultCardTypeEnum,
-     *   stopwatch?: array{startedAt?: string|null, total?: int}|null
-     * } $map Associative array of fields to update
+     * @param string                    $cardId Card ID
+     * @param array|PatchInputInterface $map    Associative array or PatchInputInterface of fields to update
      */
-    public function patching(string $cardId, array $map): CardDto
+    public function patching(string $cardId, array|PatchInputInterface $map): CardDto
     {
-        if (isset($map['dueDate']) && $map['dueDate'] instanceof \DateTimeInterface) {
-            $map['dueDate'] = $map['dueDate']->format('Y-m-d\TH:i:s.v\Z');
+        $data = $map instanceof PatchInputInterface ? $map->toArray() : $map;
+
+        if (isset($data['dueDate']) && $data['dueDate'] instanceof \DateTimeInterface) {
+            $data['dueDate'] = $data['dueDate']->format('Y-m-d\TH:i:s.v\Z');
         }
 
-        if (isset($map['type']) && $map['type'] instanceof BoardDefaultCardTypeEnum) {
-            $map['type'] = $map['type']->value;
+        if (isset($data['type']) && $data['type'] instanceof BoardDefaultCardTypeEnum) {
+            $data['type'] = $data['type']->value;
         }
 
         return $this->client->patch(new CommonPatchAction(
             urlPath: "api/cards/{$cardId}",
-            data: $map,
-            hydrateCallback: fn($response) => $this->hydrate($response),
+            data: $data,
+            hydrateCallback: new CardDtoFactory(),
         ));
     }
 
@@ -97,8 +88,7 @@ final class Card
     public function clearTime(CardDto $card): CardDto
     {
         return $this->client->patch(new CardClearDueDateAction(
-            card: $card,
-            token: $this->config->getAuthToken(),
+            cardId: $card->id,
         ));
     }
 
@@ -106,18 +96,23 @@ final class Card
     public function moveCard(CardDto $card): CardDto
     {
         return $this->client->patch(new CardMoveAction(
-            card: $card,
-            token: $this->config->getAuthToken(),
+            cardId: $card->id,
+            listId: $card->listId,
+            position: $card->position,
         ));
     }
 
     /** 'PATCH /api/cards/:id' */
     public function addSpentTime(CardDto $card, int $seconds): CardDto
     {
-        return $this->client->patch(new CardUpdateAction(
-            card: $card,
-            token: $this->config->getAuthToken(),
-            spentSeconds: $seconds,
+        $total = ($card->stopwatch->total ?? 0) + $seconds;
+
+        return $this->client->patch(new CardTimerAction(
+            cardId: $card->id,
+            stopwatch: [
+                'startedAt' => $card->stopwatch->startedAt?->format('Y-m-d\TH:i:s.v\Z'),
+                'total' => $total,
+            ],
         ));
     }
 
@@ -125,16 +120,18 @@ final class Card
     public function triggerTimer(CardDto $card, bool $start): CardDto
     {
         return $this->client->patch(new CardTimerAction(
-            card: $card,
-            token: $this->config->getAuthToken(),
-            start: $start,
+            cardId: $card->id,
+            stopwatch: [
+                'startedAt' => $start ? (new \DateTimeImmutable())->format('Y-m-d\TH:i:s.v\Z') : null,
+                'total' => $card->stopwatch->total ?? 0,
+            ],
         ));
     }
 
     /** 'DELETE /api/cards/:id' */
     public function delete(string $cardId): void
     {
-        $this->client->delete(new CardDeleteAction(cardId: $cardId, token: $this->config->getAuthToken()));
+        $this->client->delete(new CardDeleteAction(cardId: $cardId));
     }
 
     /** 'POST /api/cards/:cardId/memberships' */
@@ -143,7 +140,6 @@ final class Card
         return $this->client->post(new CardSubscribeMembershipAction(
             cardId: $cardId,
             userId: $userId,
-            token: $this->config->getAuthToken(),
         ));
     }
 
@@ -153,30 +149,25 @@ final class Card
         return $this->client->delete(new CardUnsubscribeMembershipAction(
             cardId: $cardId,
             userId: $userId,
-            token: $this->config->getAuthToken(),
         ));
     }
 
     /** 'POST /api/cards/:id/duplicate' */
     public function duplicate(
         string $cardId,
-        ?string $boardId = null,
         ?string $listId = null,
         int $position = 65536,
-        ?string $name = null,
     ): CardDto {
-        return $this->client->post(new \Planka\Bridge\Actions\Card\CardDuplicateAction(
+        return $this->client->post(new CardDuplicateAction(
             cardId: $cardId,
-            boardId: $boardId,
             listId: $listId,
             position: $position,
-            name: $name,
         ));
     }
 
     /** 'POST /api/cards/:id/read-notifications' */
     public function readNotifications(string $cardId): CardDto
     {
-        return $this->client->post(new \Planka\Bridge\Actions\Card\CardReadNotificationsAction(cardId: $cardId));
+        return $this->client->post(new CardReadNotificationsAction(cardId: $cardId));
     }
 }

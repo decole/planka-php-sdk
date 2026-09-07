@@ -14,18 +14,22 @@ final class CommentDtoFactory implements OutputInterface
     use DateConverterTrait;
 
     /**
-     * @param array{
-     *     id: string,
-     *     cardId: string,
-     *     userId?: ?string,
-     *     text?: ?string,
-     *     type?: ?string,
-     *     createdAt?: ?string,
-     *     updatedAt?: ?string
-     * } $data
+     * @param array<string, mixed> $data
+     *
+     * @see Payload structure:
+     *      array{
+     *          id: string,
+     *          cardId: string,
+     *          userId?: ?string,
+     *          text?: ?string,
+     *          type?: ?string,
+     *          createdAt?: ?string,
+     *          updatedAt?: ?string
+     *      }
      */
     public function create(array $data): CommentDto
     {
+        $data = $data['item'] ?? $data;
         $text = $data['text'] ?? $data['data']['text'] ?? '';
         $type = isset($data['type']) && is_string($data['type']) ? CommentTypeEnum::tryFrom($data['type']) : null;
 

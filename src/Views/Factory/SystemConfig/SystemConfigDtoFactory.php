@@ -13,22 +13,27 @@ final class SystemConfigDtoFactory implements OutputInterface
     use DateConverterTrait;
 
     /**
-     * @param array{
-     *     id: string,
-     *     smtpHost?: ?string,
-     *     smtpPort?: ?int,
-     *     smtpName?: ?string,
-     *     smtpSecure?: bool,
-     *     smtpTlsRejectUnauthorized?: bool,
-     *     smtpUser?: ?string,
-     *     smtpPassword?: ?string,
-     *     smtpFrom?: ?string,
-     *     createdAt?: ?string,
-     *     updatedAt?: ?string
-     * } $data
+     * @param array<string, mixed> $data
+     *
+     * @see Payload structure:
+     *      array{
+     *          id: string,
+     *          smtpHost?: ?string,
+     *          smtpPort?: ?int,
+     *          smtpName?: ?string,
+     *          smtpSecure?: bool,
+     *          smtpTlsRejectUnauthorized?: bool,
+     *          smtpUser?: ?string,
+     *          smtpPassword?: ?string,
+     *          smtpFrom?: ?string,
+     *          createdAt?: ?string,
+     *          updatedAt?: ?string
+     *      }
      */
     public function create(array $data): SystemConfigDto
     {
+        $data = $data['item'] ?? $data;
+
         return new SystemConfigDto(
             id: $data['id'],
             smtpHost: $data['smtpHost'] ?? null,

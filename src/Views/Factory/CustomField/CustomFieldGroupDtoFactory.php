@@ -13,19 +13,24 @@ final class CustomFieldGroupDtoFactory implements OutputInterface
     use DateConverterTrait;
 
     /**
-     * @param array{
-     *     id: string,
-     *     boardId?: ?string,
-     *     cardId?: ?string,
-     *     baseCustomFieldGroupId?: ?string,
-     *     position: int,
-     *     name?: ?string,
-     *     createdAt?: ?string,
-     *     updatedAt?: ?string
-     * } $data
+     * @param array<string, mixed> $data
+     *
+     * @see Payload structure:
+     *      array{
+     *          id: string,
+     *          boardId?: ?string,
+     *          cardId?: ?string,
+     *          baseCustomFieldGroupId?: ?string,
+     *          position: int,
+     *          name?: ?string,
+     *          createdAt?: ?string,
+     *          updatedAt?: ?string
+     *      }
      */
     public function create(array $data): CustomFieldGroupDto
     {
+        $data = $data['item'] ?? $data;
+
         return new CustomFieldGroupDto(
             id: $data['id'],
             boardId: $data['boardId'] ?? null,

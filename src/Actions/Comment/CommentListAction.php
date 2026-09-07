@@ -7,20 +7,13 @@ namespace Planka\Bridge\Actions\Comment;
 use Planka\Bridge\Contracts\Actions\ActionInterface;
 use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
-use Planka\Bridge\Traits\AuthenticateTrait;
+use Planka\Bridge\Contracts\Factory\OutputInterface;
 use Planka\Bridge\Views\Factory\Comment\CommentDtoFactory;
-use Symfony\Contracts\HttpClient\ResponseInterface;
+use Planka\Bridge\Views\Factory\ItemDtoListFactory;
 
 final class CommentListAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait;
-
-    public function __construct(
-        private readonly string $cardId,
-        string $token = '',
-    ) {
-        $this->setToken($token);
-    }
+    public function __construct(private readonly string $cardId) {}
 
     public function url(): string
     {
@@ -32,12 +25,8 @@ final class CommentListAction implements ActionInterface, AuthenticateInterface,
         return [];
     }
 
-    public function hydrate(ResponseInterface $response): array
+    public function getFactory(): OutputInterface
     {
-        $result = $response->toArray();
-        $items = $result['items'] ?? [];
-        $factory = new CommentDtoFactory();
-
-        return array_map(fn (array $item) => $factory->create($item), $items);
+        return new ItemDtoListFactory(new CommentDtoFactory());
     }
 }

@@ -4,24 +4,18 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Actions\CardLabel;
 
-use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
-use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ActionInterface;
-use Planka\Bridge\Traits\CardLabelHydrateTrait;
-use Planka\Bridge\Traits\AuthenticateTrait;
+use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
+use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
+use Planka\Bridge\Contracts\Factory\OutputInterface;
+use Planka\Bridge\Views\Factory\Card\CardLabelDtoFactory;
 
 final class CardLabelCreateAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait;
-    use CardLabelHydrateTrait;
-
     public function __construct(
         private readonly string $cardId,
         private readonly string $labelId,
-        string $token,
-    ) {
-        $this->setToken($token);
-    }
+    ) {}
 
     public function url(): string
     {
@@ -31,9 +25,14 @@ final class CardLabelCreateAction implements ActionInterface, AuthenticateInterf
     public function getOptions(): array
     {
         return [
-            'body' => [
+            'json' => [
                 'labelId' => $this->labelId,
             ],
         ];
+    }
+
+    public function getFactory(): OutputInterface
+    {
+        return new CardLabelDtoFactory();
     }
 }

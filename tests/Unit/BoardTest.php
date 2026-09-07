@@ -12,7 +12,7 @@ final class BoardTest extends AbstractUnitTestCase
     public function testCreateBoard(): void
     {
         $client = $this->createMockClient('Board/board_create.json');
-        $board = $client->board->create('1854744330170795558', 'Fixture Board', 0);
+        $board = $client->board()->create('1854744330170795558', 'Fixture Board', 0);
 
         $this->assertInstanceOf(BoardDto::class, $board);
         $this->assertNotNull($board->item);
@@ -22,7 +22,7 @@ final class BoardTest extends AbstractUnitTestCase
     public function testUpdateBoard(): void
     {
         $client = $this->createMockClient('Board/board_update.json');
-        $updated = $client->board->update('1854744330917381674', 'Board Updated');
+        $updated = $client->board()->update('1854744330917381674', 'Board Updated');
 
         $this->assertInstanceOf(BoardDto::class, $updated);
     }
@@ -48,7 +48,7 @@ final class BoardTest extends AbstractUnitTestCase
         ]);
 
         $client = $this->createMockClientWithResponse($mockJson);
-        $actions = $client->board->getActions('1854744330917381674');
+        $actions = $client->board()->getActions('1854744330917381674');
 
         $this->assertInstanceOf(CardActionListDto::class, $actions);
         $this->assertNotEmpty($actions->items);

@@ -9,26 +9,19 @@ use Planka\Bridge\Actions\CardTask\CardTaskDeleteAction;
 use Planka\Bridge\Actions\CardTask\CardTaskUpdateAction;
 use Planka\Bridge\Actions\CardTask\TaskListCreateAction;
 use Planka\Bridge\Actions\CardTask\TaskListDeleteAction;
+use Planka\Bridge\Actions\CardTask\TaskListUpdateAction;
+use Planka\Bridge\Actions\CardTask\TaskListViewAction;
 use Planka\Bridge\Actions\Common\CommonPatchAction;
-use Planka\Bridge\Config;
-use Planka\Bridge\Traits\CardTaskHydrateTrait;
-use Planka\Bridge\Traits\TaskListHydrateTrait;
-use Planka\Bridge\TransportClients\Client;
+use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\Card\CardTaskDto;
 use Planka\Bridge\Views\Dto\Card\TaskListDto;
+use Planka\Bridge\Views\Factory\Card\CardTaskDtoFactory;
+use Planka\Bridge\Views\Factory\Card\TaskListDtoFactory;
 
 final class CardTask
 {
-    use CardTaskHydrateTrait;
-    use TaskListHydrateTrait {
-        TaskListHydrateTrait::hydrate insteadof CardTaskHydrateTrait;
-        TaskListHydrateTrait::hydrate as hydrateTaskList;
-        CardTaskHydrateTrait::hydrate as hydrateCardTask;
-    }
-
     public function __construct(
-        private readonly Config $config,
-        private readonly Client $client,
+        private readonly TransportClientInterface $client,
     ) {}
 
     /** 'POST /api/cards/:cardId/task-lists' */
@@ -44,7 +37,7 @@ final class CardTask
     /** 'GET /api/task-lists/:id' */
     public function getTaskList(string $taskListId): TaskListDto
     {
-        return $this->client->get(new \Planka\Bridge\Actions\CardTask\TaskListViewAction(id: $taskListId));
+        return $this->client->get(new TaskListViewAction(taskListId: $taskListId));
     }
 
     /** 'PATCH /api/task-lists/:id' */
@@ -55,12 +48,27 @@ final class CardTask
         ?bool $showOnFrontOfCard = null,
         ?bool $hideCompletedTasks = null,
     ): TaskListDto {
-        return $this->client->patch(new \Planka\Bridge\Actions\CardTask\TaskListUpdateAction(
-            id: $taskListId,
-            name: $name,
-            position: $position,
-            showOnFrontOfCard: $showOnFrontOfCard,
-            hideCompletedTasks: $hideCompletedTasks,
+        $data = [];
+
+        if (null !== $name) {
+            $data['name'] = $name;
+        }
+
+        if (null !== $position) {
+            $data['position'] = $position;
+        }
+
+        if (null !== $showOnFrontOfCard) {
+            $data['showOnFrontOfCard'] = $showOnFrontOfCard;
+        }
+
+        if (null !== $hideCompletedTasks) {
+            $data['hideCompletedTasks'] = $hideCompletedTasks;
+        }
+
+        return $this->client->patch(new TaskListUpdateAction(
+            taskListId: $taskListId,
+            data: $data,
         ));
     }
 
@@ -80,14 +88,14 @@ final class CardTask
         return $this->client->patch(new CommonPatchAction(
             urlPath: "api/task-lists/{$taskListId}",
             data: $map,
-            hydrateCallback: fn($response) => $this->hydrateTaskList($response),
+            hydrateCallback: new TaskListDtoFactory(),
         ));
     }
 
     /** 'DELETE /api/task-lists/:id' */
     public function deleteTaskList(string $taskListId): TaskListDto
     {
-        return $this->client->delete(new TaskListDeleteAction(id: $taskListId));
+        return $this->client->delete(new TaskListDeleteAction(taskListId: $taskListId));
     }
 
     /** 'POST /api/task-lists/:taskListId/tasks' */
@@ -103,7 +111,14 @@ final class CardTask
     /** 'PATCH /api/tasks/:id' */
     public function update(CardTaskDto $task): CardTaskDto
     {
-        return $this->client->patch(new CardTaskUpdateAction(task: $task));
+        return $this->client->patch(new CardTaskUpdateAction(
+            taskId: $task->id,
+            data: [
+                'name' => $task->name,
+                'position' => $task->position,
+                'isCompleted' => $task->isCompleted,
+            ],
+        ));
     }
 
     /**
@@ -123,7 +138,7 @@ final class CardTask
         return $this->client->patch(new CommonPatchAction(
             urlPath: "api/tasks/{$taskId}",
             data: $map,
-            hydrateCallback: fn($response) => $this->hydrateCardTask($response),
+            hydrateCallback: new CardTaskDtoFactory(),
         ));
     }
 

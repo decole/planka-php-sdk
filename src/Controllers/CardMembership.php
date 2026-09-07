@@ -7,14 +7,12 @@ namespace Planka\Bridge\Controllers;
 use Planka\Bridge\Actions\CardMembership\CardMembershipCreateAction;
 use Planka\Bridge\Actions\CardMembership\CardMembershipDeleteAction;
 use Planka\Bridge\Views\Dto\Card\CardMembershipDto;
-use Planka\Bridge\TransportClients\Client;
-use Planka\Bridge\Config;
+use Planka\Bridge\TransportClients\TransportClientInterface;
 
 final class CardMembership
 {
     public function __construct(
-        private readonly Config $config,
-        private readonly Client $client,
+        private readonly TransportClientInterface $client,
     ) {}
 
     /** 'POST /api/cards/:cardId/memberships' */
@@ -23,7 +21,6 @@ final class CardMembership
         return $this->client->post(new CardMembershipCreateAction(
             cardId: $cardId,
             userId: $userId,
-            token: $this->config->getAuthToken(),
         ));
     }
 
@@ -33,7 +30,6 @@ final class CardMembership
         return $this->client->delete(new CardMembershipDeleteAction(
             cardId: $cardId,
             userId: $userId,
-            token: $this->config->getAuthToken(),
         ));
     }
 }

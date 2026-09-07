@@ -14,18 +14,23 @@ final class LabelDtoFactory implements OutputInterface
     use DateConverterTrait;
 
     /**
-     * @param array{
-     *     id: string,
-     *     createdAt: string,
-     *     updatedAt: ?string,
-     *     position: int,
-     *     name: string,
-     *     color: ?string,
-     *     boardId: string
-     * } $data
+     * @param array<string, mixed> $data
+     *
+     * @see Payload structure:
+     *      array{
+     *          id: string,
+     *          createdAt: string,
+     *          updatedAt: ?string,
+     *          position: int,
+     *          name: string,
+     *          color: ?string,
+     *          boardId: string
+     *      }
      */
     public function create(array $data): LabelDto
     {
+        $data = $data['item'] ?? $data;
+
         return new LabelDto(
             id: $data['id'],
             boardId: $data['boardId'],

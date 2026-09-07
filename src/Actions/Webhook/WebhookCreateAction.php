@@ -5,21 +5,21 @@ declare(strict_types=1);
 namespace Planka\Bridge\Actions\Webhook;
 
 use Planka\Bridge\Contracts\Actions\ActionInterface;
+use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
-use Planka\Bridge\Traits\WebhookHydrateTrait;
+use Planka\Bridge\Contracts\Factory\OutputInterface;
+use Planka\Bridge\Views\Factory\Webhook\WebhookDtoFactory;
 
-final class WebhookCreateAction implements ActionInterface, ResponseResultInterface
+final class WebhookCreateAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use WebhookHydrateTrait;
-
     private array $options = [];
 
     public function __construct(
         string $name,
         string $url,
         ?string $accessToken = null,
-        ?string $events = null,
-        ?string $excludedEvents = null,
+        ?array $events = null,
+        ?array $excludedEvents = null,
     ) {
         $body = [
             'name' => $name,
@@ -49,5 +49,10 @@ final class WebhookCreateAction implements ActionInterface, ResponseResultInterf
     public function getOptions(): array
     {
         return $this->options;
+    }
+
+    public function getFactory(): OutputInterface
+    {
+        return new WebhookDtoFactory();
     }
 }

@@ -17,7 +17,7 @@ $config = new Config(
 $client = new PlankaClient($config);
 
 // 1. Create a new card in list
-$card = $client->card->create(
+$card = $client->card()->create(
     listId: '1357158568008091266',
     name: 'Implement OAuth2 Login',
     position: 65536
@@ -25,16 +25,16 @@ $card = $client->card->create(
 
 // 2. Add description and update card
 $card->description = 'Detailed description of OAuth2 integration';
-$updatedCard = $client->card->update($card);
+$updatedCard = $client->card()->update($card);
 
 // 3. Add task list and tasks to card
-$taskList = $client->cardTask->createTaskList($card->id, 'Checklist');
-$task1 = $client->cardTask->create($taskList->id, 'Design schema', 0);
-$task2 = $client->cardTask->create($taskList->id, 'Write endpoints', 1);
+$taskList = $client->cardTask()->createTaskList($card->id, 'Checklist');
+$task1 = $client->cardTask()->create($taskList->id, 'Design schema', 0);
+$task2 = $client->cardTask()->create($taskList->id, 'Write endpoints', 1);
 
 // 4. Duplicate card (Planka v2 feature)
-$duplicatedCard = $client->card->duplicate($card->id);
+$duplicatedCard = $client->card()->duplicate($card->id);
 
 // 5. Mark notifications as read for card (Planka v2 feature)
-$client->card->readNotifications($card->id);
+$client->card()->readNotifications($card->id);
 ```

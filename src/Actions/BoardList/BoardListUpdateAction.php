@@ -4,24 +4,18 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Actions\BoardList;
 
-use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
-use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ActionInterface;
-use Planka\Bridge\Traits\BoardListHydrateTrait;
-use Planka\Bridge\Traits\AuthenticateTrait;
+use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
+use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
+use Planka\Bridge\Contracts\Factory\OutputInterface;
+use Planka\Bridge\Views\Factory\Board\BoardListDtoFactory;
 
 final class BoardListUpdateAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait;
-    use BoardListHydrateTrait;
-
     public function __construct(
         private readonly string $listId,
         private readonly string $name,
-        string $token,
-    ) {
-        $this->setToken($token);
-    }
+    ) {}
 
     public function url(): string
     {
@@ -35,5 +29,10 @@ final class BoardListUpdateAction implements ActionInterface, AuthenticateInterf
                 'name' => $this->name,
             ],
         ];
+    }
+
+    public function getFactory(): OutputInterface
+    {
+        return new BoardListDtoFactory();
     }
 }

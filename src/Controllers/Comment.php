@@ -6,20 +6,17 @@ namespace Planka\Bridge\Controllers;
 
 use Planka\Bridge\Actions\Comment\CommentCreateAction;
 use Planka\Bridge\Actions\Comment\CommentDeleteAction;
+use Planka\Bridge\Actions\Comment\CommentListAction;
 use Planka\Bridge\Actions\Comment\CommentUpdateAction;
 use Planka\Bridge\Actions\Common\CommonPatchAction;
-use Planka\Bridge\Config;
-use Planka\Bridge\Traits\CommentHydrateTrait;
-use Planka\Bridge\TransportClients\Client;
+use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\Comment\CommentDto;
+use Planka\Bridge\Views\Factory\Comment\CommentDtoFactory;
 
 final class Comment
 {
-    use CommentHydrateTrait;
-
     public function __construct(
-        private readonly Config $config,
-        private readonly Client $client,
+        private readonly TransportClientInterface $client,
     ) {}
 
     /**
@@ -29,9 +26,8 @@ final class Comment
      */
     public function list(string $cardId): array
     {
-        return $this->client->get(new \Planka\Bridge\Actions\Comment\CommentListAction(
+        return $this->client->get(new CommentListAction(
             cardId: $cardId,
-            token: $this->config->getAuthToken(),
         ));
     }
 
@@ -41,7 +37,6 @@ final class Comment
         return $this->client->post(new CommentCreateAction(
             cardId: $cardId,
             text: $text,
-            token: $this->config->getAuthToken(),
         ));
     }
 
@@ -51,7 +46,6 @@ final class Comment
         return $this->client->patch(new CommentUpdateAction(
             commentId: $commentId,
             text: $text,
-            token: $this->config->getAuthToken(),
         ));
     }
 
@@ -68,7 +62,7 @@ final class Comment
         return $this->client->patch(new CommonPatchAction(
             urlPath: "api/comment-actions/{$commentId}",
             data: $map,
-            hydrateCallback: fn($response) => $this->hydrate($response),
+            hydrateCallback: new CommentDtoFactory(),
         ));
     }
 
@@ -77,7 +71,6 @@ final class Comment
     {
         return $this->client->delete(new CommentDeleteAction(
             commentId: $commentId,
-            token: $this->config->getAuthToken(),
         ));
     }
 }

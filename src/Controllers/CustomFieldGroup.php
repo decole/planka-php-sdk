@@ -9,17 +9,14 @@ use Planka\Bridge\Actions\CustomField\CustomFieldGroupCreateInBoardAction;
 use Planka\Bridge\Actions\CustomField\CustomFieldGroupCreateInCardAction;
 use Planka\Bridge\Actions\CustomField\CustomFieldGroupDeleteAction;
 use Planka\Bridge\Actions\CustomField\CustomFieldGroupUpdateAction;
-use Planka\Bridge\Config;
-use Planka\Bridge\Exceptions\ResponseException;
-use Planka\Bridge\TransportClients\Client;
+use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\CustomField\CustomFieldGroupDto;
 use Planka\Bridge\Views\Factory\CustomField\CustomFieldGroupDtoFactory;
 
 final class CustomFieldGroup
 {
     public function __construct(
-        private readonly Config $config,
-        private readonly Client $client,
+        private readonly TransportClientInterface $client,
     ) {}
 
     /** 'POST /api/boards/:boardId/custom-field-groups' */
@@ -47,10 +44,19 @@ final class CustomFieldGroup
     /** 'PATCH /api/custom-field-groups/:id' */
     public function update(string $id, ?string $name = null, ?int $position = null): CustomFieldGroupDto
     {
+        $data = [];
+
+        if (null !== $name) {
+            $data['name'] = $name;
+        }
+
+        if (null !== $position) {
+            $data['position'] = $position;
+        }
+
         return $this->client->patch(new CustomFieldGroupUpdateAction(
-            id: $id,
-            name: $name,
-            position: $position,
+            customFieldGroupId: $id,
+            data: $data,
         ));
     }
 
@@ -68,21 +74,13 @@ final class CustomFieldGroup
         return $this->client->patch(new CommonPatchAction(
             urlPath: "api/custom-field-groups/{$id}",
             data: $map,
-            hydrateCallback: function ($response): CustomFieldGroupDto {
-                $result = $response->toArray();
-
-                if (array_key_exists('item', $result)) {
-                    return (new CustomFieldGroupDtoFactory())->create($result['item']);
-                }
-
-                throw new ResponseException($response->getContent());
-            },
+            hydrateCallback: new CustomFieldGroupDtoFactory(),
         ));
     }
 
     /** 'DELETE /api/custom-field-groups/:id' */
     public function delete(string $id): CustomFieldGroupDto
     {
-        return $this->client->delete(new CustomFieldGroupDeleteAction(id: $id));
+        return $this->client->delete(new CustomFieldGroupDeleteAction(customFieldGroupId: $id));
     }
 }

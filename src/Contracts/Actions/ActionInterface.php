@@ -8,6 +8,6 @@ interface ActionInterface
 {
     public function url(): string;
 
-    /** @return list<mixed> */
+    /** @return array<string, mixed> */
     public function getOptions(): array;
 }

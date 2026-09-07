@@ -61,7 +61,7 @@ $planka = new PlankaClient($config);
 $planka->authenticate();
 
 // Get list of projects
-$projects = $planka->project->list();
+$projects = $planka->project()->list();
 ```
 
 ### 2. User API Key (Planka v2)
@@ -83,7 +83,7 @@ $config = new Config(
 $planka = new PlankaClient($config);
 
 // API Key is automatically included in X-Api-Key headers
-$projects = $planka->project->list();
+$projects = $planka->project()->list();
 ```
 
 ---
@@ -94,44 +94,139 @@ $projects = $planka->project->list();
 | :--- | :--- | :--- |
 | **Planka Version Support** | Planka v1.x | **Planka v2.x** |
 | **Authentication Methods** | Username & Password (JWT) only | **JWT** OR **User API Key** (`apiKey` parameter) |
-| **Config Instantiation** | `new Config(user, password, baseUri, port)` | `new Config(user, password, baseUri, port, apiKey)` |
+| **Config Instantiation** | `new Config(user, password, baseUri, port)` | `new Config(user, password, baseUri, port, apiKey, tokenStorage)` |
 | **Mandatory Auth Call** | Always required `$planka->authenticate()` | Required only for JWT. **Skipped** when using `apiKey`. |
-| **Transport Injection** | Standard Symfony HttpClient | Supports custom `Client` injection: `new PlankaClient($config, $customTransportClient)` for mocking/unit testing |
+| **Transport Injection** | Standard Symfony HttpClient | Supports custom `TransportClientInterface` or PSR-18/17 via `PsrTransportClient` for mocking/unit testing |
+| **Exception Handling** | Basic `\Exception` inheritance | Unified `PlankaSdkExceptionInterface` for all SDK exceptions |
 | **API Endpoints & Features** | Standard boards/cards | Adds **Webhooks**, **Base Custom Fields**, **Notification Services**, **System Config**, **Card Duplication**, etc. |
+
+---
+
+## Advanced Usage
+
+### 1. Unified Exception Handling
+
+All SDK exceptions implement `Planka\Bridge\Exceptions\PlankaSdkExceptionInterface`, allowing you to catch any SDK-related error with a single `catch` block:
+
+```php
+use Planka\Bridge\Exceptions\PlankaSdkExceptionInterface;
+use Planka\Bridge\Exceptions\PlankaNotFoundException;
+use Planka\Bridge\Exceptions\PlankaValidationException;
+
+try {
+    $card = $planka->card()->get('invalid-id');
+} catch (PlankaNotFoundException $e) {
+    echo "Resource not found: " . $e->getMessage();
+} catch (PlankaValidationException $e) {
+    echo "Validation error (" . $e->getStatusCode() . "): " . $e->getMessage();
+} catch (PlankaSdkExceptionInterface $e) {
+    echo "SDK Error (" . $e->getStatusCode() . "): " . $e->getMessage();
+}
+```
+
+### 2. Custom PSR-18 / PSR-17 HTTP Client
+
+The SDK provides `PsrTransportClient` implementing `TransportClientInterface` to allow using any PSR-18 HTTP Client (such as Guzzle, Buzz, or Symfony HTTP Client via PSR-18 adapter):
+
+```php
+use Planka\Bridge\Config;
+use Planka\Bridge\PlankaClient;
+use Planka\Bridge\TransportClients\PsrTransportClient;
+
+// $guzzleClient implements Psr\Http\Client\ClientInterface
+// $requestFactory implements Psr\Http\Message\RequestFactoryInterface
+// $streamFactory implements Psr\Http\Message\StreamFactoryInterface
+
+$psrTransport = new PsrTransportClient(
+    config: $config,
+    httpClient: $guzzleClient,
+    requestFactory: $requestFactory,
+    streamFactory: $streamFactory,
+);
+
+$planka = new PlankaClient($config, $psrTransport);
+```
+
+### 3. Custom Token Storage
+
+You can provide a custom implementation of `TokenStorageInterface` to persist JWT authentication tokens or API keys across HTTP requests or sessions:
+
+```php
+use Planka\Bridge\Auth\TokenStorageInterface;
+
+class CustomTokenStorage implements TokenStorageInterface
+{
+    public function getAuthToken(): ?string { return $_SESSION['planka_jwt'] ?? null; }
+    public function setAuthToken(?string $authToken): void { $_SESSION['planka_jwt'] = $authToken; }
+    public function getApiKey(): ?string { return null; }
+    public function setApiKey(?string $apiKey): void {}
+}
+
+$config = new Config(
+    baseUri: 'http://192.168.1.100',
+    port: 3000,
+    tokenStorage: new CustomTokenStorage()
+);
+```
+
+### 4. Type-Safe Partial Updates (Patch Input DTOs)
+
+For partial entity updates via `patching()`, you can use strongly-typed Input DTOs (`BoardPatchInput`, `CardPatchInput`, `ProjectPatchInput`) or associative arrays:
+
+```php
+use Planka\Bridge\Inputs\CardPatchInput;
+use Planka\Bridge\Inputs\BoardPatchInput;
+
+// Using strongly-typed Patch Input DTO
+$card = $planka->card()->patching(
+    cardId: '1357158568008091264',
+    map: new CardPatchInput(
+        name: 'Updated Card Title',
+        isClosed: true
+    )
+);
+
+// Or using an associative array
+$board = $planka->board()->patching(
+    boardId: '1357158568008091265',
+    map: ['name' => 'Renamed Board']
+);
+```
 
 ---
 
 ## Controllers & Features
 
-All Planka API endpoints are organized into clean, strongly-typed controllers:
+All Planka API endpoints are accessible via explicit getter methods on `PlankaClient`:
 
-- `$planka->project` — Manage projects (`list`, `create`, `get`, `update`, `delete`, `updateBackground`)
-- `$planka->projectManager` — Manage project managers (`create`, `delete`)
-- `$planka->board` — Manage boards (`create`, `get`, `update`, `delete`)
-- `$planka->boardList` — Manage lists (`create`, `update`, `delete`, `clear`, `moveCards`, `sort`)
-- `$planka->boardMembership` — Manage board memberships (`create`, `update`, `delete`)
-- `$planka->card` — Manage cards (`create`, `get`, `update`, `delete`, `duplicate`, `readNotifications`, `subscribe`, `unsubscribe`)
-- `$planka->cardAction` — Fetch card activity history
-- `$planka->cardLabel` — Add and remove labels on cards
-- `$planka->cardTask` — Manage task lists within cards
-- `$planka->cardMembership` — Manage members assigned to cards
-- `$planka->comment` — Add, update and delete comments on cards
-- `$planka->attachment` — Upload, update and delete attachments
-- `$planka->label` — Manage board labels
-- `$planka->user` — Manage users (`list`, `create`, `get`, `update`, `createApiKey`, etc.)
-- `$planka->webhook` — **(New in v2)** Manage webhooks (`list`, `create`, `update`, `delete`)
-- `$planka->baseCustomFieldGroup` — **(New in v2)** Base custom field groups in projects
-- `$planka->customFieldGroup` — **(New in v2)** Custom field groups on boards/cards
-- `$planka->customField` — **(New in v2)** Custom fields inside groups
-- `$planka->notification` — User notifications (`list`, `getOne`, `markIsRead`, `markIsNotRead`, `readAll`)
-- `$planka->notificationService` — **(New in v2)** External notification services (Slack, Discord, Webhooks)
-- `$planka->systemConfig` — **(New in v2)** Planka application settings and SMTP testing
+- `$planka->project()` — Manage projects (`list`, `create`, `get`, `update`, `delete`, `updateBackground`)
+- `$planka->projectManager()` — Manage project managers (`create`, `delete`)
+- `$planka->board()` — Manage boards (`create`, `get`, `update`, `delete`, `patching`)
+- `$planka->boardList()` — Manage lists (`create`, `update`, `delete`, `clear`, `moveCards`, `sort`)
+- `$planka->boardMembership()` — Manage board memberships (`create`, `update`, `delete`)
+- `$planka->card()` — Manage cards (`create`, `get`, `update`, `delete`, `duplicate`, `patching`, `readNotifications`, `subscribe`, `unsubscribe`)
+- `$planka->cardAction()` — Fetch card activity history
+- `$planka->cardLabel()` — Add and remove labels on cards
+- `$planka->cardTask()` — Manage task lists within cards
+- `$planka->cardMembership()` — Manage members assigned to cards
+- `$planka->comment()` — Add, update and delete comments on cards
+- `$planka->attachment()` — Upload, update and delete attachments
+- `$planka->label()` — Manage board labels
+- `$planka->user()` — Manage users (`list`, `create`, `get`, `update`, `createApiKey`, etc.)
+- `$planka->webhook()` — **(New in v2)** Manage webhooks (`list`, `create`, `update`, `delete`)
+- `$planka->baseCustomFieldGroup()` — **(New in v2)** Base custom field groups in projects
+- `$planka->customFieldGroup()` — **(New in v2)** Custom field groups on boards/cards
+- `$planka->customField()` — **(New in v2)** Custom fields inside groups
+- `$planka->notification()` — User notifications (`list`, `getOne`, `markIsRead`, `markIsNotRead`, `readAll`)
+- `$planka->notificationService()` — **(New in v2)** External notification services (Slack, Discord, Webhooks)
+- `$planka->systemConfig()` — **(New in v2)** Planka application settings and SMTP testing
 
 ---
 
 ## Documentation & Examples
 
 - [API Key Authentication](docs/API_KEY_AUTHENTICATION.md)
+- [Partial Updates with Patch Input DTOs](docs/PATCH_INPUTS.md)
 - [Webhooks Management](docs/WEBHOOKS_MANAGEMENT.md)
 - [Custom Fields Management](docs/CUSTOM_FIELDS_MANAGEMENT.md)
 - [Delete Empty Boards](docs/DELETE_EMPTY_BOARD.md)
@@ -186,16 +281,17 @@ Integration tests perform full real-world SDK verification against a live Planka
    vendor/bin/phpunit --testsuite=Integration
    ```
 
-### Code Quality & Formatting
+### Code Quality & Static Analysis
 
-Static code analysis:
+Run all quality checks (CS Fixer dry-run, Psalm static analysis, and Unit tests):
 ```bash
-./vendor/bin/psalm --no-cache
+composer check
 ```
 
-Code style fixer:
+Or individual checks:
 ```bash
-composer fix-cs
+composer analyse    # Runs Psalm static analysis
+composer fix-cs     # Formats code style
 ```
 
 ---

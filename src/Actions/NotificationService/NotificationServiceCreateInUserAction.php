@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace Planka\Bridge\Actions\NotificationService;
 
 use Planka\Bridge\Contracts\Actions\ActionInterface;
+use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
+use Planka\Bridge\Contracts\Factory\OutputInterface;
 use Planka\Bridge\Enum\NotificationServiceFormatEnum;
-use Planka\Bridge\Traits\NotificationServiceHydrateTrait;
+use Planka\Bridge\Views\Factory\NotificationService\NotificationServiceDtoFactory;
 
-final class NotificationServiceCreateInUserAction implements ActionInterface, ResponseResultInterface
+final class NotificationServiceCreateInUserAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use NotificationServiceHydrateTrait;
-
     private array $options = [];
 
     public function __construct(
@@ -34,5 +34,10 @@ final class NotificationServiceCreateInUserAction implements ActionInterface, Re
     public function getOptions(): array
     {
         return $this->options;
+    }
+
+    public function getFactory(): OutputInterface
+    {
+        return new NotificationServiceDtoFactory();
     }
 }

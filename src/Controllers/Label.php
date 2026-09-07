@@ -8,19 +8,15 @@ use Planka\Bridge\Actions\Common\CommonPatchAction;
 use Planka\Bridge\Actions\Label\LabelCreateAction;
 use Planka\Bridge\Actions\Label\LabelDeleteAction;
 use Planka\Bridge\Actions\Label\LabelUpdateAction;
-use Planka\Bridge\Config;
 use Planka\Bridge\Enum\LabelColorEnum;
-use Planka\Bridge\Traits\LabelHydrateTrait;
-use Planka\Bridge\TransportClients\Client;
+use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\Label\LabelDto;
+use Planka\Bridge\Views\Factory\Label\LabelDtoFactory;
 
 final class Label
 {
-    use LabelHydrateTrait;
-
     public function __construct(
-        private readonly Config $config,
-        private readonly Client $client,
+        private readonly TransportClientInterface $client,
     ) {}
 
     /** 'POST /api/boards/:boardId/labels' */
@@ -31,7 +27,6 @@ final class Label
             name: $name,
             color: $color,
             position: $position,
-            token: $this->config->getAuthToken(),
         ));
     }
 
@@ -42,7 +37,6 @@ final class Label
             labelId: $labelId,
             name: $name,
             color: $color,
-            token: $this->config->getAuthToken(),
         ));
     }
 
@@ -65,13 +59,13 @@ final class Label
         return $this->client->patch(new CommonPatchAction(
             urlPath: "api/labels/{$labelId}",
             data: $map,
-            hydrateCallback: fn($response) => $this->hydrate($response),
+            hydrateCallback: new LabelDtoFactory(),
         ));
     }
 
     /** 'DELETE /api/labels/:id' */
     public function delete(string $labelId): LabelDto
     {
-        return $this->client->delete(new LabelDeleteAction(labelId: $labelId, token: $this->config->getAuthToken()));
+        return $this->client->delete(new LabelDeleteAction(labelId: $labelId));
     }
 }

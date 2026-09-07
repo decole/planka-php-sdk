@@ -9,15 +9,13 @@ use Planka\Bridge\Actions\Webhook\WebhookCreateAction;
 use Planka\Bridge\Actions\Webhook\WebhookDeleteAction;
 use Planka\Bridge\Actions\Webhook\WebhookListAction;
 use Planka\Bridge\Actions\Webhook\WebhookUpdateAction;
-use Planka\Bridge\Traits\WebhookHydrateTrait;
-use Planka\Bridge\TransportClients\Client;
+use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\Webhook\WebhookDto;
+use Planka\Bridge\Views\Factory\Webhook\WebhookDtoFactory;
 
 final class Webhook
 {
-    use WebhookHydrateTrait;
-
-    public function __construct(private readonly Client $client) {}
+    public function __construct(private readonly TransportClientInterface $client) {}
 
     /**
      * 'GET /api/webhooks'.
@@ -34,9 +32,13 @@ final class Webhook
         string $name,
         string $url,
         ?string $accessToken = null,
-        ?string $events = null,
-        ?string $excludedEvents = null,
+        array|string|null $events = null,
+        ?array $excludedEvents = null,
     ): WebhookDto {
+        if (\is_string($events)) {
+            $events = array_map('trim', explode(',', $events));
+        }
+
         return $this->client->post(new WebhookCreateAction(
             name: $name,
             url: $url,
@@ -52,16 +54,33 @@ final class Webhook
         ?string $name = null,
         ?string $url = null,
         ?string $accessToken = null,
-        ?string $events = null,
-        ?string $excludedEvents = null,
+        array|string|null $events = null,
+        ?array $excludedEvents = null,
+        array $data = [],
     ): WebhookDto {
+        if (null !== $name) {
+            $data['name'] = $name;
+        }
+
+        if (null !== $url) {
+            $data['url'] = $url;
+        }
+
+        if (null !== $accessToken) {
+            $data['accessToken'] = $accessToken;
+        }
+
+        if (null !== $events) {
+            $data['events'] = \is_string($events) ? array_map('trim', explode(',', $events)) : $events;
+        }
+
+        if (null !== $excludedEvents) {
+            $data['excludedEvents'] = $excludedEvents;
+        }
+
         return $this->client->patch(new WebhookUpdateAction(
             webhookId: $webhookId,
-            name: $name,
-            url: $url,
-            accessToken: $accessToken,
-            events: $events,
-            excludedEvents: $excludedEvents,
+            data: $data,
         ));
     }
 
@@ -73,8 +92,8 @@ final class Webhook
      *   name?: string,
      *   url?: string,
      *   accessToken?: string|null,
-     *   events?: string|null,
-     *   excludedEvents?: string|null
+     *   events?: list<string>|null,
+     *   excludedEvents?: list<string>|null
      * } $map Associative array of fields to update
      */
     public function patching(string $webhookId, array $map): WebhookDto
@@ -82,7 +101,7 @@ final class Webhook
         return $this->client->patch(new CommonPatchAction(
             urlPath: "api/webhooks/{$webhookId}",
             data: $map,
-            hydrateCallback: fn($response) => $this->hydrate($response),
+            hydrateCallback: new WebhookDtoFactory(),
         ));
     }
 

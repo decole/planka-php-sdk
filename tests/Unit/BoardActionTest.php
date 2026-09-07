@@ -29,7 +29,7 @@ final class BoardActionTest extends AbstractUnitTestCase
         ]);
 
         $client = $this->createMockClientWithResponse($mockJson);
-        $actions = $client->cardAction->getBoardActions('board123');
+        $actions = $client->cardAction()->getBoardActions('board123');
 
         $this->assertInstanceOf(CardActionListDto::class, $actions);
         $this->assertNotEmpty($actions->items);

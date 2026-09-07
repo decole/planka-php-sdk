@@ -13,16 +13,21 @@ final class BaseCustomFieldGroupDtoFactory implements OutputInterface
     use DateConverterTrait;
 
     /**
-     * @param array{
-     *     id: string,
-     *     projectId: string,
-     *     name: string,
-     *     createdAt?: ?string,
-     *     updatedAt?: ?string
-     * } $data
+     * @param array<string, mixed> $data
+     *
+     * @see Payload structure:
+     *      array{
+     *          id: string,
+     *          projectId: string,
+     *          name: string,
+     *          createdAt?: ?string,
+     *          updatedAt?: ?string
+     *      }
      */
     public function create(array $data): BaseCustomFieldGroupDto
     {
+        $data = $data['item'] ?? $data;
+
         return new BaseCustomFieldGroupDto(
             id: $data['id'],
             projectId: $data['projectId'],

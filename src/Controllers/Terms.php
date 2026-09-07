@@ -7,13 +7,13 @@ namespace Planka\Bridge\Controllers;
 use Planka\Bridge\Actions\Auth\AcceptTermsAction;
 use Planka\Bridge\Actions\Auth\GetTermsAction;
 use Planka\Bridge\Enum\LanguageEnum;
-use Planka\Bridge\TransportClients\Client;
+use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\AccessToken\AccessTokenDto;
 use Planka\Bridge\Views\Dto\Terms\TermsDto;
 
 final class Terms
 {
-    public function __construct(private readonly Client $client) {}
+    public function __construct(private readonly TransportClientInterface $client) {}
 
     /** 'GET /api/terms' */
     public function get(?LanguageEnum $language = null): TermsDto
