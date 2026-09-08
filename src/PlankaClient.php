@@ -4,36 +4,42 @@ declare(strict_types=1);
 
 namespace Planka\Bridge;
 
-use Planka\Bridge\Exceptions\AuthenticateException;
 use Planka\Bridge\Actions\Auth\AuthenticateAction;
-use Planka\Bridge\Actions\Common\GetInfoAction;
-use Planka\Bridge\Controllers\AccessToken;
-use Planka\Bridge\Controllers\BoardMembership;
-use Planka\Bridge\Controllers\CardMembership;
-use Planka\Bridge\Controllers\ProjectManager;
-use Planka\Bridge\Controllers\Terms;
-use Planka\Bridge\Exceptions\LogoutException;
 use Planka\Bridge\Actions\Auth\LogoutAction;
-use Planka\Bridge\Controllers\Notification;
-use Planka\Bridge\TransportClients\Client;
-use Planka\Bridge\TransportClients\TransportClientInterface;
+use Planka\Bridge\Actions\Auth\VerifyTotpAction;
+use Planka\Bridge\Actions\Auth\AcceptTermsAction;
+use Planka\Bridge\Actions\Common\GetInfoAction;
+use Planka\Bridge\Contracts\Actions\ActionInterface;
+use Planka\Bridge\Controllers\AccessToken;
 use Planka\Bridge\Controllers\Attachment;
-use Planka\Bridge\Controllers\CardAction;
+use Planka\Bridge\Controllers\BaseCustomFieldGroup;
+use Planka\Bridge\Controllers\Board;
 use Planka\Bridge\Controllers\BoardList;
+use Planka\Bridge\Controllers\BoardMembership;
+use Planka\Bridge\Controllers\Card;
+use Planka\Bridge\Controllers\CardAction;
 use Planka\Bridge\Controllers\CardLabel;
+use Planka\Bridge\Controllers\CardMembership;
 use Planka\Bridge\Controllers\CardTask;
 use Planka\Bridge\Controllers\Comment;
-use Planka\Bridge\Controllers\Project;
-use Planka\Bridge\Controllers\Board;
-use Planka\Bridge\Controllers\Label;
-use Planka\Bridge\Controllers\Card;
-use Planka\Bridge\Controllers\BaseCustomFieldGroup;
 use Planka\Bridge\Controllers\CustomField;
 use Planka\Bridge\Controllers\CustomFieldGroup;
+use Planka\Bridge\Controllers\Label;
+use Planka\Bridge\Controllers\Notification;
 use Planka\Bridge\Controllers\NotificationService;
+use Planka\Bridge\Controllers\Project;
+use Planka\Bridge\Controllers\ProjectManager;
 use Planka\Bridge\Controllers\SystemConfig;
+use Planka\Bridge\Controllers\Terms;
 use Planka\Bridge\Controllers\User;
 use Planka\Bridge\Controllers\Webhook;
+use Planka\Bridge\Enum\LanguageEnum;
+use Planka\Bridge\Exceptions\AuthenticateException;
+use Planka\Bridge\Exceptions\LogoutException;
+use Planka\Bridge\Exceptions\PlankaAccessDeniedException;
+use Planka\Bridge\TransportClients\Client;
+use Planka\Bridge\TransportClients\TransportClientInterface;
+use Planka\Bridge\Views\Dto\Auth\AuthenticateResultDto;
 
 /**
  * @see https://plankanban.github.io/planka/swagger-ui/
@@ -171,19 +177,99 @@ final class PlankaClient
      *
      * @throws AuthenticateException
      */
-    public function authenticate(): bool
+    public function authenticate(bool $withHttpOnlyToken = false): AuthenticateResultDto
     {
-        $response = $this->client->post(new AuthenticateAction($this->config->getUser(), $this->config->getPassword()));
+        try {
+            $response = $this->client->post(new AuthenticateAction(
+                $this->config->getUser(),
+                $this->config->getPassword(),
+                $withHttpOnlyToken,
+            ));
+        } catch (PlankaAccessDeniedException $e) {
+            $data = json_decode($e->getMessage(), true);
 
-        $token = $response->toArray()['item'] ?? null;
+            if (is_array($data)) {
+                $message = $data['message'] ?? '';
+                $pendingToken = is_string($data['item'] ?? null) ? $data['item'] : ($data['pendingToken'] ?? null);
+                $challenge = match ($message) {
+                    'TOTP verification required' => AuthenticateResultDto::CHALLENGE_TOTP,
+                    'Terms acceptance required' => AuthenticateResultDto::CHALLENGE_TERMS,
+                    default => null,
+                };
 
-        if (empty($token)) {
-            throw new AuthenticateException('not authenticate');
+                if (null !== $challenge) {
+                    return new AuthenticateResultDto(
+                        success: false,
+                        pendingToken: is_string($pendingToken) ? $pendingToken : null,
+                        challenge: $challenge,
+                        _rawResponse: $data,
+                    );
+                }
+            }
+
+            throw new AuthenticateException($e->getMessage(), $e->getCode(), $e);
+        }
+
+        $data = $response instanceof \Symfony\Contracts\HttpClient\ResponseInterface
+            ? $response->toArray(false)
+            : (is_array($response) ? $response : []);
+
+        $token = $data['item'] ?? null;
+
+        if (empty($token) || !is_string($token)) {
+            throw new AuthenticateException('Authentication failed: empty token returned');
         }
 
         $this->config->setAuthToken($token);
 
-        return true;
+        return new AuthenticateResultDto(
+            success: true,
+            token: $token,
+            _rawResponse: $data,
+        );
+    }
+
+    /**
+     * 'POST /api/access-tokens/verify-totp'.
+     *
+     * @throws AuthenticateException
+     */
+    public function verifyTotp(string $pendingToken, string $code, bool $trustDevice = false): AuthenticateResultDto
+    {
+        return $this->completePendingAuth(new VerifyTotpAction($pendingToken, $code, $trustDevice));
+    }
+
+    /**
+     * 'POST /api/access-tokens/accept-terms'.
+     *
+     * @throws AuthenticateException
+     */
+    public function acceptTerms(string $pendingToken, string $signature, ?LanguageEnum $initialLanguage = null): AuthenticateResultDto
+    {
+        return $this->completePendingAuth(new AcceptTermsAction($pendingToken, $signature, $initialLanguage));
+    }
+
+    private function completePendingAuth(ActionInterface $action): AuthenticateResultDto
+    {
+        $response = $this->client->post($action);
+
+        $data = $response instanceof \Symfony\Contracts\HttpClient\ResponseInterface
+            ? $response->toArray(false)
+            : (is_array($response) ? $response : []);
+
+        $token = $data['item'] ?? null;
+
+        if (empty($token) || !is_string($token)) {
+            throw new AuthenticateException($data['message'] ?? 'Authentication failed');
+        }
+
+        $this->config->setAuthToken($token);
+
+        return new AuthenticateResultDto(
+            success: true,
+            token: $token,
+            _rawResponse: $data,
+        );
     }
 
     /**

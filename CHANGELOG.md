@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Transport Dependency**: Updated controllers and `PlankaClient` to depend on `TransportClientInterface` instead of the concrete `Client` class.
 
 ### ✨ Added
+- **2FA / TOTP Authentication**: Added 2FA TOTP support during login via `AuthenticateResultDto` (`$result->requiresTotp()`, `$result->requiresTerms()`), `$client->verifyTotp()`, and `$client->acceptTerms()`.
+- **User TOTP & Trusted Devices Management**: Added `setupTotp()`, `enableTotp()`, `disableTotp()`, `regenerateTotpRecoveryCodes()`, `listTrustedDevices()`, and `deleteTrustedDevice()` to `User` controller.
 - **PSR-18 / PSR-17 Transport**: Added `PsrTransportClient` implementing `TransportClientInterface` for seamless integration with any PSR-18 HTTP client (Guzzle, Symfony, etc.) and PSR-17 factories.
 - **Unified Exception Interface**: Added `PlankaSdkExceptionInterface` extending `\Throwable`. All SDK exceptions now implement this interface for simplified error handling.
 - **Token Storage Abstraction**: Introduced `TokenStorageInterface` and `InMemoryTokenStorage` to separate authentication state from `Config`.

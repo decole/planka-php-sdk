@@ -58,7 +58,18 @@ $config = new Config(
 );
 
 $planka = new PlankaClient($config);
-$planka->authenticate();
+$result = $planka->authenticate();
+
+if (!$result->success) {
+    if ($result->requiresTotp()) {
+        $result = $planka->verifyTotp($result->pendingToken, '123456');
+    }
+
+    if ($result->requiresTerms()) {
+        $terms = $planka->terms()->get();
+        $result = $planka->acceptTerms($result->pendingToken, $terms->signature);
+    }
+}
 
 // Get list of projects
 $projects = $planka->project()->list();
