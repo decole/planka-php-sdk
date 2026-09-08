@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Planka\Bridge\Actions\Notification;
 
 use Planka\Bridge\Contracts\Actions\ActionInterface;
+use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
-use Symfony\Contracts\HttpClient\ResponseInterface;
+use Planka\Bridge\Contracts\Factory\OutputInterface;
+use Planka\Bridge\Views\Factory\Notification\NotificationListDtoFactory;
 
-final class NotificationReadAllAction implements ActionInterface, ResponseResultInterface
+final class NotificationReadAllAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
     public function url(): string
     {
@@ -20,8 +22,8 @@ final class NotificationReadAllAction implements ActionInterface, ResponseResult
         return [];
     }
 
-    public function hydrate(ResponseInterface $response): array
+    public function getFactory(): OutputInterface
     {
-        return $response->toArray();
+        return new NotificationListDtoFactory();
     }
 }

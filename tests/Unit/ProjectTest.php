@@ -11,7 +11,7 @@ final class ProjectTest extends AbstractUnitTestCase
     public function testCreateProject(): void
     {
         $client = $this->createMockClient('Project/project_create.json');
-        $project = $client->project->create('Test Project');
+        $project = $client->project()->create('Test Project');
 
         $this->assertInstanceOf(ProjectDto::class, $project);
         $this->assertNotEmpty($project->id);
@@ -31,7 +31,7 @@ final class ProjectTest extends AbstractUnitTestCase
             backgroundImage: null,
         );
 
-        $updatedProject = $client->project->update($projectDto);
+        $updatedProject = $client->project()->update($projectDto);
 
         $this->assertInstanceOf(ProjectDto::class, $updatedProject);
         $this->assertEquals($projectDto->id, $updatedProject->id);

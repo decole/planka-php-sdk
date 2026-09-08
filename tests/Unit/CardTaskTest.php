@@ -12,7 +12,7 @@ final class CardTaskTest extends AbstractUnitTestCase
     public function testCreateTaskList(): void
     {
         $client = $this->createMockClient('CardTask/task_list_create.json');
-        $taskList = $client->cardTask->createTaskList('1854744332452496946', 'Checklist');
+        $taskList = $client->cardTask()->createTaskList('1854744332452496946', 'Checklist');
 
         $this->assertInstanceOf(TaskListDto::class, $taskList);
         $this->assertNotEmpty($taskList->id);
@@ -22,7 +22,7 @@ final class CardTaskTest extends AbstractUnitTestCase
     public function testCreateTask(): void
     {
         $client = $this->createMockClient('CardTask/task_create.json');
-        $task = $client->cardTask->create('1854744333501072952', 'Subtask 1', 0);
+        $task = $client->cardTask()->create('1854744333501072952', 'Subtask 1', 0);
 
         $this->assertInstanceOf(CardTaskDto::class, $task);
         $this->assertNotEmpty($task->id);

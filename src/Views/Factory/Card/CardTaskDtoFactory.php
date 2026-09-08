@@ -14,6 +14,8 @@ final class CardTaskDtoFactory implements OutputInterface
 
     public function create(array $data): CardTaskDto
     {
+        $data = $data['item'] ?? $data;
+
         return new CardTaskDto(
             id: $data['id'],
             taskListId: $data['taskListId'],
@@ -24,6 +26,7 @@ final class CardTaskDtoFactory implements OutputInterface
             isCompleted: (bool) ($data['isCompleted'] ?? false),
             createdAt: $this->convertToDateTime($data['createdAt'] ?? null),
             updatedAt: $this->convertToDateTime($data['updatedAt'] ?? null),
+            _rawResponse: $data,
         );
     }
 }

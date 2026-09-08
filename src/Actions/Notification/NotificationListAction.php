@@ -4,26 +4,27 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Actions\Notification;
 
-use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
-use Planka\Bridge\Views\Factory\Notification\NotificationListDtoFactory;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
-use Planka\Bridge\Views\Dto\Notification\NotificationListDto;
-use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
-use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ActionInterface;
-use Symfony\Contracts\HttpClient\ResponseInterface;
-use Planka\Bridge\Traits\AuthenticateTrait;
+use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
+use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
+use Planka\Bridge\Contracts\Factory\OutputInterface;
+use Planka\Bridge\Views\Factory\Notification\NotificationListDtoFactory;
 
 final class NotificationListAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait;
+    private array $options = [];
 
-    public function __construct(string $token)
-    {
-        $this->setToken($token);
+    public function __construct(
+        int $limit = 30,
+        ?string $nextId = null,
+    ) {
+        $query = ['limit' => $limit];
+
+        if (null !== $nextId) {
+            $query['nextId'] = $nextId;
+        }
+
+        $this->options['query'] = $query;
     }
 
     public function url(): string
@@ -33,18 +34,11 @@ final class NotificationListAction implements ActionInterface, AuthenticateInter
 
     public function getOptions(): array
     {
-        return [];
+        return $this->options;
     }
 
-    /**
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
-     */
-    public function hydrate(ResponseInterface $response): NotificationListDto
+    public function getFactory(): OutputInterface
     {
-        return (new NotificationListDtoFactory())->create($response->toArray());
+        return new NotificationListDtoFactory();
     }
 }

@@ -6,7 +6,8 @@ namespace Planka\Bridge\Actions\User;
 
 use Planka\Bridge\Contracts\Actions\ActionInterface;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
-use Symfony\Contracts\HttpClient\ResponseInterface;
+use Planka\Bridge\Contracts\Factory\OutputInterface;
+use Planka\Bridge\Views\Factory\User\ApiKeyDtoFactory;
 
 final class UserCreateApiKeyAction implements ActionInterface, ResponseResultInterface
 {
@@ -22,8 +23,8 @@ final class UserCreateApiKeyAction implements ActionInterface, ResponseResultInt
         return [];
     }
 
-    public function hydrate(ResponseInterface $response): array
+    public function getFactory(): OutputInterface
     {
-        return $response->toArray();
+        return new ApiKeyDtoFactory();
     }
 }

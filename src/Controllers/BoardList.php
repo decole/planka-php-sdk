@@ -10,15 +10,16 @@ use Planka\Bridge\Actions\BoardList\BoardListDeleteAction;
 use Planka\Bridge\Actions\BoardList\BoardListMoveCardsAction;
 use Planka\Bridge\Actions\BoardList\BoardListSortAction;
 use Planka\Bridge\Actions\BoardList\BoardListUpdateAction;
-use Planka\Bridge\Config;
-use Planka\Bridge\TransportClients\Client;
+use Planka\Bridge\Actions\Common\CommonPatchAction;
+use Planka\Bridge\Enum\ListTypeEnum;
+use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\Board\BoardListDto;
+use Planka\Bridge\Views\Factory\Board\BoardListDtoFactory;
 
 final class BoardList
 {
     public function __construct(
-        private readonly Config $config,
-        private readonly Client $client,
+        private readonly TransportClientInterface $client,
     ) {}
 
     /** 'POST /api/boards/:boardId/lists' */
@@ -26,7 +27,7 @@ final class BoardList
         string $boardId,
         string $name,
         int $position,
-        \Planka\Bridge\Enum\ListTypeEnum $type = \Planka\Bridge\Enum\ListTypeEnum::ACTIVE,
+        ListTypeEnum $type = ListTypeEnum::ACTIVE,
     ): BoardListDto {
         return $this->client->post(new BoardListCreateAction(
             boardId: $boardId,
@@ -42,14 +43,33 @@ final class BoardList
         return $this->client->patch(new BoardListUpdateAction(
             listId: $listId,
             name: $name,
-            token: $this->config->getAuthToken(),
+        ));
+    }
+
+    /**
+     * 'PATCH /api/lists/:id' - Partially updates list properties.
+     *
+     * @param string $listId List ID
+     * @param array{
+     *   name?: string,
+     *   position?: int,
+     *   type?: 'active'|'closed'|'archive'|'trash',
+     *   color?: string|null
+     * } $map Associative array of fields to update
+     */
+    public function patching(string $listId, array $map): BoardListDto
+    {
+        return $this->client->patch(new CommonPatchAction(
+            urlPath: "api/lists/{$listId}",
+            data: $map,
+            hydrateCallback: new BoardListDtoFactory(),
         ));
     }
 
     /** 'DELETE /api/lists/:id' */
     public function delete(string $listId): BoardListDto
     {
-        return $this->client->delete(new BoardListDeleteAction(listId: $listId, token: $this->config->getAuthToken()));
+        return $this->client->delete(new BoardListDeleteAction(listId: $listId));
     }
 
     /** 'POST /api/lists/:id/clear' */

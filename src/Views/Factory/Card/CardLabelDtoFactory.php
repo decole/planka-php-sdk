@@ -13,22 +13,28 @@ final class CardLabelDtoFactory implements OutputInterface
     use DateConverterTrait;
 
     /**
-     * @param array{
-     *     id: string,
-     *     createdAt: string,
-     *     updatedAt: ?string,
-     *     cardId: string,
-     *     labelId: ?string
-     * } $data
+     * @param array<string, mixed> $data
+     *
+     * @see Payload structure:
+     *      array{
+     *          id: string,
+     *          createdAt: string,
+     *          updatedAt: ?string,
+     *          cardId: string,
+     *          labelId: ?string
+     *      }
      */
     public function create(array $data): CardLabelDto
     {
+        $data = $data['item'] ?? $data;
+
         return new CardLabelDto(
             id: $data['id'],
             createdAt: $this->convertToDateTime($data['createdAt']),
             updatedAt: $this->convertToDateTime($data['updatedAt']),
             cardId: $data['cardId'],
             labelId: $data['labelId'],
+            _rawResponse: $data,
         );
     }
 }

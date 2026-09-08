@@ -13,19 +13,24 @@ final class CustomFieldDtoFactory implements OutputInterface
     use DateConverterTrait;
 
     /**
-     * @param array{
-     *     id: string,
-     *     baseCustomFieldGroupId?: ?string,
-     *     customFieldGroupId?: ?string,
-     *     position: int,
-     *     name: string,
-     *     showOnFrontOfCard?: bool,
-     *     createdAt?: ?string,
-     *     updatedAt?: ?string
-     * } $data
+     * @param array<string, mixed> $data
+     *
+     * @see Payload structure:
+     *      array{
+     *          id: string,
+     *          baseCustomFieldGroupId?: ?string,
+     *          customFieldGroupId?: ?string,
+     *          position: int,
+     *          name: string,
+     *          showOnFrontOfCard?: bool,
+     *          createdAt?: ?string,
+     *          updatedAt?: ?string
+     *      }
      */
     public function create(array $data): CustomFieldDto
     {
+        $data = $data['item'] ?? $data;
+
         return new CustomFieldDto(
             id: $data['id'],
             baseCustomFieldGroupId: $data['baseCustomFieldGroupId'] ?? null,
@@ -35,6 +40,7 @@ final class CustomFieldDtoFactory implements OutputInterface
             showOnFrontOfCard: (bool) ($data['showOnFrontOfCard'] ?? false),
             createdAt: $this->convertToDateTime($data['createdAt'] ?? null),
             updatedAt: $this->convertToDateTime($data['updatedAt'] ?? null),
+            _rawResponse: $data,
         );
     }
 }

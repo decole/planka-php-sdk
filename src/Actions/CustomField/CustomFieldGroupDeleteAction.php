@@ -5,19 +5,18 @@ declare(strict_types=1);
 namespace Planka\Bridge\Actions\CustomField;
 
 use Planka\Bridge\Contracts\Actions\ActionInterface;
+use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
-use Planka\Bridge\Exceptions\ResponseException;
-use Planka\Bridge\Views\Dto\CustomField\CustomFieldGroupDto;
+use Planka\Bridge\Contracts\Factory\OutputInterface;
 use Planka\Bridge\Views\Factory\CustomField\CustomFieldGroupDtoFactory;
-use Symfony\Contracts\HttpClient\ResponseInterface;
 
-final class CustomFieldGroupDeleteAction implements ActionInterface, ResponseResultInterface
+final class CustomFieldGroupDeleteAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    public function __construct(private readonly string $id) {}
+    public function __construct(private readonly string $customFieldGroupId) {}
 
     public function url(): string
     {
-        return "api/custom-field-groups/{$this->id}";
+        return "api/custom-field-groups/{$this->customFieldGroupId}";
     }
 
     public function getOptions(): array
@@ -25,14 +24,8 @@ final class CustomFieldGroupDeleteAction implements ActionInterface, ResponseRes
         return [];
     }
 
-    public function hydrate(ResponseInterface $response): CustomFieldGroupDto
+    public function getFactory(): OutputInterface
     {
-        $result = $response->toArray();
-
-        if (array_key_exists('item', $result)) {
-            return (new CustomFieldGroupDtoFactory())->create($result['item']);
-        }
-
-        throw new ResponseException($response->getContent());
+        return new CustomFieldGroupDtoFactory();
     }
 }

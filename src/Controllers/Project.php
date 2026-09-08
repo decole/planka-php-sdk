@@ -4,23 +4,29 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Controllers;
 
-use Planka\Bridge\Actions\Project\ProjectUpdateBackgroundImageAction;
-use Planka\Bridge\Actions\Project\ProjectUpdateAction;
+use Planka\Bridge\Actions\Common\CommonPatchAction;
+use Planka\Bridge\Actions\Project\BackgroundImageDeleteAction;
 use Planka\Bridge\Actions\Project\ProjectCreateAction;
 use Planka\Bridge\Actions\Project\ProjectDeleteAction;
 use Planka\Bridge\Actions\Project\ProjectListAction;
+use Planka\Bridge\Actions\Project\ProjectUpdateAction;
+use Planka\Bridge\Actions\Project\ProjectUpdateBackgroundImageAction;
 use Planka\Bridge\Actions\Project\ProjectViewAction;
-use Planka\Bridge\Views\Dto\Project\ProjectListDto;
+use Planka\Bridge\Enum\BackgroundGradientEnum;
+use Planka\Bridge\Enum\BackgroundTypeEnum;
+use Planka\Bridge\Enum\ProjectTypeEnum;
+use Planka\Bridge\Inputs\PatchInputInterface;
 use Planka\Bridge\Exceptions\FileExistException;
+use Planka\Bridge\TransportClients\TransportClientInterface;
+use Planka\Bridge\Views\Dto\Background\BackgroundImageDto;
 use Planka\Bridge\Views\Dto\Project\ProjectDto;
-use Planka\Bridge\TransportClients\Client;
-use Planka\Bridge\Config;
+use Planka\Bridge\Views\Dto\Project\ProjectListDto;
+use Planka\Bridge\Views\Factory\Project\ProjectDtoFactory;
 
 final class Project
 {
     public function __construct(
-        private readonly Config $config,
-        private readonly Client $client,
+        private readonly TransportClientInterface $client,
     ) {}
 
     /**
@@ -28,13 +34,13 @@ final class Project
      */
     public function list(): ProjectListDto
     {
-        return $this->client->get(new ProjectListAction(token: $this->config->getAuthToken()));
+        return $this->client->get(new ProjectListAction());
     }
 
     /** 'POST /api/projects' */
     public function create(
         string $name,
-        \Planka\Bridge\Enum\ProjectTypeEnum $type = \Planka\Bridge\Enum\ProjectTypeEnum::PRIVATE,
+        ProjectTypeEnum $type = ProjectTypeEnum::PRIVATE,
         ?string $description = null,
     ): ProjectDto {
         return $this->client->post(new ProjectCreateAction(
@@ -47,15 +53,40 @@ final class Project
     /** 'GET /api/projects/:id' */
     public function get(string $projectId): ProjectDto
     {
-        return $this->client->get(new ProjectViewAction(projectId: $projectId, token: $this->config->getAuthToken()));
+        return $this->client->get(new ProjectViewAction(projectId: $projectId));
     }
 
     /** 'PATCH /api/projects/:id' */
     public function update(ProjectDto $project): ProjectDto
     {
         return $this->client->patch(new ProjectUpdateAction(
-            project: $project,
-            token: $this->config->getAuthToken(),
+            projectId: $project->id,
+            name: $project->name,
+        ));
+    }
+
+    /**
+     * 'PATCH /api/projects/:id' - Partially updates project properties.
+     *
+     * @param string                    $projectId Project ID
+     * @param array|PatchInputInterface $map       Associative array or PatchInputInterface of fields to update
+     */
+    public function patching(string $projectId, array|PatchInputInterface $map): ProjectDto
+    {
+        $data = $map instanceof PatchInputInterface ? $map->toArray() : $map;
+
+        if (isset($data['backgroundType']) && $data['backgroundType'] instanceof BackgroundTypeEnum) {
+            $data['backgroundType'] = $data['backgroundType']->value;
+        }
+
+        if (isset($data['backgroundGradient']) && $data['backgroundGradient'] instanceof BackgroundGradientEnum) {
+            $data['backgroundGradient'] = $data['backgroundGradient']->value;
+        }
+
+        return $this->client->patch(new CommonPatchAction(
+            urlPath: "api/projects/{$projectId}",
+            data: $data,
+            hydrateCallback: new ProjectDtoFactory(),
         ));
     }
 
@@ -64,12 +95,11 @@ final class Project
     {
         return $this->client->delete(new ProjectDeleteAction(
             projectId: $projectId,
-            token: $this->config->getAuthToken(),
         ));
     }
 
     /**
-     * 'POST /api/projects/:id/background-image'.
+     * 'POST /api/projects/:id/background-images'.
      *
      * @throws FileExistException
      */
@@ -78,7 +108,14 @@ final class Project
         return $this->client->post(new ProjectUpdateBackgroundImageAction(
             projectId: $projectId,
             file: $file,
-            token: $this->config->getAuthToken(),
+        ));
+    }
+
+    /** 'DELETE /api/background-images/:id' */
+    public function deleteBackgroundImage(string $imageId): ?BackgroundImageDto
+    {
+        return $this->client->delete(new BackgroundImageDeleteAction(
+            projectId: $imageId,
         ));
     }
 }

@@ -5,25 +5,36 @@ declare(strict_types=1);
 namespace Planka\Bridge\Views\Factory\Board;
 
 use Planka\Bridge\Contracts\Factory\OutputInterface;
-use Planka\Bridge\Views\Dto\Board\BoardListDto;
+use Planka\Bridge\Enum\ListColorEnum;
+use Planka\Bridge\Enum\ListTypeEnum;
 use Planka\Bridge\Traits\DateConverterTrait;
+use Planka\Bridge\Views\Dto\Board\BoardListDto;
 
 final class BoardListDtoFactory implements OutputInterface
 {
     use DateConverterTrait;
 
     /**
-     * @param array{
-     *     id: string,
-     *     createdAt: string,
-     *     updatedAt: ?string,
-     *     position: int,
-     *     name: string,
-     *     boardId: string
-     * } $data
+     * @param array<string, mixed> $data
+     *
+     * @see Payload structure:
+     *      array{
+     *          id: string,
+     *          createdAt: string,
+     *          updatedAt: ?string,
+     *          position: int,
+     *          name: string,
+     *          boardId: string,
+     *          type?: ?string,
+     *          color?: ?string
+     *      }
      */
     public function create(array $data): BoardListDto
     {
+        $data = $data['item'] ?? $data;
+        $typeEnum = isset($data['type']) && is_string($data['type']) ? ListTypeEnum::tryFrom($data['type']) : null;
+        $colorEnum = isset($data['color']) && is_string($data['color']) ? ListColorEnum::tryFrom($data['color']) : null;
+
         return new BoardListDto(
             id: $data['id'],
             createdAt: $this->convertToDateTime($data['createdAt']),
@@ -31,6 +42,9 @@ final class BoardListDtoFactory implements OutputInterface
             position: (int) $data['position'],
             name: $data['name'],
             boardId: $data['boardId'],
+            type: $typeEnum,
+            color: $colorEnum,
+            _rawResponse: $data,
         );
     }
 }

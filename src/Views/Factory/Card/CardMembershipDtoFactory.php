@@ -13,22 +13,28 @@ final class CardMembershipDtoFactory implements OutputInterface
     use DateConverterTrait;
 
     /**
-     * @param array{
-     *     id: string,
-     *     createdAt: string,
-     *     updatedAt: ?string,
-     *     cardId: string,
-     *     userId: string
-     * } $data
+     * @param array<string, mixed> $data
+     *
+     * @see Payload structure:
+     *      array{
+     *          id: string,
+     *          createdAt: string,
+     *          updatedAt: ?string,
+     *          cardId: string,
+     *          userId: string
+     *      }
      */
     public function create(array $data): CardMembershipDto
     {
+        $data = $data['item'] ?? $data;
+
         return new CardMembershipDto(
             id: $data['id'],
             createdAt: $this->convertToDateTime($data['createdAt']),
             updatedAt: $this->convertToDateTime($data['updatedAt']),
             cardId: $data['cardId'],
             userId: $data['userId'],
+            _rawResponse: $data,
         );
     }
 }

@@ -14,18 +14,24 @@ final class BoardMembershipDtoFactory implements OutputInterface
     use DateConverterTrait;
 
     /**
-     * @param array{
-     *     id: string,
-     *     createdAt: string,
-     *     updatedAt: ?string,
-     *     role: string,
-     *     canComment: ?bool,
-     *     boardId: string,
-     *     userId: string,
-     * } $data
+     * @param array<string, mixed> $data
+     *
+     * @see Payload structure:
+     *      array{
+     *          id: string,
+     *          createdAt: string,
+     *          updatedAt: ?string,
+     *          role: string,
+     *          canComment: ?bool,
+     *          boardId: string,
+     *          userId: string,
+     *          projectId?: ?string
+     *      }
      */
     public function create(array $data): BoardMembershipDto
     {
+        $data = $data['item'] ?? $data;
+
         return new BoardMembershipDto(
             id: $data['id'],
             createdAt: $this->convertToDateTime($data['createdAt']),
@@ -34,6 +40,8 @@ final class BoardMembershipDtoFactory implements OutputInterface
             canComment: (bool) $data['canComment'],
             role: BoardMembershipRoleEnum::from($data['role']),
             boardId: $data['boardId'],
+            projectId: $data['projectId'] ?? null,
+            _rawResponse: $data,
         );
     }
 }

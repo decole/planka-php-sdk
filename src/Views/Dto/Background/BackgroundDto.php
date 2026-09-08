@@ -11,7 +11,9 @@ use Planka\Bridge\Enum\BackgroundTypeEnum;
 class BackgroundDto implements OutputDtoInterface
 {
     public function __construct(
-        public BackgroundTypeEnum $type,
-        public ?BackgroundGradientEnum $name,
+        public ?BackgroundTypeEnum $type = null,
+        public ?BackgroundGradientEnum $gradient = null,
+        public ?BackgroundGradientEnum $name = null,
+        public readonly array $_rawResponse = [],
     ) {}
 }

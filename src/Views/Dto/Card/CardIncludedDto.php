@@ -19,5 +19,6 @@ class CardIncludedDto
         public array $cardLabels,
         public array $tasks,
         public array $attachments,
+        public readonly array $_rawResponse = [],
     ) {}
 }

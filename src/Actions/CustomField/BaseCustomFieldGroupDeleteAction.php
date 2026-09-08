@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace Planka\Bridge\Actions\CustomField;
 
 use Planka\Bridge\Contracts\Actions\ActionInterface;
+use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
-use Planka\Bridge\Exceptions\ResponseException;
-use Planka\Bridge\Views\Dto\CustomField\BaseCustomFieldGroupDto;
+use Planka\Bridge\Contracts\Factory\OutputInterface;
 use Planka\Bridge\Views\Factory\CustomField\BaseCustomFieldGroupDtoFactory;
-use Symfony\Contracts\HttpClient\ResponseInterface;
 
-final class BaseCustomFieldGroupDeleteAction implements ActionInterface, ResponseResultInterface
+final class BaseCustomFieldGroupDeleteAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
     public function __construct(private readonly string $id) {}
 
@@ -25,14 +24,8 @@ final class BaseCustomFieldGroupDeleteAction implements ActionInterface, Respons
         return [];
     }
 
-    public function hydrate(ResponseInterface $response): BaseCustomFieldGroupDto
+    public function getFactory(): OutputInterface
     {
-        $result = $response->toArray();
-
-        if (array_key_exists('item', $result)) {
-            return (new BaseCustomFieldGroupDtoFactory())->create($result['item']);
-        }
-
-        throw new ResponseException($response->getContent());
+        return new BaseCustomFieldGroupDtoFactory();
     }
 }

@@ -4,39 +4,43 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Actions\BoardMembership;
 
-use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
-use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
-use Planka\Bridge\Traits\BoardMembershipHydrateTrait;
 use Planka\Bridge\Contracts\Actions\ActionInterface;
+use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
+use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
+use Planka\Bridge\Contracts\Factory\OutputInterface;
 use Planka\Bridge\Enum\BoardMembershipRoleEnum;
-use Planka\Bridge\Traits\AuthenticateTrait;
+use Planka\Bridge\Views\Factory\Board\BoardMembershipDtoFactory;
 
 final class BoardMembershipUpdateAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait;
-    use BoardMembershipHydrateTrait;
-
     public function __construct(
-        private readonly string $membershipId,
+        private readonly string $boardMembershipId,
         private readonly BoardMembershipRoleEnum $role,
-        string $token,
-        private readonly bool $canComment = true,
-    ) {
-        $this->setToken($token);
-    }
+        private readonly ?bool $canComment = null,
+    ) {}
 
     public function url(): string
     {
-        return "api/board-memberships/{$this->membershipId}";
+        return "api/board-memberships/{$this->boardMembershipId}";
     }
 
     public function getOptions(): array
     {
-        return [
-            'body' => [
-                'canComment' => $this->canComment,
-                'role' => $this->role->value,
-            ],
+        $json = [
+            'role' => $this->role->value,
         ];
+
+        if (null !== $this->canComment) {
+            $json['canComment'] = $this->canComment;
+        }
+
+        return [
+            'json' => $json,
+        ];
+    }
+
+    public function getFactory(): OutputInterface
+    {
+        return new BoardMembershipDtoFactory();
     }
 }

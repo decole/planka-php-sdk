@@ -7,17 +7,15 @@ namespace Planka\Bridge\Controllers;
 use Planka\Bridge\Actions\ProjectManager\ProjectManagerCreateAction;
 use Planka\Bridge\Actions\ProjectManager\ProjectManagerDeleteAction;
 use Symfony\Component\HttpClient\Exception\ClientException;
-use Planka\Bridge\Views\Factory\Project\ProjectManagerDto;
+use Planka\Bridge\Views\Dto\Project\ProjectManagerDto;
 use Planka\Bridge\Exceptions\ResponseException;
 use Planka\Bridge\Exceptions\ValidateException;
-use Planka\Bridge\TransportClients\Client;
-use Planka\Bridge\Config;
+use Planka\Bridge\TransportClients\TransportClientInterface;
 
 final class ProjectManager
 {
     public function __construct(
-        private readonly Config $config,
-        private readonly Client $client,
+        private readonly TransportClientInterface $client,
     ) {}
 
     /**
@@ -31,7 +29,6 @@ final class ProjectManager
             return $this->client->post(new ProjectManagerCreateAction(
                 projectId: $projectId,
                 userId: $userId,
-                token: $this->config->getAuthToken(),
             ));
         } catch (ClientException $exception) {
             if (409 === $exception->getCode()) {
@@ -47,7 +44,6 @@ final class ProjectManager
     {
         return $this->client->delete(new ProjectManagerDeleteAction(
             projectManagerId: $managerId,
-            token: $this->config->getAuthToken(),
         ));
     }
 }

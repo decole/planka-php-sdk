@@ -5,20 +5,25 @@ declare(strict_types=1);
 namespace Planka\Bridge\Actions\SystemConfig;
 
 use Planka\Bridge\Contracts\Actions\ActionInterface;
+use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
-use Planka\Bridge\Traits\SystemConfigHydrateTrait;
+use Planka\Bridge\Contracts\Factory\OutputInterface;
+use Planka\Bridge\Views\Factory\SystemConfig\SystemConfigDtoFactory;
 
-final class SystemConfigGetAction implements ActionInterface, ResponseResultInterface
+final class SystemConfigGetAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use SystemConfigHydrateTrait;
-
     public function url(): string
     {
-        return 'api/config';
+        return 'api/system-settings';
     }
 
     public function getOptions(): array
     {
         return [];
+    }
+
+    public function getFactory(): OutputInterface
+    {
+        return new SystemConfigDtoFactory();
     }
 }

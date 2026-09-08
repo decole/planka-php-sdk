@@ -24,6 +24,7 @@ final class ProjectIncludedDtoFactory implements OutputInterface
             projectManagers: $this->getProjectManagers($data),
             boards: $this->getBoards($data),
             boardMemberships: $this->getBoardMemberships($data),
+            _rawResponse: $data,
         );
     }
 

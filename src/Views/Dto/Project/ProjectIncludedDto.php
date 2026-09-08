@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Views\Dto\Project;
 
-use Planka\Bridge\Views\Factory\Project\ProjectManagerDto;
 use Planka\Bridge\Views\Dto\Board\BoardMembershipDto;
 use Planka\Bridge\Views\Dto\Board\BoardItemDto;
 use Planka\Bridge\Views\Dto\User\UserDto;
@@ -22,5 +21,6 @@ class ProjectIncludedDto
         public array $projectManagers,
         public array $boards,
         public array $boardMemberships,
+        public readonly array $_rawResponse = [],
     ) {}
 }

@@ -11,5 +11,6 @@ class BoardDto implements OutputDtoInterface
     public function __construct(
         public readonly ?BoardItemDto $item,
         public readonly ?BoardIncludedDto $included,
+        public readonly array $_rawResponse = [],
     ) {}
 }

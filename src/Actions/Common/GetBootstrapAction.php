@@ -6,7 +6,6 @@ namespace Planka\Bridge\Actions\Common;
 
 use Planka\Bridge\Contracts\Actions\ActionInterface;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
-use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class GetBootstrapAction implements ActionInterface, ResponseResultInterface
 {
@@ -20,8 +19,8 @@ final class GetBootstrapAction implements ActionInterface, ResponseResultInterfa
         return [];
     }
 
-    public function hydrate(ResponseInterface $response): array
+    public function getFactory(): callable
     {
-        return $response->toArray();
+        return static fn(array $data): array => $data;
     }
 }

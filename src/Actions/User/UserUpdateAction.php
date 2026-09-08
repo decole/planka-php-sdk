@@ -4,37 +4,35 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Actions\User;
 
-use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
-use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ActionInterface;
-use Planka\Bridge\Traits\AuthenticateTrait;
-use Planka\Bridge\Traits\UserHydrateTrait;
-use Planka\Bridge\Views\Dto\User\UserDto;
+use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
+use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
+use Planka\Bridge\Contracts\Factory\OutputInterface;
+use Planka\Bridge\Views\Factory\User\UserDtoFactory;
 
 final class UserUpdateAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait;
-    use UserHydrateTrait;
+    private array $options = [];
 
-    public function __construct(private readonly UserDto $user, string $token)
-    {
-        $this->setToken($token);
+    public function __construct(
+        private readonly string $userId,
+        array $data,
+    ) {
+        $this->options['json'] = $data;
     }
 
     public function url(): string
     {
-        return "api/users/{$this->user->id}";
+        return "api/users/{$this->userId}";
     }
 
     public function getOptions(): array
     {
-        return [
-            'body' => [
-                'name' => $this->user->name,
-                'organization' => $this->user->organization,
-                'phone' => $this->user->phone,
-                'isAdmin' => $this->user->isAdmin,
-            ],
-        ];
+        return $this->options;
+    }
+
+    public function getFactory(): OutputInterface
+    {
+        return new UserDtoFactory();
     }
 }

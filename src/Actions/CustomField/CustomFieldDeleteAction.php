@@ -5,19 +5,18 @@ declare(strict_types=1);
 namespace Planka\Bridge\Actions\CustomField;
 
 use Planka\Bridge\Contracts\Actions\ActionInterface;
+use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
-use Planka\Bridge\Exceptions\ResponseException;
-use Planka\Bridge\Views\Dto\CustomField\CustomFieldDto;
+use Planka\Bridge\Contracts\Factory\OutputInterface;
 use Planka\Bridge\Views\Factory\CustomField\CustomFieldDtoFactory;
-use Symfony\Contracts\HttpClient\ResponseInterface;
 
-final class CustomFieldDeleteAction implements ActionInterface, ResponseResultInterface
+final class CustomFieldDeleteAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    public function __construct(private readonly string $id) {}
+    public function __construct(private readonly string $customFieldId) {}
 
     public function url(): string
     {
-        return "api/custom-fields/{$this->id}";
+        return "api/custom-fields/{$this->customFieldId}";
     }
 
     public function getOptions(): array
@@ -25,14 +24,8 @@ final class CustomFieldDeleteAction implements ActionInterface, ResponseResultIn
         return [];
     }
 
-    public function hydrate(ResponseInterface $response): CustomFieldDto
+    public function getFactory(): OutputInterface
     {
-        $result = $response->toArray();
-
-        if (array_key_exists('item', $result)) {
-            return (new CustomFieldDtoFactory())->create($result['item']);
-        }
-
-        throw new ResponseException($response->getContent());
+        return new CustomFieldDtoFactory();
     }
 }

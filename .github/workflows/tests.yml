@@ -1,0 +1,32 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [ master, v2, v1 ]
+  pull_request:
+    branches: [ master, v2, v1 ]
+
+jobs:
+  tests:
+    name: PHP ${{ matrix.php }} Quality Checks
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['8.1', '8.2', '8.3']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          tools: composer
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Run Quality Verification Suite (CS Fixer, Psalm, PHPUnit)
+        run: composer check

@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace Planka\Bridge\Actions\Card;
 
 use Planka\Bridge\Contracts\Actions\ActionInterface;
+use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
+use Planka\Bridge\Contracts\Factory\OutputInterface;
 use Planka\Bridge\Enum\BoardDefaultCardTypeEnum;
-use Planka\Bridge\Traits\CardHydrateTrait;
+use Planka\Bridge\Views\Factory\Card\CardDtoFactory;
 
-final class CardCreateAction implements ActionInterface, ResponseResultInterface
+final class CardCreateAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use CardHydrateTrait;
-
     private array $options = [];
 
     public function __construct(
@@ -36,5 +36,10 @@ final class CardCreateAction implements ActionInterface, ResponseResultInterface
     public function getOptions(): array
     {
         return $this->options;
+    }
+
+    public function getFactory(): OutputInterface
+    {
+        return new CardDtoFactory();
     }
 }

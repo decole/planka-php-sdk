@@ -4,17 +4,23 @@ declare(strict_types=1);
 
 namespace Planka\Bridge;
 
+use Planka\Bridge\Auth\InMemoryTokenStorage;
+use Planka\Bridge\Auth\TokenStorageInterface;
+
 final class Config
 {
-    private ?string $authToken = null;
+    private readonly TokenStorageInterface $tokenStorage;
 
     public function __construct(
         private readonly ?string $user = null,
         private readonly ?string $password = null,
         private readonly string $baseUri = '',
         private readonly int $port = 80,
-        private ?string $apiKey = null,
-    ) {}
+        ?string $apiKey = null,
+        ?TokenStorageInterface $tokenStorage = null,
+    ) {
+        $this->tokenStorage = $tokenStorage ?? new InMemoryTokenStorage(apiKey: $apiKey);
+    }
 
     public function getUser(): ?string
     {
@@ -28,22 +34,27 @@ final class Config
 
     public function getAuthToken(): ?string
     {
-        return $this->authToken;
+        return $this->tokenStorage->getAuthToken();
     }
 
     public function setAuthToken(?string $authToken): void
     {
-        $this->authToken = $authToken;
+        $this->tokenStorage->setAuthToken($authToken);
     }
 
     public function getApiKey(): ?string
     {
-        return $this->apiKey;
+        return $this->tokenStorage->getApiKey();
     }
 
     public function setApiKey(?string $apiKey): void
     {
-        $this->apiKey = $apiKey;
+        $this->tokenStorage->setApiKey($apiKey);
+    }
+
+    public function getTokenStorage(): TokenStorageInterface
+    {
+        return $this->tokenStorage;
     }
 
     public function getBaseUri(): string

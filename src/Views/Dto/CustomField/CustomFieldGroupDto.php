@@ -17,5 +17,6 @@ class CustomFieldGroupDto implements OutputDtoInterface
         public ?string $name,
         public ?\DateTimeImmutable $createdAt,
         public ?\DateTimeImmutable $updatedAt,
+        public readonly array $_rawResponse = [],
     ) {}
 }

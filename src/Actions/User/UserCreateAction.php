@@ -4,25 +4,28 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Actions\User;
 
-use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
-use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ActionInterface;
-use Planka\Bridge\Traits\AuthenticateTrait;
-use Planka\Bridge\Traits\UserHydrateTrait;
+use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
+use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
+use Planka\Bridge\Contracts\Factory\OutputInterface;
+use Planka\Bridge\Views\Factory\User\UserDtoFactory;
 
 final class UserCreateAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait;
-    use UserHydrateTrait;
+    private array $options = [];
 
     public function __construct(
-        private readonly string $email,
-        private readonly string $name,
-        private readonly string $password,
-        private readonly string $username,
-        string $token,
+        string $email,
+        string $password,
+        string $name,
+        string $username,
     ) {
-        $this->setToken($token);
+        $this->options['json'] = [
+            'email' => $email,
+            'password' => $password,
+            'name' => $name,
+            'username' => $username,
+        ];
     }
 
     public function url(): string
@@ -32,13 +35,11 @@ final class UserCreateAction implements ActionInterface, AuthenticateInterface, 
 
     public function getOptions(): array
     {
-        return [
-            'body' => [
-                'email' => $this->email,
-                'name' => $this->name,
-                'password' => $this->password,
-                'username' => $this->username,
-            ],
-        ];
+        return $this->options;
+    }
+
+    public function getFactory(): OutputInterface
+    {
+        return new UserDtoFactory();
     }
 }
