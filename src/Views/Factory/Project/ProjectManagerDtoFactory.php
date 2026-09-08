@@ -12,16 +12,21 @@ final class ProjectManagerDtoFactory implements OutputInterface
     use DateConverterTrait;
 
     /**
-     * @param array{
-     *     id: string,
-     *     createdAt: string,
-     *     updatedAt: ?string,
-     *     projectId: string,
-     *     userId: string
-     * } $data
+     * @param array<string, mixed> $data
+     *
+     * @see Payload structure:
+     *      array{
+     *          id: string,
+     *          createdAt: string,
+     *          updatedAt: ?string,
+     *          projectId: string,
+     *          userId: string
+     *      }
      */
     public function create(array $data): ProjectManagerDto
     {
+        $data = $data['item'] ?? $data;
+
         return new ProjectManagerDto(
             id: $data['id'],
             createdAt: $this->convertToDateTime($data['createdAt']),

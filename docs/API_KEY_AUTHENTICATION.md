@@ -27,7 +27,7 @@ $client = new PlankaClient($config);
 $client->authenticate();
 
 // Generate API key for a specific user ID
-$response = $client->user->createApiKey(userId: '1357158568008091264');
+$response = $client->user()->createApiKey(userId: '1357158568008091264');
 
 $apiKey = $response['included']['apiKey'];
 echo "Generated API Key: " . $apiKey . "\n";
@@ -57,6 +57,6 @@ $config = new Config(
 $client = new PlankaClient($config);
 
 // No need to call ->authenticate()! All requests will include `X-Api-Key` header.
-$projects = $client->project->list();
+$projects = $client->project()->list();
 var_dump($projects);
 ```

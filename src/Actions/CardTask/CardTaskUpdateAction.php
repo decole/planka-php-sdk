@@ -5,29 +5,34 @@ declare(strict_types=1);
 namespace Planka\Bridge\Actions\CardTask;
 
 use Planka\Bridge\Contracts\Actions\ActionInterface;
+use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
-use Planka\Bridge\Traits\CardTaskHydrateTrait;
-use Planka\Bridge\Views\Dto\Card\CardTaskDto;
+use Planka\Bridge\Contracts\Factory\OutputInterface;
+use Planka\Bridge\Views\Factory\Card\CardTaskDtoFactory;
 
-final class CardTaskUpdateAction implements ActionInterface, ResponseResultInterface
+final class CardTaskUpdateAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use CardTaskHydrateTrait;
+    private array $options = [];
 
-    public function __construct(private readonly CardTaskDto $task) {}
+    public function __construct(
+        private readonly string $taskId,
+        array $data,
+    ) {
+        $this->options['json'] = $data;
+    }
 
     public function url(): string
     {
-        return "api/tasks/{$this->task->id}";
+        return "api/tasks/{$this->taskId}";
     }
 
     public function getOptions(): array
     {
-        return [
-            'json' => [
-                'name' => $this->task->name,
-                'isCompleted' => $this->task->isCompleted,
-                'position' => $this->task->position,
-            ],
-        ];
+        return $this->options;
+    }
+
+    public function getFactory(): OutputInterface
+    {
+        return new CardTaskDtoFactory();
     }
 }

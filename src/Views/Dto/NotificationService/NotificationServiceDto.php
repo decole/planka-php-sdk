@@ -17,5 +17,6 @@ class NotificationServiceDto implements OutputDtoInterface
         public NotificationServiceFormatEnum $format,
         public ?\DateTimeImmutable $createdAt,
         public ?\DateTimeImmutable $updatedAt,
+        public readonly array $_rawResponse = [],
     ) {}
 }

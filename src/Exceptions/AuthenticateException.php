@@ -4,4 +4,4 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Exceptions;
 
-class AuthenticateException extends \Exception {}
+class AuthenticateException extends \Exception implements PlankaSdkExceptionInterface {}

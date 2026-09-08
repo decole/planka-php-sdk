@@ -5,35 +5,44 @@ declare(strict_types=1);
 namespace Planka\Bridge\Views\Factory\Comment;
 
 use Planka\Bridge\Contracts\Factory\OutputInterface;
-use Planka\Bridge\Views\Dto\Comment\CommentDto;
-use Planka\Bridge\Traits\DateConverterTrait;
 use Planka\Bridge\Enum\CommentTypeEnum;
+use Planka\Bridge\Traits\DateConverterTrait;
+use Planka\Bridge\Views\Dto\Comment\CommentDto;
 
 final class CommentDtoFactory implements OutputInterface
 {
     use DateConverterTrait;
 
     /**
-     * @param array{
-     *     id: string,
-     *     createdAt: string,
-     *     updatedAt: ?string,
-     *     type: string,
-     *     data: array{text: string},
-     *     cardId: string,
-     *     userId: string
-     * } $data
+     * @param array<string, mixed> $data
+     *
+     * @see Payload structure:
+     *      array{
+     *          id: string,
+     *          cardId: string,
+     *          userId?: ?string,
+     *          text?: ?string,
+     *          type?: ?string,
+     *          createdAt?: ?string,
+     *          updatedAt?: ?string
+     *      }
      */
     public function create(array $data): CommentDto
     {
+        $data = $data['item'] ?? $data;
+        $text = $data['text'] ?? $data['data']['text'] ?? '';
+        $type = isset($data['type']) && is_string($data['type']) ? CommentTypeEnum::tryFrom($data['type']) : null;
+
         return new CommentDto(
             id: $data['id'],
-            createdAt: $this->convertToDateTime($data['createdAt']),
-            updatedAt: $this->convertToDateTime($data['updatedAt']),
-            cardId: $data['cardId'],
-            userId: $data['userId'],
-            type: CommentTypeEnum::from($data['type']),
-            dataText: $data['data']['text'],
+            createdAt: $this->convertToDateTime($data['createdAt'] ?? null),
+            updatedAt: $this->convertToDateTime($data['updatedAt'] ?? null),
+            cardId: $data['cardId'] ?? '',
+            userId: $data['userId'] ?? '',
+            type: $type,
+            dataText: $text,
+            text: $text,
+            _rawResponse: $data,
         );
     }
 }

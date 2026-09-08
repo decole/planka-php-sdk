@@ -71,6 +71,7 @@ final class BoardIncludedDtoFactory implements OutputInterface
             tasks: $this->getTasks($data),
             attachments: $this->getAttachments($data),
             projects: $this->getProjects($data),
+            _rawResponse: $data,
         );
     }
 

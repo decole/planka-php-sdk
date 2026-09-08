@@ -17,5 +17,6 @@ class LabelDto implements OutputDtoInterface
         public int $position,
         public string $name,
         public ?LabelColorEnum $color,
+        public readonly array $_rawResponse = [],
     ) {}
 }

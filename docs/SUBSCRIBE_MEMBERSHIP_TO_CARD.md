@@ -19,17 +19,17 @@ $config = new Config(
 
 $client = new PlankaClient($config);
 
-$list = $client->project->list();
+$list = $client->project()->list();
 $project = $list->items[0];
 
-$boardInfo = $client->board->get($list->included->boards[0]->id);
+$boardInfo = $client->board()->get($list->included->boards[0]->id);
 
 $userId = $boardInfo->included->users[0]->id;
 
 foreach ($boardInfo->included->cards as $item) {
     try {
         // Subscribe user on cards
-        $client->card->subscribe($item->id, $userId);
+        $client->card()->subscribe($item->id, $userId);
     } catch (\Throwable $e) {
         // Handle if user is already subscribed
     }
@@ -37,7 +37,7 @@ foreach ($boardInfo->included->cards as $item) {
 
 // Inspect memberships
 foreach ($boardInfo->included->cards as $item) {
-    $cardInfo = $client->card->get($item->id);
+    $cardInfo = $client->card()->get($item->id);
 
     var_dump([
         'cardId' => $cardInfo->id,
@@ -52,7 +52,7 @@ foreach ($boardInfo->included->cards as $item) {
 // Unsubscribe user from cards
 foreach ($boardInfo->included->cards as $item) {
     try {
-        $client->card->unsubscribe($item->id, $userId);
+        $client->card()->unsubscribe($item->id, $userId);
     } catch (\Throwable $e) {
         // Handle if user is already unsubscribed
     }

@@ -13,7 +13,7 @@ final class CustomFieldTest extends AbstractUnitTestCase
     public function testCreateBaseCustomFieldGroup(): void
     {
         $client = $this->createMockClient('CustomField/base_group_create.json');
-        $group = $client->baseCustomFieldGroup->create('1854744330170795558', 'Base Specs');
+        $group = $client->baseCustomFieldGroup()->create('1854744330170795558', 'Base Specs');
 
         $this->assertInstanceOf(BaseCustomFieldGroupDto::class, $group);
         $this->assertNotEmpty($group->id);
@@ -23,7 +23,7 @@ final class CustomFieldTest extends AbstractUnitTestCase
     public function testCreateCustomFieldInBaseGroup(): void
     {
         $client = $this->createMockClient('CustomField/custom_field_create.json');
-        $field = $client->customField->createInBaseGroup('1854744330464396840', 'Priority', showOnFrontOfCard: true);
+        $field = $client->customField()->createInBaseGroup('1854744330464396840', 'Priority', showOnFrontOfCard: true);
 
         $this->assertInstanceOf(CustomFieldDto::class, $field);
         $this->assertNotEmpty($field->id);
@@ -33,7 +33,7 @@ final class CustomFieldTest extends AbstractUnitTestCase
     public function testCreateBoardCustomFieldGroup(): void
     {
         $client = $this->createMockClient('CustomField/board_group_create.json');
-        $group = $client->customFieldGroup->createInBoard('1854744330917381674', 'Board Fields');
+        $group = $client->customFieldGroup()->createInBoard('1854744330917381674', 'Board Fields');
 
         $this->assertInstanceOf(CustomFieldGroupDto::class, $group);
         $this->assertNotEmpty($group->id);

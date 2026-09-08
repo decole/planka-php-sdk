@@ -4,19 +4,20 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Controllers;
 
+use Planka\Bridge\Actions\Common\CommonPatchAction;
 use Planka\Bridge\Actions\CustomField\CustomFieldCreateInBaseGroupAction;
 use Planka\Bridge\Actions\CustomField\CustomFieldCreateInGroupAction;
 use Planka\Bridge\Actions\CustomField\CustomFieldDeleteAction;
 use Planka\Bridge\Actions\CustomField\CustomFieldUpdateAction;
-use Planka\Bridge\Config;
-use Planka\Bridge\TransportClients\Client;
+use Planka\Bridge\Exceptions\ResponseException;
+use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\CustomField\CustomFieldDto;
+use Planka\Bridge\Views\Factory\CustomField\CustomFieldDtoFactory;
 
 final class CustomField
 {
     public function __construct(
-        private readonly Config $config,
-        private readonly Client $client,
+        private readonly TransportClientInterface $client,
     ) {}
 
     /** 'POST /api/base-custom-field-groups/:baseGroupId/custom-fields' */
@@ -44,17 +45,48 @@ final class CustomField
     /** 'PATCH /api/custom-fields/:id' */
     public function update(string $id, ?string $name = null, ?int $position = null, ?bool $showOnFrontOfCard = null): CustomFieldDto
     {
+        $data = array_filter([
+            'name' => $name,
+            'position' => $position,
+            'showOnFrontOfCard' => $showOnFrontOfCard,
+        ], fn ($v) => null !== $v);
+
         return $this->client->patch(new CustomFieldUpdateAction(
-            id: $id,
-            name: $name,
-            position: $position,
-            showOnFrontOfCard: $showOnFrontOfCard,
+            customFieldId: $id,
+            data: $data,
+        ));
+    }
+
+    /**
+     * 'PATCH /api/custom-fields/:id' - Partially updates custom field properties.
+     *
+     * @param string $id Custom field ID
+     * @param array{
+     *   name?: string,
+     *   position?: int,
+     *   showOnFrontOfCard?: bool
+     * } $map Associative array of fields to update
+     */
+    public function patching(string $id, array $map): CustomFieldDto
+    {
+        return $this->client->patch(new CommonPatchAction(
+            urlPath: "api/custom-fields/{$id}",
+            data: $map,
+            hydrateCallback: function ($response): CustomFieldDto {
+                $result = $response->toArray();
+
+                if (array_key_exists('item', $result)) {
+                    return (new CustomFieldDtoFactory())->create($result['item']);
+                }
+
+                throw new ResponseException($response->getContent());
+            },
         ));
     }
 
     /** 'DELETE /api/custom-fields/:id' */
     public function delete(string $id): CustomFieldDto
     {
-        return $this->client->delete(new CustomFieldDeleteAction(id: $id));
+        return $this->client->delete(new CustomFieldDeleteAction(customFieldId: $id));
     }
 }

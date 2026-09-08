@@ -39,16 +39,15 @@ Thank you for considering contributing to `decole/planka-php-sdk`! We welcome bu
    - If recording real Planka responses as test fixtures, place JSON files under `tests/Fixtures/`.
 
 4. **Verify Quality Standards**
-   Before submitting your PR, ensure all checks pass:
+   Before submitting your PR, run the comprehensive project verification script:
    ```bash
-   # 1. Run Unit tests
-   composer test
+   # Run all checks (Code Style dry-run, Psalm analysis, and Unit tests):
+   composer check
 
-   # 2. Run Psalm static analysis
-   ./vendor/bin/psalm --no-cache
-
-   # 3. Format code according to project style rules
-   composer fix-cs
+   # Or run individual checks:
+   composer analyse     # Static analysis via Psalm
+   composer test        # Unit tests via PHPUnit
+   composer fix-cs      # Auto-format code using php-cs-fixer
    ```
 
 5. **Commit & Push**
@@ -65,11 +64,14 @@ Thank you for considering contributing to `decole/planka-php-sdk`! We welcome bu
 
 ---
 
-## Code Style & Standards
+## Code Style & Architectural Standards
 
 - **PHP Version:** PHP ^8.1
-- **Code Style:** PSR-12 enforced via `php-cs-fixer`.
+- **Code Style:** Enforced via `php-cs-fixer`.
 - **Strict Typing:** All new PHP files must start with `declare(strict_types=1);`.
-- **Static Analysis:** Code should pass Psalm static analysis without error level 1-3 regressions.
+- **Static Analysis:** Code must pass Psalm static analysis (`composer analyse`) with zero errors.
+- **Controller Architecture:** Controllers must accept only `TransportClientInterface $client` in their constructor (do not inject `Config`).
+- **Exception Hierarchy:** All custom SDK exceptions must implement `Planka\Bridge\Exceptions\PlankaSdkExceptionInterface`.
+- **DTO Factories:** Always include a `@see Payload structure:` comment in DTO factory `create()` methods for IDE documentation.
 
 Thank you for helping make the Planka PHP SDK better!

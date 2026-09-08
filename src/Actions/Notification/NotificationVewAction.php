@@ -4,29 +4,28 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Actions\Notification;
 
-use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
-use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ActionInterface;
-use Planka\Bridge\Traits\NotificationHydrateTrait;
-use Planka\Bridge\Traits\AuthenticateTrait;
+use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
+use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
+use Planka\Bridge\Contracts\Factory\OutputInterface;
+use Planka\Bridge\Views\Factory\Notification\NotificationItemDtoFactory;
 
 final class NotificationVewAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait;
-    use NotificationHydrateTrait;
-
-    public function __construct(private readonly string $notifyId, string $token)
-    {
-        $this->setToken($token);
-    }
+    public function __construct(private readonly string $notificationId) {}
 
     public function url(): string
     {
-        return "api/notifications/{$this->notifyId}";
+        return "api/notifications/{$this->notificationId}";
     }
 
     public function getOptions(): array
     {
         return [];
+    }
+
+    public function getFactory(): OutputInterface
+    {
+        return new NotificationItemDtoFactory();
     }
 }

@@ -12,7 +12,7 @@ final class NotificationServiceTest extends AbstractUnitTestCase
     public function testCreateNotificationServiceInBoard(): void
     {
         $client = $this->createMockClient('NotificationService/notification_service_create.json');
-        $service = $client->notificationService->createInBoard(
+        $service = $client->notificationService()->createInBoard(
             boardId: '1854744330917381674',
             url: 'https://example.com/notif-test',
             format: NotificationServiceFormatEnum::TEXT,

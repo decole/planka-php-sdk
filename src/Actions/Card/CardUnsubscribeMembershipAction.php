@@ -4,24 +4,18 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Actions\Card;
 
-use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
-use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
-use Planka\Bridge\Traits\CardMembershipHydrateTrait;
 use Planka\Bridge\Contracts\Actions\ActionInterface;
-use Planka\Bridge\Traits\AuthenticateTrait;
+use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
+use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
+use Planka\Bridge\Contracts\Factory\OutputInterface;
+use Planka\Bridge\Views\Factory\Card\CardMembershipDtoFactory;
 
 final class CardUnsubscribeMembershipAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use AuthenticateTrait;
-    use CardMembershipHydrateTrait;
-
     public function __construct(
         private readonly string $cardId,
         private readonly string $userId,
-        string $token,
-    ) {
-        $this->setToken($token);
-    }
+    ) {}
 
     public function url(): string
     {
@@ -35,5 +29,10 @@ final class CardUnsubscribeMembershipAction implements ActionInterface, Authenti
                 'userId' => $this->userId,
             ],
         ];
+    }
+
+    public function getFactory(): OutputInterface
+    {
+        return new CardMembershipDtoFactory();
     }
 }

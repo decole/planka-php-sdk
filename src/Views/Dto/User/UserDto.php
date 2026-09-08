@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Planka\Bridge\Views\Dto\User;
 
 use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
+use Planka\Bridge\Enum\UserRoleEnum;
 
-class UserDto implements OutputDtoInterface
+final class UserDto implements OutputDtoInterface
 {
     public function __construct(
         public readonly string $id,
@@ -26,6 +27,27 @@ class UserDto implements OutputDtoInterface
         public bool $isUsernameLocked,
         public bool $isDeletionLocked,
         public ?string $avatarUrl,
+        public ?array $avatar = null,
+        public ?UserRoleEnum $role = null,
+        public bool $isDeactivated = false,
+        public bool $isSsoUser = false,
+        public array $lockedFieldNames = [],
         public readonly array $_rawResponse = [],
     ) {}
+
+    /** @return array<string, mixed> */
+    public function toArray(): array
+    {
+        return array_filter([
+            'email' => $this->email,
+            'name' => $this->name,
+            'username' => $this->username,
+            'phone' => $this->phone,
+            'organization' => $this->organization,
+            'language' => $this->language,
+            'subscribeToOwnCards' => $this->subscribeToOwnCards,
+            'avatarUrl' => $this->avatarUrl,
+            'role' => $this->role?->value,
+        ], fn ($v) => null !== $v);
+    }
 }

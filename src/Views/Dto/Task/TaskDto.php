@@ -1,0 +1,23 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Planka\Bridge\Views\Dto\Task;
+
+use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
+
+class TaskDto implements OutputDtoInterface
+{
+    public function __construct(
+        public readonly string $id,
+        public readonly string $taskListId,
+        public readonly ?string $linkedCardId,
+        public readonly ?string $assigneeUserId,
+        public int $position,
+        public string $name,
+        public bool $isCompleted,
+        public ?\DateTimeImmutable $createdAt = null,
+        public ?\DateTimeImmutable $updatedAt = null,
+        public readonly array $_rawResponse = [],
+    ) {}
+}

@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace Planka\Bridge;
 
-use Symfony\Contracts\HttpClient\ResponseInterface;
 use Planka\Bridge\Exceptions\AuthenticateException;
 use Planka\Bridge\Actions\Auth\AuthenticateAction;
 use Planka\Bridge\Actions\Common\GetInfoAction;
+use Planka\Bridge\Controllers\AccessToken;
 use Planka\Bridge\Controllers\BoardMembership;
 use Planka\Bridge\Controllers\CardMembership;
 use Planka\Bridge\Controllers\ProjectManager;
+use Planka\Bridge\Controllers\Terms;
 use Planka\Bridge\Exceptions\LogoutException;
 use Planka\Bridge\Actions\Auth\LogoutAction;
 use Planka\Bridge\Controllers\Notification;
 use Planka\Bridge\TransportClients\Client;
+use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Controllers\Attachment;
 use Planka\Bridge\Controllers\CardAction;
 use Planka\Bridge\Controllers\BoardList;
@@ -38,81 +40,130 @@ use Planka\Bridge\Controllers\Webhook;
  */
 final class PlankaClient
 {
-    public readonly Attachment $attachment;
+    private array $controllers = [];
 
-    public readonly BaseCustomFieldGroup $baseCustomFieldGroup;
-
-    public readonly Board $board;
-
-    public readonly BoardList $boardList;
-
-    public readonly BoardMembership $boardMembership;
-
-    public readonly Card $card;
-
-    public readonly CardAction $cardAction;
-
-    public readonly CardLabel $cardLabel;
-
-    public readonly CardTask $cardTask;
-
-    public readonly CardMembership $cardMembership;
-
-    public readonly Comment $comment;
-
-    public readonly CustomField $customField;
-
-    public readonly CustomFieldGroup $customFieldGroup;
-
-    public readonly Label $label;
-
-    public readonly Notification $notification;
-
-    public readonly NotificationService $notificationService;
-
-    public readonly Project $project;
-
-    public readonly ProjectManager $projectManager;
-
-    public readonly SystemConfig $systemConfig;
-
-    public readonly User $user;
-
-    public readonly Webhook $webhook;
-
-    private readonly Client $client;
+    private readonly TransportClientInterface $client;
 
     public function __construct(
         private readonly Config $config,
-        ?Client $client = null,
+        ?TransportClientInterface $client = null,
     ) {
-        if (null === $client) {
-            $client = new Client($this->config);
-        }
+        $this->client = $client ?? new Client($this->config);
+    }
 
-        $this->client = $client;
+    public function accessToken(): AccessToken
+    {
+        return $this->controllers['accessToken'] ??= new AccessToken($this->client);
+    }
 
-        $this->attachment = new Attachment($config, $this->client);
-        $this->baseCustomFieldGroup = new BaseCustomFieldGroup($config, $this->client);
-        $this->board = new Board($config, $this->client);
-        $this->boardList = new BoardList($config, $this->client);
-        $this->boardMembership = new BoardMembership($config, $this->client);
-        $this->card = new Card($config, $this->client);
-        $this->cardAction = new CardAction($config, $this->client);
-        $this->cardLabel = new CardLabel($config, $this->client);
-        $this->cardMembership = new CardMembership($config, $this->client);
-        $this->cardTask = new CardTask($config, $this->client);
-        $this->comment = new Comment($config, $this->client);
-        $this->customField = new CustomField($config, $this->client);
-        $this->customFieldGroup = new CustomFieldGroup($config, $this->client);
-        $this->label = new Label($config, $this->client);
-        $this->notification = new Notification($config, $this->client);
-        $this->notificationService = new NotificationService($config, $this->client);
-        $this->project = new Project($config, $this->client);
-        $this->projectManager = new ProjectManager($config, $this->client);
-        $this->systemConfig = new SystemConfig($config, $this->client);
-        $this->user = new User($config, $this->client);
-        $this->webhook = new Webhook($config, $this->client);
+    public function attachment(): Attachment
+    {
+        return $this->controllers['attachment'] ??= new Attachment($this->client);
+    }
+
+    public function baseCustomFieldGroup(): BaseCustomFieldGroup
+    {
+        return $this->controllers['baseCustomFieldGroup'] ??= new BaseCustomFieldGroup($this->client);
+    }
+
+    public function board(): Board
+    {
+        return $this->controllers['board'] ??= new Board($this->client);
+    }
+
+    public function boardList(): BoardList
+    {
+        return $this->controllers['boardList'] ??= new BoardList($this->client);
+    }
+
+    public function boardMembership(): BoardMembership
+    {
+        return $this->controllers['boardMembership'] ??= new BoardMembership($this->client);
+    }
+
+    public function card(): Card
+    {
+        return $this->controllers['card'] ??= new Card($this->client);
+    }
+
+    public function cardAction(): CardAction
+    {
+        return $this->controllers['cardAction'] ??= new CardAction($this->client);
+    }
+
+    public function cardLabel(): CardLabel
+    {
+        return $this->controllers['cardLabel'] ??= new CardLabel($this->client);
+    }
+
+    public function cardTask(): CardTask
+    {
+        return $this->controllers['cardTask'] ??= new CardTask($this->client);
+    }
+
+    public function cardMembership(): CardMembership
+    {
+        return $this->controllers['cardMembership'] ??= new CardMembership($this->client);
+    }
+
+    public function comment(): Comment
+    {
+        return $this->controllers['comment'] ??= new Comment($this->client);
+    }
+
+    public function customField(): CustomField
+    {
+        return $this->controllers['customField'] ??= new CustomField($this->client);
+    }
+
+    public function customFieldGroup(): CustomFieldGroup
+    {
+        return $this->controllers['customFieldGroup'] ??= new CustomFieldGroup($this->client);
+    }
+
+    public function label(): Label
+    {
+        return $this->controllers['label'] ??= new Label($this->client);
+    }
+
+    public function notification(): Notification
+    {
+        return $this->controllers['notification'] ??= new Notification($this->client);
+    }
+
+    public function notificationService(): NotificationService
+    {
+        return $this->controllers['notificationService'] ??= new NotificationService($this->client);
+    }
+
+    public function project(): Project
+    {
+        return $this->controllers['project'] ??= new Project($this->client);
+    }
+
+    public function projectManager(): ProjectManager
+    {
+        return $this->controllers['projectManager'] ??= new ProjectManager($this->client);
+    }
+
+    public function systemConfig(): SystemConfig
+    {
+        return $this->controllers['systemConfig'] ??= new SystemConfig($this->client);
+    }
+
+    public function terms(): Terms
+    {
+        return $this->controllers['terms'] ??= new Terms($this->client);
+    }
+
+    public function user(): User
+    {
+        return $this->controllers['user'] ??= new User($this->client);
+    }
+
+    public function webhook(): Webhook
+    {
+        return $this->controllers['webhook'] ??= new Webhook($this->client);
     }
 
     /**
@@ -152,7 +203,7 @@ final class PlankaClient
     }
 
     /** 'GET /' - for ping Planka */
-    public function getInfo(): ResponseInterface
+    public function getInfo(): Views\Dto\Common\ServerInfoDto
     {
         return $this->client->get(new GetInfoAction());
     }

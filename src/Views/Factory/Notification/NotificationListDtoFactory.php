@@ -24,6 +24,7 @@ final class NotificationListDtoFactory implements OutputInterface
         return new NotificationListDto(
             items: $this->getItems($data),
             included: $this->getIncluded($data),
+            _rawResponse: $data,
         );
     }
 

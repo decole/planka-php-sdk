@@ -13,7 +13,7 @@ final class BoardListTest extends AbstractUnitTestCase
     public function testCreateList(): void
     {
         $client = $this->createMockClient('BoardList/list_create.json');
-        $list = $client->boardList->create('1854744330917381674', 'To Do', 1);
+        $list = $client->boardList()->create('185474430917381674', 'To Do', 1);
 
         $this->assertInstanceOf(BoardListDto::class, $list);
         $this->assertNotEmpty($list->id);

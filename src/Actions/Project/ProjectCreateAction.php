@@ -5,32 +5,19 @@ declare(strict_types=1);
 namespace Planka\Bridge\Actions\Project;
 
 use Planka\Bridge\Contracts\Actions\ActionInterface;
+use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
+use Planka\Bridge\Contracts\Factory\OutputInterface;
 use Planka\Bridge\Enum\ProjectTypeEnum;
-use Planka\Bridge\Traits\ProjectHydrateTrait;
+use Planka\Bridge\Views\Factory\Project\ProjectDtoFactory;
 
-final class ProjectCreateAction implements ActionInterface, ResponseResultInterface
+final class ProjectCreateAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use ProjectHydrateTrait;
-
-    private array $options = [];
-
     public function __construct(
-        string $name,
-        ProjectTypeEnum $type = ProjectTypeEnum::PRIVATE,
-        ?string $description = null,
-    ) {
-        $body = [
-            'type' => $type->value,
-            'name' => $name,
-        ];
-
-        if (null !== $description) {
-            $body['description'] = $description;
-        }
-
-        $this->options['json'] = $body;
-    }
+        private readonly string $name,
+        private readonly ProjectTypeEnum $type = ProjectTypeEnum::PRIVATE,
+        private readonly ?string $description = null,
+    ) {}
 
     public function url(): string
     {
@@ -39,6 +26,22 @@ final class ProjectCreateAction implements ActionInterface, ResponseResultInterf
 
     public function getOptions(): array
     {
-        return $this->options;
+        $body = [
+            'name' => $this->name,
+            'type' => $this->type->value,
+        ];
+
+        if (null !== $this->description) {
+            $body['description'] = $this->description;
+        }
+
+        return [
+            'json' => $body,
+        ];
+    }
+
+    public function getFactory(): OutputInterface
+    {
+        return new ProjectDtoFactory();
     }
 }

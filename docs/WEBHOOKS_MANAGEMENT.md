@@ -20,7 +20,7 @@ $config = new Config(
 
 $client = new PlankaClient($config);
 
-$webhooks = $client->webhook->list();
+$webhooks = $client->webhook()->list();
 
 foreach ($webhooks as $webhook) {
     echo "Webhook: {$webhook->name} -> {$webhook->url}\n";
@@ -32,7 +32,7 @@ foreach ($webhooks as $webhook) {
 ## 2. Create Webhook
 
 ```php
-$webhook = $client->webhook->create(
+$webhook = $client->webhook()->create(
     name: 'Automation Webhook',
     url: 'https://example.com/webhook-receiver',
     accessToken: 'secret_token_123',
@@ -48,7 +48,7 @@ echo "Created Webhook ID: {$webhook->id}\n";
 ## 3. Update Webhook
 
 ```php
-$updatedWebhook = $client->webhook->update(
+$updatedWebhook = $client->webhook()->update(
     webhookId: $webhook->id,
     name: 'Updated Webhook Name',
     url: 'https://example.com/new-receiver'
@@ -60,5 +60,5 @@ $updatedWebhook = $client->webhook->update(
 ## 4. Delete Webhook
 
 ```php
-$deletedWebhook = $client->webhook->delete(webhookId: $webhook->id);
+$deletedWebhook = $client->webhook()->delete(webhookId: $webhook->id);
 ```

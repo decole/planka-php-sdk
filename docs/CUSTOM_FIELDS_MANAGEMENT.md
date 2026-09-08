@@ -21,13 +21,13 @@ $config = new Config(
 $client = new PlankaClient($config);
 
 // Create base custom field group in project
-$baseGroup = $client->baseCustomFieldGroup->create(
+$baseGroup = $client->baseCustomFieldGroup()->create(
     projectId: '1357158568008091264',
     name: 'Standard Specifications'
 );
 
 // Add custom field to base group
-$customField = $client->customField->createInBaseGroup(
+$customField = $client->customField()->createInBaseGroup(
     baseGroupId: $baseGroup->id,
     name: 'Priority',
     showOnFrontOfCard: true
@@ -40,13 +40,13 @@ $customField = $client->customField->createInBaseGroup(
 
 ```php
 // Create custom field group on a board
-$boardGroup = $client->customFieldGroup->createInBoard(
+$boardGroup = $client->customFieldGroup()->createInBoard(
     boardId: '1357158568008091265',
     name: 'Board Properties'
 );
 
 // Add custom field into board group
-$field = $client->customField->createInGroup(
+$field = $client->customField()->createInGroup(
     groupId: $boardGroup->id,
     name: 'Estimated Hours',
     showOnFrontOfCard: false
@@ -59,7 +59,7 @@ $field = $client->customField->createInGroup(
 
 ```php
 // Update field
-$updated = $client->customField->update(
+$updated = $client->customField()->update(
     id: $field->id,
     name: 'Estimated Time (Hours)',
     position: 65536,
@@ -67,5 +67,5 @@ $updated = $client->customField->update(
 );
 
 // Delete field
-$client->customField->delete(id: $field->id);
+$client->customField()->delete(id: $field->id);
 ```

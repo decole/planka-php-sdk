@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Planka\Bridge\Actions\Webhook;
 
 use Planka\Bridge\Contracts\Actions\ActionInterface;
+use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
-use Planka\Bridge\Views\Dto\Webhook\WebhookDto;
+use Planka\Bridge\Contracts\Factory\OutputInterface;
+use Planka\Bridge\Views\Factory\ItemDtoListFactory;
 use Planka\Bridge\Views\Factory\Webhook\WebhookDtoFactory;
-use Symfony\Contracts\HttpClient\ResponseInterface;
 
-final class WebhookListAction implements ActionInterface, ResponseResultInterface
+final class WebhookListAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
     public function url(): string
     {
@@ -22,17 +23,8 @@ final class WebhookListAction implements ActionInterface, ResponseResultInterfac
         return [];
     }
 
-    /**
-     * @return list<WebhookDto>
-     */
-    public function hydrate(ResponseInterface $response): array
+    public function getFactory(): OutputInterface
     {
-        $result = $response->toArray();
-        $factory = new WebhookDtoFactory();
-
-        return array_map(
-            static fn (array $item): WebhookDto => $factory->create($item),
-            $result['items'] ?? [],
-        );
+        return new ItemDtoListFactory(new WebhookDtoFactory());
     }
 }

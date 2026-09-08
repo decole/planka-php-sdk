@@ -14,18 +14,23 @@ final class NotificationServiceDtoFactory implements OutputInterface
     use DateConverterTrait;
 
     /**
-     * @param array{
-     *     id: string,
-     *     userId?: ?string,
-     *     boardId?: ?string,
-     *     url: string,
-     *     format: string,
-     *     createdAt?: ?string,
-     *     updatedAt?: ?string
-     * } $data
+     * @param array<string, mixed> $data
+     *
+     * @see Payload structure:
+     *      array{
+     *          id: string,
+     *          userId?: ?string,
+     *          boardId?: ?string,
+     *          url: string,
+     *          format: string,
+     *          createdAt?: ?string,
+     *          updatedAt?: ?string
+     *      }
      */
     public function create(array $data): NotificationServiceDto
     {
+        $data = $data['item'] ?? $data;
+
         return new NotificationServiceDto(
             id: $data['id'],
             userId: $data['userId'] ?? null,
@@ -34,6 +39,7 @@ final class NotificationServiceDtoFactory implements OutputInterface
             format: NotificationServiceFormatEnum::from($data['format']),
             createdAt: $this->convertToDateTime($data['createdAt'] ?? null),
             updatedAt: $this->convertToDateTime($data['updatedAt'] ?? null),
+            _rawResponse: $data,
         );
     }
 }

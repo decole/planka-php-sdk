@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Planka\Bridge\Actions\CardTask;
 
 use Planka\Bridge\Contracts\Actions\ActionInterface;
+use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
-use Planka\Bridge\Traits\CardTaskHydrateTrait;
+use Planka\Bridge\Contracts\Factory\OutputInterface;
+use Planka\Bridge\Views\Factory\Card\CardTaskDtoFactory;
 
-final class CardTaskDeleteAction implements ActionInterface, ResponseResultInterface
+final class CardTaskDeleteAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
-    use CardTaskHydrateTrait;
-
     public function __construct(private readonly string $taskId) {}
 
     public function url(): string
@@ -22,5 +22,10 @@ final class CardTaskDeleteAction implements ActionInterface, ResponseResultInter
     public function getOptions(): array
     {
         return [];
+    }
+
+    public function getFactory(): OutputInterface
+    {
+        return new CardTaskDtoFactory();
     }
 }
