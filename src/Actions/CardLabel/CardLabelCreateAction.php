@@ -19,7 +19,7 @@ final class CardLabelCreateAction implements ActionInterface, AuthenticateInterf
 
     public function url(): string
     {
-        return "api/cards/{$this->cardId}/labels";
+        return "api/cards/{$this->cardId}/card-labels";
     }
 
     public function getOptions(): array

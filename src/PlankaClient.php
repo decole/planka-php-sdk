@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Planka\Bridge;
 
+use Planka\Bridge\Actions\Auth\AcceptTermsAction;
 use Planka\Bridge\Actions\Auth\AuthenticateAction;
 use Planka\Bridge\Actions\Auth\LogoutAction;
 use Planka\Bridge\Actions\Auth\VerifyTotpAction;
-use Planka\Bridge\Actions\Auth\AcceptTermsAction;
+use Planka\Bridge\Actions\Common\GetBootstrapAction;
 use Planka\Bridge\Actions\Common\GetInfoAction;
 use Planka\Bridge\Contracts\Actions\ActionInterface;
 use Planka\Bridge\Controllers\AccessToken;
@@ -296,5 +297,11 @@ final class PlankaClient
     public function getInfo(): Views\Dto\Common\ServerInfoDto
     {
         return $this->client->get(new GetInfoAction());
+    }
+
+    /** 'GET /api/bootstrap' */
+    public function getBootstrap(): Views\Dto\Common\BootstrapDto
+    {
+        return $this->client->get(new GetBootstrapAction());
     }
 }

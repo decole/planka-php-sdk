@@ -17,20 +17,20 @@ final class SystemConfig
 {
     public function __construct(private readonly TransportClientInterface $client) {}
 
-    /** 'GET /api/system-settings' */
+    /** 'GET /api/config' */
     public function get(): SystemConfigDto
     {
         return $this->client->get(new SystemConfigGetAction());
     }
 
-    /** 'PATCH /api/system-settings' */
+    /** 'PATCH /api/config' */
     public function update(array $configData): SystemConfigDto
     {
         return $this->client->patch(new SystemConfigUpdateAction($configData));
     }
 
     /**
-     * 'PATCH /api/system-settings' - Partially updates system config properties.
+     * 'PATCH /api/config' - Partially updates system config properties.
      *
      * @param array{
      *   smtpHost?: string|null,
@@ -46,13 +46,13 @@ final class SystemConfig
     public function patching(array $map): SystemConfigDto
     {
         return $this->client->patch(new CommonPatchAction(
-            urlPath: 'api/system-settings',
+            urlPath: 'api/config',
             data: $map,
             hydrateCallback: new SystemConfigDtoFactory(),
         ));
     }
 
-    /** 'POST /api/system-settings/test-smtp' */
+    /** 'POST /api/config/test-smtp' */
     public function testSmtp(string $toEmail, ?array $smtpSettings = null): TestResultDto
     {
         return $this->client->post(new SystemConfigTestSmtpAction(toEmail: $toEmail, smtpSettings: $smtpSettings));

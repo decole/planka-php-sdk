@@ -41,16 +41,16 @@ final class AttachmentDtoFactory implements OutputInterface
 
         return new AttachmentDto(
             id: $data['id'],
-            name: $data['name'],
-            cardId: $data['cardId'],
+            name: $data['name'] ?? '',
+            cardId: $data['cardId'] ?? '',
             url: $data['url'] ?? null,
             creatorUserId: $data['creatorUserId'] ?? null,
-            createdAt: $this->convertToDateTime($data['createdAt']),
-            updatedAt: $this->convertToDateTime($data['updatedAt']),
+            createdAt: $this->convertToDateTime($data['createdAt'] ?? null),
+            updatedAt: $this->convertToDateTime($data['updatedAt'] ?? null),
             coverUrl: $data['coverUrl'] ?? null,
             image: (new ImageDtoFactory())->create($data['image'] ?? null),
-            type: $data['type'] ?? null,
-            data: $data['data'] ?? [],
+            type: $data['type'] ?? 'file',
+            data: is_array($data['data'] ?? null) ? $data['data'] : [],
             _rawResponse: $data,
         );
     }

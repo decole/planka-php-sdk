@@ -126,8 +126,8 @@ $config = new Config(
 
 $client = new PlankaClient($config);
 
-// 2. Ping Server & Terms
-dump('[1/13] Pinging Planka server and fetching Terms...');
+// 2. Ping Server, Bootstrap & Terms
+dump('[1/13] Pinging Planka server and fetching Bootstrap & Terms...');
 $infoResponse = $client->getInfo();
 
 if (200 !== $infoResponse->getStatusCode()) {
@@ -135,6 +135,14 @@ if (200 !== $infoResponse->getStatusCode()) {
 }
 
 dump('Server connection OK');
+
+try {
+    $bootstrap = $client->getBootstrap();
+    dump('Bootstrap fetch OK');
+    assertRawResponseMappedToDto($bootstrap, 'BootstrapDto');
+} catch (Throwable $e) {
+    dump('Bootstrap fetch note: ' . $e->getMessage());
+}
 
 try {
     $terms = $client->terms()->get();

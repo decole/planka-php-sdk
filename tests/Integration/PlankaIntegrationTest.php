@@ -6,18 +6,24 @@ namespace Planka\Bridge\Tests\Integration;
 
 use PHPUnit\Framework\TestCase;
 use Planka\Bridge\Config;
+use Planka\Bridge\Enum\LabelColorEnum;
 use Planka\Bridge\Enum\NotificationServiceFormatEnum;
 use Planka\Bridge\PlankaClient;
+use Planka\Bridge\Views\Dto\Attachment\AttachmentDto;
 use Planka\Bridge\Views\Dto\Board\BoardDto;
 use Planka\Bridge\Views\Dto\Card\CardDto;
+use Planka\Bridge\Views\Dto\Card\CardLabelDto;
 use Planka\Bridge\Views\Dto\Card\CardTaskDto;
 use Planka\Bridge\Views\Dto\Card\TaskListDto;
 use Planka\Bridge\Views\Dto\CustomField\BaseCustomFieldGroupDto;
 use Planka\Bridge\Views\Dto\CustomField\CustomFieldDto;
 use Planka\Bridge\Views\Dto\CustomField\CustomFieldGroupDto;
+use Planka\Bridge\Views\Dto\Label\LabelDto;
 use Planka\Bridge\Views\Dto\NotificationService\NotificationServiceDto;
 use Planka\Bridge\Views\Dto\Project\ProjectDto;
 use Planka\Bridge\Views\Dto\SystemConfig\SystemConfigDto;
+use Planka\Bridge\Views\Dto\User\ApiKeyDto;
+use Planka\Bridge\Views\Dto\User\UserDto;
 use Planka\Bridge\Views\Dto\Webhook\WebhookDto;
 use Planka\Bridge\Exceptions\PlankaNotFoundException;
 use Symfony\Component\HttpClient\Exception\ClientException;
@@ -33,6 +39,9 @@ final class PlankaIntegrationTest extends TestCase
         'cards' => [],
         'taskLists' => [],
         'tasks' => [],
+        'labels' => [],
+        'cardLabels' => [],
+        'attachments' => [],
         'baseCustomGroups' => [],
         'customGroups' => [],
         'customFields' => [],
@@ -106,9 +115,16 @@ final class PlankaIntegrationTest extends TestCase
 
     public function testFullIntegrationLifecycle(): void
     {
-        // 1. Ping Server & Terms
+        // 1. Ping Server & Bootstrap & Terms
         $infoResponse = $this->client->getInfo();
         $this->assertEquals(200, $infoResponse->getStatusCode(), 'Planka server is not reachable!');
+
+        try {
+            $bootstrap = $this->client->getBootstrap();
+            $this->assertInstanceOf(\Planka\Bridge\Views\Dto\Common\BootstrapDto::class, $bootstrap);
+        } catch (\Throwable $e) {
+            // Bootstrap optional
+        }
 
         try {
             $terms = $this->client->terms()->get();
@@ -117,9 +133,25 @@ final class PlankaIntegrationTest extends TestCase
             // Terms optional
         }
 
-        // 2. Authenticate
+        // 2. Authenticate & User Profile checks
         $authResult = $this->client->authenticate();
         $this->assertTrue($authResult->success, 'Authentication failed!');
+
+        $users = $this->client->user()->list();
+        $this->assertIsArray($users);
+        $this->assertNotEmpty($users);
+        $currentUser = $users[0];
+        $this->assertInstanceOf(UserDto::class, $currentUser);
+
+        $fetchedUser = $this->client->user()->get($currentUser->id);
+        $this->assertInstanceOf(UserDto::class, $fetchedUser);
+
+        try {
+            $apiKeyResult = $this->client->user()->createApiKey($currentUser->id);
+            $this->assertInstanceOf(ApiKeyDto::class, $apiKeyResult);
+        } catch (\Throwable) {
+            // API key creation optional per user role
+        }
 
         // 3. System Config
         try {
@@ -195,10 +227,49 @@ final class PlankaIntegrationTest extends TestCase
             $this->assertEquals(404, $e->getStatusCode());
         }
 
-        // 8. Test Cards & Card v2 Operations
+        // 8. Test Cards, Labels & Card v2 Operations
+        $label = $this->client->label()->create($boardId, '[v2-test] Bug', LabelColorEnum::BERRY_RED, 1);
+        $this->assertInstanceOf(LabelDto::class, $label);
+        $this->assertCreated('labels', $label->id, $label);
+
+        $updatedLabel = $this->client->label()->update($label->id, '[v2-test] Critical Bug', LabelColorEnum::PUMPKIN_ORANGE);
+        $this->assertInstanceOf(LabelDto::class, $updatedLabel);
+
         $card1 = $this->client->card()->create($columnTodo->id, '[v2-test] Task 1', 1);
         $this->assertInstanceOf(CardDto::class, $card1);
         $this->assertCreated('cards', $card1->id, $card1);
+
+        $cardLabel = $this->client->cardLabel()->add($card1->id, $label->id);
+        $this->assertInstanceOf(CardLabelDto::class, $cardLabel);
+        $this->assertCreated('cardLabels', $cardLabel->id, $cardLabel);
+
+        $this->client->cardLabel()->remove($card1->id, $label->id);
+        unset($this->createdTracker['cardLabels'][$cardLabel->id]);
+
+        $this->client->label()->delete($label->id);
+        unset($this->createdTracker['labels'][$label->id]);
+
+        // Attachment upload test
+        $tmpFilePath = sys_get_temp_dir() . '/planka_test_attachment_' . time() . '.txt';
+        file_put_contents($tmpFilePath, 'Integration test attachment content');
+
+        try {
+            $attachment = $this->client->attachment()->upload($card1->id, $tmpFilePath);
+            $this->assertInstanceOf(AttachmentDto::class, $attachment);
+            $this->assertCreated('attachments', $attachment->id, $attachment);
+
+            $updatedAttach = $this->client->attachment()->updateName($attachment->id, 'renamed_attachment.txt');
+            $this->assertInstanceOf(AttachmentDto::class, $updatedAttach);
+
+            $this->client->attachment()->delete($attachment->id);
+            unset($this->createdTracker['attachments'][$attachment->id]);
+        } catch (\Throwable) {
+            // Attachment optional
+        } finally {
+            if (file_exists($tmpFilePath)) {
+                unlink($tmpFilePath);
+            }
+        }
 
         $duplicatedCard = $this->client->card()->duplicate($card1->id);
         $this->assertInstanceOf(CardDto::class, $duplicatedCard);

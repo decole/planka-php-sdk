@@ -29,7 +29,7 @@ final class SystemConfigTestSmtpAction implements ActionInterface, AuthenticateI
 
     public function url(): string
     {
-        return 'api/system-settings/test-smtp';
+        return 'api/config/test-smtp';
     }
 
     public function getOptions(): array
