@@ -251,6 +251,7 @@ All Planka API endpoints are accessible via explicit getter methods on `PlankaCl
 
 ## Documentation & Examples
 
+- [Two-Factor Authentication (2FA / TOTP) & Trusted Devices](docs/TWO_FACTOR_AUTHENTICATION.md)
 - [API Key Authentication](docs/API_KEY_AUTHENTICATION.md)
 - [Partial Updates with Patch Input DTOs](docs/PATCH_INPUTS.md)
 - [Webhooks Management](docs/WEBHOOKS_MANAGEMENT.md)
