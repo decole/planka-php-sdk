@@ -85,6 +85,11 @@ final class UserDtoFactory implements OutputInterface
             role: $roleEnum,
             isDeactivated: (bool) ($item['isDeactivated'] ?? false),
             isSsoUser: (bool) ($item['isSsoUser'] ?? false),
+            isDefaultAdmin: (bool) ($item['isDefaultAdmin'] ?? false),
+            apiKeyPrefix: isset($item['apiKeyPrefix']) && is_string($item['apiKeyPrefix']) ? $item['apiKeyPrefix'] : null,
+            isTotpEnabled: (bool) ($item['isTotpEnabled'] ?? false),
+            totpEnabledAt: $this->convertToDateTime($item['totpEnabledAt'] ?? null),
+            totpRecoveryCodesRemaining: isset($item['totpRecoveryCodesRemaining']) ? (int) $item['totpRecoveryCodesRemaining'] : null,
             lockedFieldNames: (array) ($item['lockedFieldNames'] ?? []),
             _rawResponse: $data,
         );

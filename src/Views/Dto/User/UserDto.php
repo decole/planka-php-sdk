@@ -31,6 +31,11 @@ final class UserDto implements OutputDtoInterface
         public ?UserRoleEnum $role = null,
         public bool $isDeactivated = false,
         public bool $isSsoUser = false,
+        public bool $isDefaultAdmin = false,
+        public ?string $apiKeyPrefix = null,
+        public bool $isTotpEnabled = false,
+        public ?\DateTimeImmutable $totpEnabledAt = null,
+        public ?int $totpRecoveryCodesRemaining = null,
         public array $lockedFieldNames = [],
         /** @var array<string, mixed> Diagnostic raw response array from Planka API to verify DTO field hydration. */
         public readonly array $_rawResponse = [],
