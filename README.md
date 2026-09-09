@@ -5,6 +5,7 @@ An easy-to-use PHP SDK for accessing Planka's REST API.
 > ⚠️ **Version Notice & Compatibility:**
 > - **Planka v1 Support:** Support for Planka v1 is discontinued in the main branch. The SDK for Planka v1 is maintained as-is in the `v1` branch (SDK v1.x).
 > - **Planka v2 Support:** SDK 2.x is designed and optimized for **Planka v2**. Tested on **Planka Community v2.2.1**.
+> - **TOTP & OIDC / SSO Notice:** Two-Factor Authentication (TOTP) and OpenID Connect (OIDC / SSO) features are implemented according to Planka v2 OpenAPI specification, but have not been fully verified in automated live integration test suites. If you encounter any bugs or unexpected behavior with TOTP or OIDC, please **open an Issue on GitHub** with a detailed description, error logs, and reproduction steps.
 
 ---
 
@@ -285,7 +286,13 @@ vendor/bin/phpunit --testsuite=Unit
 
 ### Integration Tests (Live Server Verification)
 
-Integration tests perform full real-world SDK verification against a live Planka v2 instance (creating, updating, and safely cleaning up projects, boards, cards, task lists, custom fields, webhooks, and notification services).
+Integration tests perform real-world SDK verification against a live Planka v2 instance. To verify SDK health on your own Planka server, you can use two complementary testing methods:
+
+1. **PHPUnit Integration Test Suite (`composer test-integration`)**:
+   Runs [`tests/Integration/PlankaIntegrationTest.php`](tests/Integration/PlankaIntegrationTest.php), performing a safe end-to-end lifecycle test (creating, updating, inspecting, and deleting projects, boards, columns, cards, task lists, labels, attachments, custom fields, webhooks, and notification services) with strict safety tracking guards.
+
+2. **Standalone Test Script (`php tests/index.php`)**:
+   Runs [`tests/index.php`](tests/index.php), a standalone CLI script that executes end-to-end operations and dumps formatted DTO structures and `_rawResponse` payloads directly to the terminal for debugging.
 
 **Setup:**
 1. Copy the example configuration file:
@@ -304,8 +311,8 @@ Integration tests perform full real-world SDK verification against a live Planka
 3. Run the integration test suite:
    ```bash
    composer test-integration
-   # Or directly via PHPUnit:
-   vendor/bin/phpunit --testsuite=Integration
+   # Or run the standalone CLI test script:
+   php tests/index.php
    ```
 
 ### Code Quality & Static Analysis
@@ -320,6 +327,12 @@ Or individual checks:
 composer analyse    # Runs Psalm static analysis
 composer fix-cs     # Formats code style
 ```
+
+---
+
+## Acknowledgements & Community Contributions
+
+This SDK v2 release incorporates valuable improvements, endpoint refinements, and architectural ideas inspired by the community fork [`steglasaurous/planka-php-sdk`](https://github.com/steglasaurous/planka-php-sdk) (such as TOTP 2FA flow structures, OpenAPI `/api/config` alignment, and extended user profile properties).
 
 ---
 

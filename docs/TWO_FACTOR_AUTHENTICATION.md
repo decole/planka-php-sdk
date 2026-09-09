@@ -1,5 +1,9 @@
 # Two-Factor Authentication (2FA / TOTP) & Trusted Devices (Planka v2)
 
+> ⚠️ **Notice on Testing & Support:**
+> Two-Factor Authentication (TOTP) and OIDC/SSO endpoints are implemented according to the Planka v2 OpenAPI specification, but have not been fully verified in automated live integration test suites.
+> If you encounter any issues or bugs when using TOTP or OIDC authentication, please **open an Issue on GitHub** with a detailed description, error message, and reproduction steps.
+
 Planka v2 supports Two-Factor Authentication (TOTP) via authenticator apps (e.g., Google Authenticator, 1Password) and Trusted Device management.
 
 ---
