@@ -15,9 +15,7 @@ use Planka\Bridge\Views\Factory\CustomField\BaseCustomFieldGroupDtoFactory;
 
 final class BaseCustomFieldGroup
 {
-    public function __construct(
-        private readonly TransportClientInterface $client,
-    ) {}
+    public function __construct(private readonly TransportClientInterface $client) {}
 
     /** 'POST /api/projects/:projectId/base-custom-field-groups' */
     public function create(string $projectId, string $name): BaseCustomFieldGroupDto

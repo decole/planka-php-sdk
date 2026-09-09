@@ -27,6 +27,6 @@ final class ProjectPatchInput implements PatchInputInterface
             'backgroundGradient' => $this->backgroundGradient instanceof BackgroundGradientEnum ? $this->backgroundGradient->value : $this->backgroundGradient,
             'backgroundImageId' => $this->backgroundImageId,
             'isHidden' => $this->isHidden,
-        ], fn ($v) => null !== $v);
+        ], static fn ($v) => null !== $v);
     }
 }

@@ -33,9 +33,7 @@ use Planka\Bridge\Views\Factory\User\UserDtoFactory;
 
 final class User
 {
-    public function __construct(
-        private readonly TransportClientInterface $client,
-    ) {}
+    public function __construct(private readonly TransportClientInterface $client) {}
 
     /**
      * 'GET /api/users'.
@@ -52,8 +50,8 @@ final class User
     {
         return $this->client->post(new UserCreateAction(
             email: $email,
-            name: $name,
             password: $password,
+            name: $name,
             username: $username,
         ));
     }
@@ -151,19 +149,25 @@ final class User
     /** 'POST /api/users/:id/totp/enable' */
     public function enableTotp(string $userId, string $currentPassword, string $code): UserDto
     {
-        return $this->client->post(new UserTotpEnableAction(userId: $userId, currentPassword: $currentPassword, code: $code));
+        return $this->client->post(
+            new UserTotpEnableAction(userId: $userId, currentPassword: $currentPassword, code: $code),
+        );
     }
 
     /** 'DELETE /api/users/:id/totp' */
     public function disableTotp(string $userId, ?string $currentPassword = null, ?string $code = null): UserDto
     {
-        return $this->client->delete(new UserTotpDisableAction(userId: $userId, currentPassword: $currentPassword, code: $code));
+        return $this->client->delete(
+            new UserTotpDisableAction(userId: $userId, currentPassword: $currentPassword, code: $code),
+        );
     }
 
     /** 'POST /api/users/:id/totp/recovery-codes' */
     public function regenerateTotpRecoveryCodes(string $userId, string $currentPassword, string $code): mixed
     {
-        return $this->client->post(new UserTotpRecoveryCodesAction(userId: $userId, currentPassword: $currentPassword, code: $code));
+        return $this->client->post(
+            new UserTotpRecoveryCodesAction(userId: $userId, currentPassword: $currentPassword, code: $code),
+        );
     }
 
     /**

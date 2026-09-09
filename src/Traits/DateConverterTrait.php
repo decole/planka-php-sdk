@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Traits;
 
+use Planka\Bridge\Config;
+
 trait DateConverterTrait
 {
     final public function convertToDateTime(?string $date): ?\DateTimeImmutable
@@ -12,6 +14,6 @@ trait DateConverterTrait
             return null;
         }
 
-        return \DateTimeImmutable::createFromFormat(\DateTimeInterface::RFC3339_EXTENDED, $date);
+        return \DateTimeImmutable::createFromFormat(Config::DATE_FORMAT, $date);
     }
 }

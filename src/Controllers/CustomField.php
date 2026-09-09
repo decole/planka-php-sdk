@@ -16,9 +16,7 @@ use Planka\Bridge\Views\Factory\CustomField\CustomFieldDtoFactory;
 
 final class CustomField
 {
-    public function __construct(
-        private readonly TransportClientInterface $client,
-    ) {}
+    public function __construct(private readonly TransportClientInterface $client) {}
 
     /** 'POST /api/base-custom-field-groups/:baseGroupId/custom-fields' */
     public function createInBaseGroup(string $baseGroupId, string $name, int $position = 65536, ?bool $showOnFrontOfCard = null): CustomFieldDto
@@ -49,7 +47,7 @@ final class CustomField
             'name' => $name,
             'position' => $position,
             'showOnFrontOfCard' => $showOnFrontOfCard,
-        ], fn ($v) => null !== $v);
+        ], static fn ($v) => null !== $v);
 
         return $this->client->patch(new CustomFieldUpdateAction(
             customFieldId: $id,

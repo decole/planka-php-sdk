@@ -18,9 +18,7 @@ use Planka\Bridge\Views\Factory\Board\BoardDtoFactory;
 
 final class Board
 {
-    public function __construct(
-        private readonly TransportClientInterface $client,
-    ) {}
+    public function __construct(private readonly TransportClientInterface $client) {}
 
     /** 'POST /api/projects/:projectId/boards' */
     public function create(string $projectId, string $name, int $position): BoardDto

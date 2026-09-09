@@ -15,6 +15,7 @@ use Planka\Bridge\Exceptions\PlankaServerException;
 use Planka\Bridge\Exceptions\PlankaValidationException;
 use Planka\Bridge\Exceptions\ResponseException;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -29,6 +30,14 @@ final class Client implements TransportClientInterface
         $this->client = $client ?? HttpClient::create();
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ResponseException
+     * @throws PlankaNotFoundException
+     * @throws PlankaValidationException
+     * @throws PlankaAccessDeniedException
+     * @throws PlankaServerException
+     */
     public function get(ActionInterface $action): mixed
     {
         $response = $this->client->request(
@@ -40,6 +49,14 @@ final class Client implements TransportClientInterface
         return $this->getResult($action, $response);
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ResponseException
+     * @throws PlankaNotFoundException
+     * @throws PlankaValidationException
+     * @throws PlankaAccessDeniedException
+     * @throws PlankaServerException
+     */
     public function post(ActionInterface $action): mixed
     {
         $response = $this->client->request(
@@ -51,6 +68,14 @@ final class Client implements TransportClientInterface
         return $this->getResult($action, $response);
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ResponseException
+     * @throws PlankaNotFoundException
+     * @throws PlankaValidationException
+     * @throws PlankaAccessDeniedException
+     * @throws PlankaServerException
+     */
     public function patch(ActionInterface $action): mixed
     {
         $response = $this->client->request(
@@ -62,6 +87,14 @@ final class Client implements TransportClientInterface
         return $this->getResult($action, $response);
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ResponseException
+     * @throws PlankaNotFoundException
+     * @throws PlankaValidationException
+     * @throws PlankaAccessDeniedException
+     * @throws PlankaServerException
+     */
     public function delete(ActionInterface $action): mixed
     {
         $response = $this->client->request(
@@ -88,6 +121,14 @@ final class Client implements TransportClientInterface
         return $base . '/' . ltrim($path, '/');
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ResponseException
+     * @throws PlankaNotFoundException
+     * @throws PlankaAccessDeniedException
+     * @throws PlankaServerException
+     * @throws PlankaValidationException
+     */
     private function getResult(ActionInterface $action, ResponseInterface $response): mixed
     {
         $this->checkResponseStatusCode($response);
@@ -118,6 +159,14 @@ final class Client implements TransportClientInterface
         return $response;
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ResponseException
+     * @throws PlankaNotFoundException
+     * @throws PlankaAccessDeniedException
+     * @throws PlankaServerException
+     * @throws PlankaValidationException
+     */
     private function checkResponseStatusCode(ResponseInterface $response): void
     {
         $statusCode = $response->getStatusCode();

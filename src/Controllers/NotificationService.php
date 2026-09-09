@@ -18,13 +18,14 @@ use Planka\Bridge\Views\Factory\NotificationService\NotificationServiceDtoFactor
 
 final class NotificationService
 {
-    public function __construct(
-        private readonly TransportClientInterface $client,
-    ) {}
+    public function __construct(private readonly TransportClientInterface $client) {}
 
     /** 'POST /api/boards/:boardId/notification-services' */
-    public function createInBoard(string $boardId, string $url, NotificationServiceFormatEnum $format): NotificationServiceDto
-    {
+    public function createInBoard(
+        string $boardId,
+        string $url,
+        NotificationServiceFormatEnum $format,
+    ): NotificationServiceDto {
         return $this->client->post(new NotificationServiceCreateInBoardAction(
             boardId: $boardId,
             url: $url,
@@ -33,8 +34,11 @@ final class NotificationService
     }
 
     /** 'POST /api/users/:userId/notification-services' */
-    public function createInUser(string $userId, string $url, NotificationServiceFormatEnum $format): NotificationServiceDto
-    {
+    public function createInUser(
+        string $userId,
+        string $url,
+        NotificationServiceFormatEnum $format,
+    ): NotificationServiceDto {
         return $this->client->post(new NotificationServiceCreateInUserAction(
             userId: $userId,
             url: $url,
@@ -43,8 +47,11 @@ final class NotificationService
     }
 
     /** 'PATCH /api/notification-services/:id' */
-    public function update(string $id, ?string $url = null, ?NotificationServiceFormatEnum $format = null): NotificationServiceDto
-    {
+    public function update(
+        string $id,
+        ?string $url = null,
+        ?NotificationServiceFormatEnum $format = null,
+    ): NotificationServiceDto {
         $data = [];
 
         if (null !== $url) {

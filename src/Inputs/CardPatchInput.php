@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Inputs;
 
+use Planka\Bridge\Config;
 use Planka\Bridge\Enum\BoardDefaultCardTypeEnum;
 
 final class CardPatchInput implements PatchInputInterface
@@ -23,7 +24,7 @@ final class CardPatchInput implements PatchInputInterface
     public function toArray(): array
     {
         $dueDateStr = $this->dueDate instanceof \DateTimeInterface
-            ? $this->dueDate->format('Y-m-d\TH:i:s.v\Z')
+            ? $this->dueDate->format(Config::DATE_FORMAT)
             : $this->dueDate;
 
         $typeVal = $this->type instanceof BoardDefaultCardTypeEnum
@@ -40,6 +41,6 @@ final class CardPatchInput implements PatchInputInterface
             'isClosed' => $this->isClosed,
             'type' => $typeVal,
             'stopwatch' => $this->stopwatch,
-        ], fn ($v) => null !== $v);
+        ], static fn ($v) => null !== $v);
     }
 }

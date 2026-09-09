@@ -18,9 +18,7 @@ use Planka\Bridge\Views\Factory\Board\BoardListDtoFactory;
 
 final class BoardList
 {
-    public function __construct(
-        private readonly TransportClientInterface $client,
-    ) {}
+    public function __construct(private readonly TransportClientInterface $client) {}
 
     /** 'POST /api/boards/:boardId/lists' */
     public function create(

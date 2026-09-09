@@ -17,6 +17,7 @@ class BackgroundImageDto implements OutputDtoInterface
         public readonly array $thumbnailUrls = [],
         public readonly ?\DateTimeImmutable $createdAt = null,
         public readonly ?\DateTimeImmutable $updatedAt = null,
+        /** @var array<string, mixed> Diagnostic raw response array from Planka API to verify DTO field hydration. */
         public readonly array $_rawResponse = [],
     ) {}
 }

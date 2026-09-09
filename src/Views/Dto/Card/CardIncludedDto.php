@@ -19,6 +19,7 @@ class CardIncludedDto
         public array $cardLabels,
         public array $tasks,
         public array $attachments,
+        /** @var array<string, mixed> Diagnostic raw response array from Planka API to verify DTO field hydration. */
         public readonly array $_rawResponse = [],
     ) {}
 }

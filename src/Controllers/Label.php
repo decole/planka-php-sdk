@@ -15,9 +15,7 @@ use Planka\Bridge\Views\Factory\Label\LabelDtoFactory;
 
 final class Label
 {
-    public function __construct(
-        private readonly TransportClientInterface $client,
-    ) {}
+    public function __construct(private readonly TransportClientInterface $client) {}
 
     /** 'POST /api/boards/:boardId/labels' */
     public function create(string $boardId, string $name, LabelColorEnum $color, int $position): LabelDto

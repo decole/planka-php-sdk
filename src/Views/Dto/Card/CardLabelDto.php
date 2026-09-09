@@ -14,6 +14,7 @@ class CardLabelDto implements OutputDtoInterface
         public readonly ?\DateTimeImmutable $updatedAt,
         public readonly string $cardId,
         public ?string $labelId,
+        /** @var array<string, mixed> Diagnostic raw response array from Planka API to verify DTO field hydration. */
         public readonly array $_rawResponse = [],
     ) {}
 }

@@ -23,6 +23,7 @@ final class BoardItemDto implements OutputDtoInterface
         public readonly bool $displayCardAges = false,
         public readonly ?\DateTimeImmutable $createdAt = null,
         public readonly ?\DateTimeImmutable $updatedAt = null,
+        /** @var array<string, mixed> Diagnostic raw response array from Planka API to verify DTO field hydration. */
         public readonly array $_rawResponse = [],
     ) {}
 }

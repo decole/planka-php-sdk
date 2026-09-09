@@ -40,6 +40,7 @@ use Planka\Bridge\Exceptions\PlankaAccessDeniedException;
 use Planka\Bridge\TransportClients\Client;
 use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\Auth\AuthenticateResultDto;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * @see https://plankanban.github.io/planka/swagger-ui/
@@ -210,7 +211,7 @@ final class PlankaClient
             throw new AuthenticateException($e->getMessage(), $e->getCode(), $e);
         }
 
-        $data = $response instanceof \Symfony\Contracts\HttpClient\ResponseInterface
+        $data = $response instanceof ResponseInterface
             ? $response->toArray(false)
             : (is_array($response) ? $response : []);
 
@@ -244,8 +245,11 @@ final class PlankaClient
      *
      * @throws AuthenticateException
      */
-    public function acceptTerms(string $pendingToken, string $signature, ?LanguageEnum $initialLanguage = null): AuthenticateResultDto
-    {
+    public function acceptTerms(
+        string $pendingToken,
+        string $signature,
+        ?LanguageEnum $initialLanguage = null,
+    ): AuthenticateResultDto {
         return $this->completePendingAuth(new AcceptTermsAction($pendingToken, $signature, $initialLanguage));
     }
 
@@ -253,7 +257,7 @@ final class PlankaClient
     {
         $response = $this->client->post($action);
 
-        $data = $response instanceof \Symfony\Contracts\HttpClient\ResponseInterface
+        $data = $response instanceof ResponseInterface
             ? $response->toArray(false)
             : (is_array($response) ? $response : []);
 

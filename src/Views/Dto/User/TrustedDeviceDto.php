@@ -16,6 +16,7 @@ final class TrustedDeviceDto
         public readonly ?string $userId = null,
         public readonly ?string $name = null,
         public readonly ?string $ipAddress = null,
+        /** @var array<string, mixed> Diagnostic raw response array from Planka API to verify DTO field hydration. */
         public readonly array $_rawResponse = [],
     ) {}
 }

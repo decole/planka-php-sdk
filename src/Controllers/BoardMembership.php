@@ -15,9 +15,7 @@ use Planka\Bridge\Views\Factory\Board\BoardMembershipDtoFactory;
 
 final class BoardMembership
 {
-    public function __construct(
-        private readonly TransportClientInterface $client,
-    ) {}
+    public function __construct(private readonly TransportClientInterface $client) {}
 
     /** 'POST /api/boards/:boardId/memberships' */
     public function add(string $boardId, string $userId, BoardMembershipRoleEnum $role): BoardMembershipDto

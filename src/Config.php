@@ -9,6 +9,8 @@ use Planka\Bridge\Auth\TokenStorageInterface;
 
 final class Config
 {
+    final public const DATE_FORMAT = 'Y-m-d\TH:i:s.v\Z';
+
     private readonly TokenStorageInterface $tokenStorage;
 
     public function __construct(

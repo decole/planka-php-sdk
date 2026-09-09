@@ -15,9 +15,7 @@ use Planka\Bridge\Views\Factory\Attachment\AttachmentDtoFactory;
 
 final class Attachment
 {
-    public function __construct(
-        private readonly TransportClientInterface $client,
-    ) {}
+    public function __construct(private readonly TransportClientInterface $client) {}
 
     /**
      * 'POST /api/cards/:cardId/attachments'.

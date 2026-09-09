@@ -15,9 +15,7 @@ use Planka\Bridge\Views\Factory\SystemConfig\SystemConfigDtoFactory;
 
 final class SystemConfig
 {
-    public function __construct(
-        private readonly TransportClientInterface $client,
-    ) {}
+    public function __construct(private readonly TransportClientInterface $client) {}
 
     /** 'GET /api/system-settings' */
     public function get(): SystemConfigDto

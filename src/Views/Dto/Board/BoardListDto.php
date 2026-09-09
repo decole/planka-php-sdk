@@ -18,6 +18,7 @@ class BoardListDto
         public readonly string $boardId,
         public ?ListTypeEnum $type = null,
         public ?ListColorEnum $color = null,
+        /** @var array<string, mixed> Diagnostic raw response array from Planka API to verify DTO field hydration. */
         public readonly array $_rawResponse = [],
     ) {}
 }

@@ -12,6 +12,7 @@ class TermsDto implements OutputDtoInterface
         public readonly ?string $language = null,
         public readonly ?string $content = null,
         public readonly ?string $signature = null,
+        /** @var array<string, mixed> Diagnostic raw response array from Planka API to verify DTO field hydration. */
         public readonly array $_rawResponse = [],
     ) {}
 }

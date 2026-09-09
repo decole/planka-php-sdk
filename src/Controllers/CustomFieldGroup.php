@@ -15,13 +15,15 @@ use Planka\Bridge\Views\Factory\CustomField\CustomFieldGroupDtoFactory;
 
 final class CustomFieldGroup
 {
-    public function __construct(
-        private readonly TransportClientInterface $client,
-    ) {}
+    public function __construct(private readonly TransportClientInterface $client) {}
 
     /** 'POST /api/boards/:boardId/custom-field-groups' */
-    public function createInBoard(string $boardId, ?string $name = null, ?string $baseCustomFieldGroupId = null, int $position = 65536): CustomFieldGroupDto
-    {
+    public function createInBoard(
+        string $boardId,
+        ?string $name = null,
+        ?string $baseCustomFieldGroupId = null,
+        int $position = 65536,
+    ): CustomFieldGroupDto {
         return $this->client->post(new CustomFieldGroupCreateInBoardAction(
             boardId: $boardId,
             name: $name,
@@ -31,8 +33,12 @@ final class CustomFieldGroup
     }
 
     /** 'POST /api/cards/:cardId/custom-field-groups' */
-    public function createInCard(string $cardId, ?string $name = null, ?string $baseCustomFieldGroupId = null, int $position = 65536): CustomFieldGroupDto
-    {
+    public function createInCard(
+        string $cardId,
+        ?string $name = null,
+        ?string $baseCustomFieldGroupId = null,
+        int $position = 65536,
+    ): CustomFieldGroupDto {
         return $this->client->post(new CustomFieldGroupCreateInCardAction(
             cardId: $cardId,
             name: $name,

@@ -16,9 +16,7 @@ use Planka\Bridge\Views\Factory\Notification\NotificationItemDtoFactory;
 
 final class Notification
 {
-    public function __construct(
-        private readonly TransportClientInterface $client,
-    ) {}
+    public function __construct(private readonly TransportClientInterface $client) {}
 
     /** 'GET /api/notifications' */
     public function list(): NotificationListDto

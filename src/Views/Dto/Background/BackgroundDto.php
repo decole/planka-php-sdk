@@ -14,6 +14,7 @@ class BackgroundDto implements OutputDtoInterface
         public ?BackgroundTypeEnum $type = null,
         public ?BackgroundGradientEnum $gradient = null,
         public ?BackgroundGradientEnum $name = null,
+        /** @var array<string, mixed> Diagnostic raw response array from Planka API to verify DTO field hydration. */
         public readonly array $_rawResponse = [],
     ) {}
 }

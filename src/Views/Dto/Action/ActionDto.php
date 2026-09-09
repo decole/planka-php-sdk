@@ -19,6 +19,7 @@ class ActionDto implements OutputDtoInterface
         public readonly ?string $userId = null,
         public readonly ?string $boardId = null,
         public readonly array $data = [],
+        /** @var array<string, mixed> Diagnostic raw response array from Planka API to verify DTO field hydration. */
         public readonly array $_rawResponse = [],
     ) {}
 }

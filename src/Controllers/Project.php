@@ -25,9 +25,7 @@ use Planka\Bridge\Views\Factory\Project\ProjectDtoFactory;
 
 final class Project
 {
-    public function __construct(
-        private readonly TransportClientInterface $client,
-    ) {}
+    public function __construct(private readonly TransportClientInterface $client) {}
 
     /**
      * 'GET /api/projects'.

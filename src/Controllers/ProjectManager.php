@@ -14,9 +14,7 @@ use Planka\Bridge\TransportClients\TransportClientInterface;
 
 final class ProjectManager
 {
-    public function __construct(
-        private readonly TransportClientInterface $client,
-    ) {}
+    public function __construct(private readonly TransportClientInterface $client) {}
 
     /**
      * 'POST /api/projects/:projectId/managers'.

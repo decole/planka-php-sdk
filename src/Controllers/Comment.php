@@ -15,9 +15,7 @@ use Planka\Bridge\Views\Factory\Comment\CommentDtoFactory;
 
 final class Comment
 {
-    public function __construct(
-        private readonly TransportClientInterface $client,
-    ) {}
+    public function __construct(private readonly TransportClientInterface $client) {}
 
     /**
      * 'GET /api/cards/:cardId/comments'.

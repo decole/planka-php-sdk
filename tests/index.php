@@ -62,7 +62,7 @@ function assertRawResponseMappedToDto(object $dto, string $label): void
     }
 
     $ref = new ReflectionClass($targetDto);
-    $properties = array_map(fn ($p) => $p->getName(), $ref->getProperties());
+    $properties = array_map(static fn ($p) => $p->getName(), $ref->getProperties());
 
     $raw = isset($targetDto->_rawResponse['item']) && is_array($targetDto->_rawResponse['item'])
         ? $targetDto->_rawResponse['item']

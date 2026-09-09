@@ -22,8 +22,11 @@ final class Terms
     }
 
     /** 'POST /api/access-tokens/accept-terms' */
-    public function acceptTerms(string $pendingToken, string $signature, ?LanguageEnum $initialLanguage = null): AccessTokenDto
-    {
+    public function acceptTerms(
+        string $pendingToken,
+        string $signature,
+        ?LanguageEnum $initialLanguage = null,
+    ): AccessTokenDto {
         return $this->client->post(new AcceptTermsAction($pendingToken, $signature, $initialLanguage));
     }
 }

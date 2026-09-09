@@ -11,9 +11,7 @@ use Planka\Bridge\TransportClients\TransportClientInterface;
 
 final class CardMembership
 {
-    public function __construct(
-        private readonly TransportClientInterface $client,
-    ) {}
+    public function __construct(private readonly TransportClientInterface $client) {}
 
     /** 'POST /api/cards/:cardId/memberships' */
     public function add(string $cardId, string $userId): CardMembershipDto

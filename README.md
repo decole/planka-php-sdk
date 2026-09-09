@@ -204,6 +204,21 @@ $board = $planka->board()->patching(
 );
 ```
 
+### 5. Raw Response Diagnostics (`$_rawResponse`)
+
+Every DTO in the SDK includes a public `$_rawResponse` property.
+This diagnostic property holds the complete, unparsed associative array received from the Planka API response. It is useful for debugging, logging, or verifying whether all API response fields are properly hydrated into DTO properties:
+
+```php
+$card = $planka->card()->get('1854744331521361455');
+
+// Access strongly-typed DTO properties:
+echo $card->name;
+
+// Inspect the raw server payload for diagnostics:
+var_dump($card->_rawResponse);
+```
+
 ---
 
 ## Controllers & Features

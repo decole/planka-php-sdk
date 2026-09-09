@@ -32,6 +32,7 @@ final class UserDto implements OutputDtoInterface
         public bool $isDeactivated = false,
         public bool $isSsoUser = false,
         public array $lockedFieldNames = [],
+        /** @var array<string, mixed> Diagnostic raw response array from Planka API to verify DTO field hydration. */
         public readonly array $_rawResponse = [],
     ) {}
 
@@ -48,6 +49,6 @@ final class UserDto implements OutputDtoInterface
             'subscribeToOwnCards' => $this->subscribeToOwnCards,
             'avatarUrl' => $this->avatarUrl,
             'role' => $this->role?->value,
-        ], fn ($v) => null !== $v);
+        ], static fn ($v) => null !== $v);
     }
 }

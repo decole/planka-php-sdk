@@ -16,6 +16,7 @@ use Planka\Bridge\Actions\Card\CardUnsubscribeMembershipAction;
 use Planka\Bridge\Actions\Card\CardUpdateAction;
 use Planka\Bridge\Actions\Card\CardViewAction;
 use Planka\Bridge\Actions\Common\CommonPatchAction;
+use Planka\Bridge\Config;
 use Planka\Bridge\Enum\BoardDefaultCardTypeEnum;
 use Planka\Bridge\Inputs\PatchInputInterface;
 use Planka\Bridge\TransportClients\TransportClientInterface;
@@ -25,9 +26,7 @@ use Planka\Bridge\Views\Factory\Card\CardDtoFactory;
 
 final class Card
 {
-    public function __construct(
-        private readonly TransportClientInterface $client,
-    ) {}
+    public function __construct(private readonly TransportClientInterface $client) {}
 
     /** 'POST /api/lists/:listId/cards' */
     public function create(
@@ -70,7 +69,7 @@ final class Card
         $data = $map instanceof PatchInputInterface ? $map->toArray() : $map;
 
         if (isset($data['dueDate']) && $data['dueDate'] instanceof \DateTimeInterface) {
-            $data['dueDate'] = $data['dueDate']->format('Y-m-d\TH:i:s.v\Z');
+            $data['dueDate'] = $data['dueDate']->format(Config::DATE_FORMAT);
         }
 
         if (isset($data['type']) && $data['type'] instanceof BoardDefaultCardTypeEnum) {
@@ -110,7 +109,7 @@ final class Card
         return $this->client->patch(new CardTimerAction(
             cardId: $card->id,
             stopwatch: [
-                'startedAt' => $card->stopwatch->startedAt?->format('Y-m-d\TH:i:s.v\Z'),
+                'startedAt' => $card->stopwatch->startedAt?->format(Config::DATE_FORMAT),
                 'total' => $total,
             ],
         ));
@@ -122,7 +121,7 @@ final class Card
         return $this->client->patch(new CardTimerAction(
             cardId: $card->id,
             stopwatch: [
-                'startedAt' => $start ? (new \DateTimeImmutable())->format('Y-m-d\TH:i:s.v\Z') : null,
+                'startedAt' => $start ? (new \DateTimeImmutable())->format(Config::DATE_FORMAT) : null,
                 'total' => $card->stopwatch->total ?? 0,
             ],
         ));

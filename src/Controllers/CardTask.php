@@ -20,9 +20,7 @@ use Planka\Bridge\Views\Factory\Card\TaskListDtoFactory;
 
 final class CardTask
 {
-    public function __construct(
-        private readonly TransportClientInterface $client,
-    ) {}
+    public function __construct(private readonly TransportClientInterface $client) {}
 
     /** 'POST /api/cards/:cardId/task-lists' */
     public function createTaskList(string $cardId, string $name, int $position = 65536): TaskListDto

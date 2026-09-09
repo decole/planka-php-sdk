@@ -18,6 +18,7 @@ final class BoardMembershipDto implements OutputDtoInterface
         public BoardMembershipRoleEnum $role,
         public string $boardId,
         public ?string $projectId = null,
+        /** @var array<string, mixed> Diagnostic raw response array from Planka API to verify DTO field hydration. */
         public readonly array $_rawResponse = [],
     ) {}
 }
