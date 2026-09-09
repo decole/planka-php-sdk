@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Planka\Bridge\Views\Dto\Card;
 
 use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
+use Planka\Bridge\Traits\OutputDtoTrait;
 
 class TaskListDto implements OutputDtoInterface
 {
+    use OutputDtoTrait;
+
     public function __construct(
         public readonly string $id,
         public readonly string $cardId,

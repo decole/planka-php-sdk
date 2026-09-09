@@ -4,8 +4,13 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Views\Dto\Notification;
 
-class NotificationIncludedDto
+use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
+use Planka\Bridge\Traits\OutputDtoTrait;
+
+class NotificationIncludedDto implements OutputDtoInterface
 {
+    use OutputDtoTrait;
+
     public function __construct(
         public readonly array $users,
         public readonly array $cards,

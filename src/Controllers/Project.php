@@ -12,10 +12,11 @@ use Planka\Bridge\Actions\Project\ProjectListAction;
 use Planka\Bridge\Actions\Project\ProjectUpdateAction;
 use Planka\Bridge\Actions\Project\ProjectUpdateBackgroundImageAction;
 use Planka\Bridge\Actions\Project\ProjectViewAction;
-use Planka\Bridge\Enum\BackgroundGradientEnum;
-use Planka\Bridge\Enum\BackgroundTypeEnum;
+use Planka\Bridge\Builders\ProjectBuilder;
 use Planka\Bridge\Enum\ProjectTypeEnum;
 use Planka\Bridge\Inputs\PatchInputInterface;
+use Planka\Bridge\Inputs\PatchInputNormalizer;
+use Planka\Bridge\Inputs\ProjectCreateInput;
 use Planka\Bridge\Exceptions\FileExistException;
 use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\Background\BackgroundImageDto;
@@ -35,14 +36,31 @@ final class Project
         return $this->client->get(new ProjectListAction());
     }
 
+    public function builder(?string $name = null): ProjectBuilder
+    {
+        return new ProjectBuilder($name);
+    }
+
     /** 'POST /api/projects' */
     public function create(
-        string $name,
+        string|ProjectCreateInput|ProjectBuilder $nameOrInput,
         ProjectTypeEnum $type = ProjectTypeEnum::PRIVATE,
         ?string $description = null,
     ): ProjectDto {
+        if ($nameOrInput instanceof ProjectBuilder) {
+            $nameOrInput = $nameOrInput->build();
+        }
+
+        if ($nameOrInput instanceof ProjectCreateInput) {
+            return $this->client->post(new CommonPatchAction(
+                urlPath: 'api/projects',
+                data: $nameOrInput->toArray(),
+                hydrateCallback: new ProjectDtoFactory(),
+            ));
+        }
+
         return $this->client->post(new ProjectCreateAction(
-            name: $name,
+            name: $nameOrInput,
             type: $type,
             description: $description,
         ));
@@ -71,19 +89,9 @@ final class Project
      */
     public function patching(string $projectId, array|PatchInputInterface $map): ProjectDto
     {
-        $data = $map instanceof PatchInputInterface ? $map->toArray() : $map;
-
-        if (isset($data['backgroundType']) && $data['backgroundType'] instanceof BackgroundTypeEnum) {
-            $data['backgroundType'] = $data['backgroundType']->value;
-        }
-
-        if (isset($data['backgroundGradient']) && $data['backgroundGradient'] instanceof BackgroundGradientEnum) {
-            $data['backgroundGradient'] = $data['backgroundGradient']->value;
-        }
-
         return $this->client->patch(new CommonPatchAction(
             urlPath: "api/projects/{$projectId}",
-            data: $data,
+            data: PatchInputNormalizer::normalize($map),
             hydrateCallback: new ProjectDtoFactory(),
         ));
     }

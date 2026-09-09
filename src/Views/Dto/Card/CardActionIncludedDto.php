@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace Planka\Bridge\Views\Dto\Card;
 
 use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
+use Planka\Bridge\Traits\OutputDtoTrait;
 use Planka\Bridge\Views\Dto\User\UserDto;
 
 class CardActionIncludedDto implements OutputDtoInterface
 {
+    use OutputDtoTrait;
+
     /**
      * @param list<UserDto> $users
      */

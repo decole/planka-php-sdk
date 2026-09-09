@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Views\Dto\Card;
 
+use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
+use Planka\Bridge\Traits\OutputDtoTrait;
 use Planka\Bridge\Views\Dto\Attachment\AttachmentDto;
 
-class CardIncludedDto
+class CardIncludedDto implements OutputDtoInterface
 {
+    use OutputDtoTrait;
+
     /**
      * @param list<CardMembershipDto|null> $cardMemberships
      * @param list<CardLabelDto|null>      $cardLabels

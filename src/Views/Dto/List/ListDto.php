@@ -7,9 +7,12 @@ namespace Planka\Bridge\Views\Dto\List;
 use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
 use Planka\Bridge\Enum\ListColorEnum;
 use Planka\Bridge\Enum\ListTypeEnum;
+use Planka\Bridge\Traits\OutputDtoTrait;
 
 class ListDto implements OutputDtoInterface
 {
+    use OutputDtoTrait;
+
     public function __construct(
         public readonly string $id,
         public readonly string $boardId,

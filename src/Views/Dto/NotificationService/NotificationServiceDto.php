@@ -6,9 +6,12 @@ namespace Planka\Bridge\Views\Dto\NotificationService;
 
 use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
 use Planka\Bridge\Enum\NotificationServiceFormatEnum;
+use Planka\Bridge\Traits\OutputDtoTrait;
 
 class NotificationServiceDto implements OutputDtoInterface
 {
+    use OutputDtoTrait;
+
     public function __construct(
         public readonly string $id,
         public readonly ?string $userId,

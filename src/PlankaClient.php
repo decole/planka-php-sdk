@@ -39,6 +39,8 @@ use Planka\Bridge\Exceptions\AuthenticateException;
 use Planka\Bridge\Exceptions\LogoutException;
 use Planka\Bridge\Exceptions\PlankaAccessDeniedException;
 use Planka\Bridge\TransportClients\Client;
+use Planka\Bridge\TransportClients\Middleware\TransportMiddlewareInterface;
+use Planka\Bridge\TransportClients\MiddlewareStackTransportClient;
 use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\Auth\AuthenticateResultDto;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -52,126 +54,147 @@ final class PlankaClient
 
     private readonly TransportClientInterface $client;
 
+    /**
+     * @param TransportMiddlewareInterface[] $middlewares
+     */
     public function __construct(
         private readonly Config $config,
         ?TransportClientInterface $client = null,
+        array $middlewares = [],
     ) {
-        $this->client = $client ?? new Client($this->config);
+        $baseClient = $client ?? new Client($this->config);
+
+        $this->client = !empty($middlewares)
+            ? new MiddlewareStackTransportClient($baseClient, $middlewares)
+            : $baseClient;
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param class-string<T> $class
+     *
+     * @return T
+     */
+    private function getController(string $class): object
+    {
+        /* @var T */
+        return $this->controllers[$class] ??= new $class($this->client);
     }
 
     public function accessToken(): AccessToken
     {
-        return $this->controllers['accessToken'] ??= new AccessToken($this->client);
+        return $this->getController(AccessToken::class);
     }
 
     public function attachment(): Attachment
     {
-        return $this->controllers['attachment'] ??= new Attachment($this->client);
+        return $this->getController(Attachment::class);
     }
 
     public function baseCustomFieldGroup(): BaseCustomFieldGroup
     {
-        return $this->controllers['baseCustomFieldGroup'] ??= new BaseCustomFieldGroup($this->client);
+        return $this->getController(BaseCustomFieldGroup::class);
     }
 
     public function board(): Board
     {
-        return $this->controllers['board'] ??= new Board($this->client);
+        return $this->getController(Board::class);
     }
 
     public function boardList(): BoardList
     {
-        return $this->controllers['boardList'] ??= new BoardList($this->client);
+        return $this->getController(BoardList::class);
     }
 
     public function boardMembership(): BoardMembership
     {
-        return $this->controllers['boardMembership'] ??= new BoardMembership($this->client);
+        return $this->getController(BoardMembership::class);
     }
 
     public function card(): Card
     {
-        return $this->controllers['card'] ??= new Card($this->client);
+        return $this->getController(Card::class);
     }
 
     public function cardAction(): CardAction
     {
-        return $this->controllers['cardAction'] ??= new CardAction($this->client);
+        return $this->getController(CardAction::class);
     }
 
     public function cardLabel(): CardLabel
     {
-        return $this->controllers['cardLabel'] ??= new CardLabel($this->client);
+        return $this->getController(CardLabel::class);
     }
 
     public function cardTask(): CardTask
     {
-        return $this->controllers['cardTask'] ??= new CardTask($this->client);
+        return $this->getController(CardTask::class);
     }
 
     public function cardMembership(): CardMembership
     {
-        return $this->controllers['cardMembership'] ??= new CardMembership($this->client);
+        return $this->getController(CardMembership::class);
     }
 
     public function comment(): Comment
     {
-        return $this->controllers['comment'] ??= new Comment($this->client);
+        return $this->getController(Comment::class);
     }
 
     public function customField(): CustomField
     {
-        return $this->controllers['customField'] ??= new CustomField($this->client);
+        return $this->getController(CustomField::class);
     }
 
     public function customFieldGroup(): CustomFieldGroup
     {
-        return $this->controllers['customFieldGroup'] ??= new CustomFieldGroup($this->client);
+        return $this->getController(CustomFieldGroup::class);
     }
 
     public function label(): Label
     {
-        return $this->controllers['label'] ??= new Label($this->client);
+        return $this->getController(Label::class);
     }
 
     public function notification(): Notification
     {
-        return $this->controllers['notification'] ??= new Notification($this->client);
+        return $this->getController(Notification::class);
     }
 
     public function notificationService(): NotificationService
     {
-        return $this->controllers['notificationService'] ??= new NotificationService($this->client);
+        return $this->getController(NotificationService::class);
     }
 
     public function project(): Project
     {
-        return $this->controllers['project'] ??= new Project($this->client);
+        return $this->getController(Project::class);
     }
 
     public function projectManager(): ProjectManager
     {
-        return $this->controllers['projectManager'] ??= new ProjectManager($this->client);
+        return $this->getController(ProjectManager::class);
     }
 
     public function systemConfig(): SystemConfig
     {
-        return $this->controllers['systemConfig'] ??= new SystemConfig($this->client);
+        return $this->getController(SystemConfig::class);
     }
 
     public function terms(): Terms
     {
-        return $this->controllers['terms'] ??= new Terms($this->client);
+        return $this->getController(Terms::class);
     }
 
     public function user(): User
     {
-        return $this->controllers['user'] ??= new User($this->client);
+        return $this->getController(User::class);
     }
 
     public function webhook(): Webhook
     {
-        return $this->controllers['webhook'] ??= new Webhook($this->client);
+        return $this->getController(Webhook::class);
     }
 
     /**

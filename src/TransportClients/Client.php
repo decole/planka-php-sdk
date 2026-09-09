@@ -21,6 +21,8 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class Client implements TransportClientInterface
 {
+    use TransportClientTrait;
+
     private HttpClientInterface $client;
 
     public function __construct(
@@ -42,7 +44,7 @@ final class Client implements TransportClientInterface
     {
         $response = $this->client->request(
             method: 'GET',
-            url: $this->buildUrl($action->url()),
+            url: $this->buildUrl($this->config, $action->url()),
             options: $this->compileOptions($action),
         );
 
@@ -61,7 +63,7 @@ final class Client implements TransportClientInterface
     {
         $response = $this->client->request(
             method: 'POST',
-            url: $this->buildUrl($action->url()),
+            url: $this->buildUrl($this->config, $action->url()),
             options: $this->compileOptions($action),
         );
 
@@ -80,7 +82,7 @@ final class Client implements TransportClientInterface
     {
         $response = $this->client->request(
             method: 'PATCH',
-            url: $this->buildUrl($action->url()),
+            url: $this->buildUrl($this->config, $action->url()),
             options: $this->compileOptions($action),
         );
 
@@ -99,26 +101,11 @@ final class Client implements TransportClientInterface
     {
         $response = $this->client->request(
             method: 'DELETE',
-            url: $this->buildUrl($action->url()),
+            url: $this->buildUrl($this->config, $action->url()),
             options: $this->compileOptions($action),
         );
 
         return $this->getResult($action, $response);
-    }
-
-    private function buildUrl(string $path): string
-    {
-        $base = rtrim($this->config->getBaseUri(), '/');
-
-        if (
-            80 !== $this->config->getPort()
-            && 443 !== $this->config->getPort()
-            && false === strpos($base, ':', 7)
-        ) {
-            $base .= ':' . $this->config->getPort();
-        }
-
-        return $base . '/' . ltrim($path, '/');
     }
 
     /**
@@ -169,12 +156,6 @@ final class Client implements TransportClientInterface
      */
     private function checkResponseStatusCode(ResponseInterface $response): void
     {
-        $statusCode = $response->getStatusCode();
-
-        if ($statusCode >= 200 && $statusCode < 300) {
-            return;
-        }
-
         $content = '';
 
         try {
@@ -182,13 +163,7 @@ final class Client implements TransportClientInterface
         } catch (\Throwable) {
         }
 
-        match (true) {
-            404 === $statusCode => throw new PlankaNotFoundException($content, 404),
-            400 === $statusCode, 422 === $statusCode => throw new PlankaValidationException($content, $statusCode),
-            401 === $statusCode, 403 === $statusCode => throw new PlankaAccessDeniedException($content, $statusCode),
-            $statusCode >= 500 => throw new PlankaServerException($content, $statusCode),
-            default => throw new ResponseException($content, $statusCode),
-        };
+        $this->handleResponseStatus($response->getStatusCode(), $content);
     }
 
     private function compileOptions(ActionInterface $action): array

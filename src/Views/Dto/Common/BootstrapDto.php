@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Planka\Bridge\Views\Dto\Common;
 
 use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
+use Planka\Bridge\Traits\OutputDtoTrait;
 
 final class BootstrapDto implements OutputDtoInterface
 {
+    use OutputDtoTrait;
+
     /**
      * @param array{
      *   authorizationUrl?: ?string,

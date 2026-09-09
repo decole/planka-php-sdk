@@ -6,6 +6,7 @@ namespace Planka\Bridge\Views\Factory\Card;
 
 use Planka\Bridge\Contracts\Factory\OutputInterface;
 use Planka\Bridge\Enum\BoardDefaultCardTypeEnum;
+use Planka\Bridge\Exceptions\PlankaHydrationException;
 use Planka\Bridge\Traits\DateConverterTrait;
 use Planka\Bridge\Views\Dto\Card\CardDto;
 use Planka\Bridge\Views\Dto\Card\CardIncludedDto;
@@ -47,6 +48,10 @@ final class CardDtoFactory implements OutputInterface
     public function create(array $data): CardDto
     {
         $item = $data['item'] ?? $data;
+
+        if (!isset($item['id']) || !is_string($item['id'])) {
+            throw new PlankaHydrationException('Failed to hydrate CardDto: missing or invalid "id" field.');
+        }
 
         $typeEnum = null;
 

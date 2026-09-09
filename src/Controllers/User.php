@@ -22,6 +22,7 @@ use Planka\Bridge\Actions\User\UserUpdateUsernameAction;
 use Planka\Bridge\Actions\User\UserViewAction;
 use Planka\Bridge\Enum\UserRoleEnum;
 use Planka\Bridge\Exceptions\FileExistException;
+use Planka\Bridge\Inputs\PatchInputNormalizer;
 use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\User\ApiKeyDto;
 use Planka\Bridge\Views\Dto\User\TotpSetupDto;
@@ -82,13 +83,9 @@ final class User
      */
     public function patching(string $userId, array $map): UserDto
     {
-        if (isset($map['role']) && $map['role'] instanceof UserRoleEnum) {
-            $map['role'] = $map['role']->value;
-        }
-
         return $this->client->patch(new CommonPatchAction(
             urlPath: "api/users/{$userId}",
-            data: $map,
+            data: PatchInputNormalizer::normalize($map),
             hydrateCallback: new UserDtoFactory(),
         ));
     }

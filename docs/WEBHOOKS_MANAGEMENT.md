@@ -62,3 +62,28 @@ $updatedWebhook = $client->webhook()->update(
 ```php
 $deletedWebhook = $client->webhook()->delete(webhookId: $webhook->id);
 ```
+
+---
+
+## 5. Parsing Incoming Webhook Events (`WebhookParser`)
+
+You can parse incoming HTTP Webhook payloads sent from the Planka server using `WebhookParser`:
+
+```php
+use Planka\Bridge\Webhook\WebhookParser;
+
+$parser = new WebhookParser();
+
+// Pass raw HTTP request JSON body
+$event = $parser->parse($requestBody);
+
+echo "Event Type: {$event->eventType}\n";
+
+if ($event->isCardCreated()) {
+    $card = $event->card;
+    echo "Card created: {$card->name} (ID: {$card->id})\n";
+} elseif ($event->isCardMoved()) {
+    $card = $event->card;
+    echo "Card moved: {$card->name}\n";
+}
+```

@@ -4,8 +4,13 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Views\Dto\Project;
 
-class ProjectListDto
+use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
+use Planka\Bridge\Traits\OutputDtoTrait;
+
+class ProjectListDto implements OutputDtoInterface
 {
+    use OutputDtoTrait;
+
     /**
      * @param list<ProjectDto> $items
      */

@@ -6,9 +6,12 @@ namespace Planka\Bridge\Views\Dto\Comment;
 
 use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
 use Planka\Bridge\Enum\CommentTypeEnum;
+use Planka\Bridge\Traits\OutputDtoTrait;
 
 class CommentDto implements OutputDtoInterface
 {
+    use OutputDtoTrait;
+
     public function __construct(
         public readonly string $id,
         public readonly \DateTimeImmutable $createdAt,

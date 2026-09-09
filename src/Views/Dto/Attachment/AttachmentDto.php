@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Views\Dto\Attachment;
 
+use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
+use Planka\Bridge\Traits\OutputDtoTrait;
 use Planka\Bridge\Views\Dto\Image\ImageDto;
 
-class AttachmentDto
+class AttachmentDto implements OutputDtoInterface
 {
+    use OutputDtoTrait;
+
     public function __construct(
         public readonly string $id,
         public readonly string $name,

@@ -7,6 +7,7 @@ namespace Planka\Bridge\Views\Factory\Project;
 use Planka\Bridge\Contracts\Factory\OutputInterface;
 use Planka\Bridge\Enum\BackgroundGradientEnum;
 use Planka\Bridge\Enum\BackgroundTypeEnum;
+use Planka\Bridge\Exceptions\PlankaHydrationException;
 use Planka\Bridge\Traits\DateConverterTrait;
 use Planka\Bridge\Views\Dto\Project\ProjectDto;
 use Planka\Bridge\Views\Factory\Background\BackgroundDtoFactory;
@@ -38,6 +39,10 @@ final class ProjectDtoFactory implements OutputInterface
     public function create(array $data): ProjectDto
     {
         $item = $data['item'] ?? $data;
+
+        if (!isset($item['id']) || !is_string($item['id'])) {
+            throw new PlankaHydrationException('Failed to hydrate ProjectDto: missing or invalid "id" field.');
+        }
         $bgType = isset($item['backgroundType']) && is_string($item['backgroundType']) ? BackgroundTypeEnum::tryFrom($item['backgroundType']) : null;
         $bgGrad = isset($item['backgroundGradient']) && is_string($item['backgroundGradient']) ? BackgroundGradientEnum::tryFrom($item['backgroundGradient']) : null;
 

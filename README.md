@@ -205,7 +205,73 @@ $board = $planka->board()->patching(
 );
 ```
 
-### 5. Raw Response Diagnostics (`$_rawResponse`)
+### 5. Type-Safe Creation Inputs & Fluent Builder API (`CardBuilder`, `BoardBuilder`, `ProjectBuilder`)
+
+When creating projects, boards, or cards, you can choose between 3 flexible options: simple positional arguments, strongly-typed Creation Input DTOs, or step-by-step Fluent Builders:
+
+```php
+use Planka\Bridge\Inputs\CardCreateInput;
+use Planka\Bridge\Inputs\BoardCreateInput;
+use Planka\Bridge\Enum\BoardDefaultCardTypeEnum;
+use Planka\Bridge\Enum\BoardDefaultViewEnum;
+
+// Option 1: Simple positional arguments (Fastest for single fields)
+$card = $planka->card()->create(listId: '1357158568008091266', nameOrInput: 'Implement OAuth2');
+
+// Option 2: Strongly-typed Creation Input DTO
+$card = $planka->card()->create(
+    listId: '1357158568008091266',
+    nameOrInput: new CardCreateInput(
+        name: 'Implement OAuth2 Flow',
+        position: 1,
+        description: 'Detailed specification for OAuth2 flow',
+        type: BoardDefaultCardTypeEnum::PROJECT
+    )
+);
+
+// Option 3: Step-by-step Fluent Builder API
+$card = $planka->card()->create(
+    listId: '1357158568008091266',
+    nameOrInput: $planka->card()->builder('Implement OAuth2 Flow')
+        ->setPosition(1)
+        ->setDescription('Detailed specification for OAuth2 flow')
+        ->setType(BoardDefaultCardTypeEnum::PROJECT)
+);
+```
+
+### 6. Transport Middleware Pipeline
+
+You can inject custom HTTP transport middlewares into `PlankaClient` for logging (PSR-3 Monolog), retrying transient network errors, or collecting request metrics:
+
+```php
+use Planka\Bridge\TransportClients\Middleware\PsrLoggerMiddleware;
+use Planka\Bridge\TransportClients\Middleware\RetryMiddleware;
+
+$planka = new PlankaClient(
+    config: $config,
+    middlewares: [
+        new PsrLoggerMiddleware($monologLogger),
+        new RetryMiddleware(maxRetries: 3),
+    ]
+);
+```
+
+### 7. Parsing Incoming Webhooks (`WebhookParser`)
+
+You can parse incoming HTTP Webhook JSON payloads received from the Planka server into typed DTOs using `WebhookParser`:
+
+```php
+use Planka\Bridge\Webhook\WebhookParser;
+
+$parser = new WebhookParser();
+$event = $parser->parse($requestJsonString);
+
+if ($event->isCardCreated()) {
+    echo "Card created: {$event->card->name}\n";
+}
+```
+
+### 8. Raw Response Diagnostics (`$_rawResponse`)
 
 Every DTO in the SDK includes a public `$_rawResponse` property.
 This diagnostic property holds the complete, unparsed associative array received from the Planka API response. It is useful for debugging, logging, or verifying whether all API response fields are properly hydrated into DTO properties:

@@ -10,7 +10,10 @@ use Planka\Bridge\Actions\Board\BoardUpdateAction;
 use Planka\Bridge\Actions\Board\BoardViewAction;
 use Planka\Bridge\Actions\CardAction\BoardActionListAction;
 use Planka\Bridge\Actions\Common\CommonPatchAction;
+use Planka\Bridge\Builders\BoardBuilder;
+use Planka\Bridge\Inputs\BoardCreateInput;
 use Planka\Bridge\Inputs\PatchInputInterface;
+use Planka\Bridge\Inputs\PatchInputNormalizer;
 use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\Board\BoardDto;
 use Planka\Bridge\Views\Dto\Card\CardActionListDto;
@@ -20,12 +23,29 @@ final class Board
 {
     public function __construct(private readonly TransportClientInterface $client) {}
 
-    /** 'POST /api/projects/:projectId/boards' */
-    public function create(string $projectId, string $name, int $position): BoardDto
+    public function builder(?string $name = null): BoardBuilder
     {
+        return new BoardBuilder($name);
+    }
+
+    /** 'POST /api/projects/:projectId/boards' */
+    public function create(string $projectId, string|BoardCreateInput|BoardBuilder $nameOrInput, int $position = 65536): BoardDto
+    {
+        if ($nameOrInput instanceof BoardBuilder) {
+            $nameOrInput = $nameOrInput->build();
+        }
+
+        if ($nameOrInput instanceof BoardCreateInput) {
+            return $this->client->post(new CommonPatchAction(
+                urlPath: "api/projects/{$projectId}/boards",
+                data: $nameOrInput->toArray(),
+                hydrateCallback: new BoardDtoFactory(),
+            ));
+        }
+
         return $this->client->post(new BoardCreateAction(
             projectId: $projectId,
-            name: $name,
+            name: $nameOrInput,
             position: $position,
         ));
     }
@@ -53,11 +73,9 @@ final class Board
      */
     public function patching(string $boardId, array|PatchInputInterface $map): BoardDto
     {
-        $data = $map instanceof PatchInputInterface ? $map->toArray() : $map;
-
         return $this->client->patch(new CommonPatchAction(
             urlPath: "api/boards/{$boardId}",
-            data: $data,
+            data: PatchInputNormalizer::normalize($map),
             hydrateCallback: new BoardDtoFactory(),
         ));
     }

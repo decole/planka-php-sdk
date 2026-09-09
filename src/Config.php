@@ -13,15 +13,25 @@ final class Config
 
     private readonly TokenStorageInterface $tokenStorage;
 
+    private readonly int $port;
+
     public function __construct(
         private readonly ?string $user = null,
         private readonly ?string $password = null,
         private readonly string $baseUri = '',
-        private readonly int $port = 80,
+        ?int $port = null,
         ?string $apiKey = null,
         ?TokenStorageInterface $tokenStorage = null,
     ) {
         $this->tokenStorage = $tokenStorage ?? new InMemoryTokenStorage(apiKey: $apiKey);
+
+        if (null !== $port) {
+            $this->port = $port;
+        } else {
+            $parsedPort = parse_url($this->baseUri, PHP_URL_PORT);
+            $parsedScheme = parse_url($this->baseUri, PHP_URL_SCHEME);
+            $this->port = $parsedPort ?? ('https' === $parsedScheme ? 443 : 80);
+        }
     }
 
     public function getUser(): ?string

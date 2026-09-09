@@ -6,9 +6,12 @@ namespace Planka\Bridge\Views\Dto\Label;
 
 use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
 use Planka\Bridge\Enum\LabelColorEnum;
+use Planka\Bridge\Traits\OutputDtoTrait;
 
 class LabelDto implements OutputDtoInterface
 {
+    use OutputDtoTrait;
+
     public function __construct(
         public readonly string $id,
         public readonly string $boardId,

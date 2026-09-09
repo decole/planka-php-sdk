@@ -6,9 +6,12 @@ namespace Planka\Bridge\Views\Dto\Board;
 
 use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
 use Planka\Bridge\Enum\BoardMembershipRoleEnum;
+use Planka\Bridge\Traits\OutputDtoTrait;
 
 final class BoardMembershipDto implements OutputDtoInterface
 {
+    use OutputDtoTrait;
+
     public function __construct(
         public readonly string $id,
         public readonly \DateTimeImmutable $createdAt,

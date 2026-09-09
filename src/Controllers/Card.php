@@ -16,9 +16,12 @@ use Planka\Bridge\Actions\Card\CardUnsubscribeMembershipAction;
 use Planka\Bridge\Actions\Card\CardUpdateAction;
 use Planka\Bridge\Actions\Card\CardViewAction;
 use Planka\Bridge\Actions\Common\CommonPatchAction;
+use Planka\Bridge\Builders\CardBuilder;
 use Planka\Bridge\Config;
 use Planka\Bridge\Enum\BoardDefaultCardTypeEnum;
+use Planka\Bridge\Inputs\CardCreateInput;
 use Planka\Bridge\Inputs\PatchInputInterface;
+use Planka\Bridge\Inputs\PatchInputNormalizer;
 use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\Card\CardDto;
 use Planka\Bridge\Views\Dto\Card\CardMembershipDto;
@@ -28,16 +31,33 @@ final class Card
 {
     public function __construct(private readonly TransportClientInterface $client) {}
 
+    public function builder(?string $name = null): CardBuilder
+    {
+        return new CardBuilder($name);
+    }
+
     /** 'POST /api/lists/:listId/cards' */
     public function create(
         string $listId,
-        string $name,
+        string|CardCreateInput|CardBuilder $nameOrInput,
         int $position = 65536,
         BoardDefaultCardTypeEnum $type = BoardDefaultCardTypeEnum::PROJECT,
     ): CardDto {
+        if ($nameOrInput instanceof CardBuilder) {
+            $nameOrInput = $nameOrInput->build();
+        }
+
+        if ($nameOrInput instanceof CardCreateInput) {
+            return $this->client->post(new CommonPatchAction(
+                urlPath: "api/lists/{$listId}/cards",
+                data: $nameOrInput->toArray(),
+                hydrateCallback: new CardDtoFactory(),
+            ));
+        }
+
         return $this->client->post(new CardCreateAction(
             listId: $listId,
-            name: $name,
+            name: $nameOrInput,
             position: $position,
             type: $type,
         ));
@@ -66,19 +86,9 @@ final class Card
      */
     public function patching(string $cardId, array|PatchInputInterface $map): CardDto
     {
-        $data = $map instanceof PatchInputInterface ? $map->toArray() : $map;
-
-        if (isset($data['dueDate']) && $data['dueDate'] instanceof \DateTimeInterface) {
-            $data['dueDate'] = $data['dueDate']->format(Config::DATE_FORMAT);
-        }
-
-        if (isset($data['type']) && $data['type'] instanceof BoardDefaultCardTypeEnum) {
-            $data['type'] = $data['type']->value;
-        }
-
         return $this->client->patch(new CommonPatchAction(
             urlPath: "api/cards/{$cardId}",
-            data: $data,
+            data: PatchInputNormalizer::normalize($map),
             hydrateCallback: new CardDtoFactory(),
         ));
     }

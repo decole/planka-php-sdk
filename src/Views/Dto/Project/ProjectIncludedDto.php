@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Views\Dto\Project;
 
-use Planka\Bridge\Views\Dto\Board\BoardMembershipDto;
+use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
+use Planka\Bridge\Traits\OutputDtoTrait;
 use Planka\Bridge\Views\Dto\Board\BoardItemDto;
+use Planka\Bridge\Views\Dto\Board\BoardMembershipDto;
 use Planka\Bridge\Views\Dto\User\UserDto;
 
-class ProjectIncludedDto
+class ProjectIncludedDto implements OutputDtoInterface
 {
+    use OutputDtoTrait;
+
     /**
      * @param list<UserDto>            $users
      * @param list<ProjectManagerDto>  $projectManagers

@@ -4,8 +4,13 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Views\Dto\Notification;
 
-class NotificationListDto
+use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
+use Planka\Bridge\Traits\OutputDtoTrait;
+
+class NotificationListDto implements OutputDtoInterface
 {
+    use OutputDtoTrait;
+
     /**
      * @param list<NotificationItemDto> $items
      */
