@@ -35,7 +35,7 @@ final class SystemConfigDtoFactory implements OutputInterface
         $data = $data['item'] ?? $data;
 
         return new SystemConfigDto(
-            id: $data['id'],
+            id: $data['id'] ?? '',
             smtpHost: $data['smtpHost'] ?? null,
             smtpPort: isset($data['smtpPort']) ? (int) $data['smtpPort'] : null,
             smtpName: $data['smtpName'] ?? null,

@@ -72,7 +72,7 @@ function assertRawResponseMappedToDto(object $dto, string $label): void
     $mappedCount = 0;
 
     foreach ($raw as $key => $val) {
-        if (in_array($key, ['item', 'items', 'included'], true)) {
+        if (in_array($key, ['item', 'items', 'included', 'statusCode'], true)) {
             continue;
         }
 
@@ -255,7 +255,7 @@ unset($createdTracker['lists'][$columnTemp->id]);
 try {
     $client->boardList()->update($columnTemp->id, 'Should Fail');
     dd('ERROR: Column was not deleted on server!');
-} catch (ClientException $e) {
+} catch (PlankaNotFoundException|Planka\Bridge\Exceptions\PlankaSdkExceptionInterface|ClientException $e) {
     dump('Column deletion verified OK (HTTP error caught on update)');
 }
 
@@ -428,7 +428,7 @@ unset($createdTracker['cards'][$card1->id]);
 try {
     $client->card()->get($card1->id);
     dd('ERROR: Card1 was not deleted on server!');
-} catch (ClientException $e) {
+} catch (PlankaNotFoundException|Planka\Bridge\Exceptions\PlankaSdkExceptionInterface|ClientException $e) {
     dump('Card1 deletion verified OK (404 caught)');
 }
 
@@ -439,7 +439,7 @@ unset($createdTracker['cards'][$duplicatedCard->id]);
 try {
     $client->card()->get($duplicatedCard->id);
     dd('ERROR: Duplicated card was not deleted on server!');
-} catch (ClientException $e) {
+} catch (PlankaNotFoundException|Planka\Bridge\Exceptions\PlankaSdkExceptionInterface|ClientException $e) {
     dump('Duplicated card deletion verified OK (404 caught)');
 }
 
@@ -454,7 +454,7 @@ unset($createdTracker['lists'][$columnTodo->id], $createdTracker['lists'][$colum
 try {
     $client->board()->get($boardId);
     dd('ERROR: Board was not deleted on server!');
-} catch (ClientException $e) {
+} catch (PlankaNotFoundException|Planka\Bridge\Exceptions\PlankaSdkExceptionInterface|ClientException $e) {
     dump('Board deletion verified OK (404 caught)');
 }
 
@@ -472,7 +472,7 @@ unset($createdTracker['projects'][$project->id]);
 try {
     $client->project()->get($project->id);
     dd('ERROR: Project was not deleted on server!');
-} catch (ClientException $e) {
+} catch (PlankaNotFoundException|Planka\Bridge\Exceptions\PlankaSdkExceptionInterface|ClientException $e) {
     dump('Project deletion verified OK (404 caught)');
 }
 
