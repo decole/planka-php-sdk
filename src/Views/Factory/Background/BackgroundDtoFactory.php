@@ -28,8 +28,17 @@ final class BackgroundDtoFactory
         $typeRaw = $data['type'] ?? $data['backgroundType'] ?? null;
         $gradientRaw = $data['gradient'] ?? $data['backgroundGradient'] ?? $data['name'] ?? null;
 
-        $type = is_string($typeRaw) ? BackgroundTypeEnum::tryFrom($typeRaw) : null;
-        $gradient = is_string($gradientRaw) ? BackgroundGradientEnum::tryFrom($gradientRaw) : null;
+        $type = null;
+
+        if (is_string($typeRaw)) {
+            $type = BackgroundTypeEnum::tryFrom($typeRaw);
+        }
+
+        $gradient = null;
+
+        if (is_string($gradientRaw)) {
+            $gradient = BackgroundGradientEnum::tryFrom($gradientRaw);
+        }
 
         return new BackgroundDto(
             type: $type,

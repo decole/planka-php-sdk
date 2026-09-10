@@ -9,7 +9,7 @@ use Planka\Bridge\Enum\BackgroundGradientEnum;
 use Planka\Bridge\Enum\BackgroundTypeEnum;
 use Planka\Bridge\Traits\OutputDtoTrait;
 
-class BackgroundDto implements OutputDtoInterface
+final class BackgroundDto implements OutputDtoInterface
 {
     use OutputDtoTrait;
 

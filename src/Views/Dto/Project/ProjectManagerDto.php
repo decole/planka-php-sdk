@@ -7,7 +7,7 @@ namespace Planka\Bridge\Views\Dto\Project;
 use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
 use Planka\Bridge\Traits\OutputDtoTrait;
 
-class ProjectManagerDto implements OutputDtoInterface
+final class ProjectManagerDto implements OutputDtoInterface
 {
     use OutputDtoTrait;
 

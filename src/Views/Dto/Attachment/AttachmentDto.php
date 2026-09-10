@@ -8,7 +8,7 @@ use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
 use Planka\Bridge\Traits\OutputDtoTrait;
 use Planka\Bridge\Views\Dto\Image\ImageDto;
 
-class AttachmentDto implements OutputDtoInterface
+final class AttachmentDto implements OutputDtoInterface
 {
     use OutputDtoTrait;
 

@@ -22,7 +22,9 @@ final class AccessTokenDtoFactory implements OutputInterface
         $token = null;
 
         if (array_key_exists('item', $data)) {
-            $token = is_string($data['item']) ? $data['item'] : null;
+            if (is_string($data['item'])) {
+                $token = $data['item'];
+            }
         } elseif (array_key_exists('token', $data) && is_string($data['token'])) {
             $token = $data['token'];
         }

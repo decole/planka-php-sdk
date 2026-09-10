@@ -21,8 +21,11 @@ final class CardActionListDtoFactory implements OutputInterface
      */
     public function create(array $data): CardActionListDto
     {
-        /** @var array<string, mixed> $included */
-        $included = isset($data['included']) && is_array($data['included']) ? $data['included'] : [];
+        $included = [];
+
+        if (isset($data['included']) && is_array($data['included'])) {
+            $included = $data['included'];
+        }
 
         return new CardActionListDto(
             items: $this->getItems($data),

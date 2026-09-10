@@ -7,7 +7,7 @@ namespace Planka\Bridge\Views\Dto\Background;
 use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
 use Planka\Bridge\Traits\OutputDtoTrait;
 
-class BackgroundImageDto implements OutputDtoInterface
+final class BackgroundImageDto implements OutputDtoInterface
 {
     use OutputDtoTrait;
 

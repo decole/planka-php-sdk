@@ -65,9 +65,11 @@ final class PlankaClient implements PlankaClientInterface
     ) {
         $baseClient = $client ?? new Client($this->config);
 
-        $this->client = !empty($middlewares)
-            ? new MiddlewareStackTransportClient($baseClient, $middlewares)
-            : $baseClient;
+        if (!empty($middlewares)) {
+            $this->client = new MiddlewareStackTransportClient($baseClient, $middlewares);
+        } else {
+            $this->client = $baseClient;
+        }
     }
 
     /**
@@ -212,11 +214,18 @@ final class PlankaClient implements PlankaClientInterface
                 $withHttpOnlyToken,
             ));
         } catch (PlankaAccessDeniedException $e) {
-            $data = json_decode($e->getMessage(), true);
+            $data = json_decode($e->getMessage(), true, 512, JSON_THROW_ON_ERROR);
 
             if (is_array($data)) {
                 $message = $data['message'] ?? '';
-                $pendingToken = is_string($data['item'] ?? null) ? $data['item'] : ($data['pendingToken'] ?? null);
+                $pendingToken = null;
+
+                if (isset($data['item']) && is_string($data['item'])) {
+                    $pendingToken = $data['item'];
+                } elseif (isset($data['pendingToken']) && is_string($data['pendingToken'])) {
+                    $pendingToken = $data['pendingToken'];
+                }
+
                 $challenge = match ($message) {
                     'TOTP verification required' => AuthenticateResultDto::CHALLENGE_TOTP,
                     'Terms acceptance required' => AuthenticateResultDto::CHALLENGE_TERMS,
@@ -226,7 +235,7 @@ final class PlankaClient implements PlankaClientInterface
                 if (null !== $challenge) {
                     return new AuthenticateResultDto(
                         success: false,
-                        pendingToken: is_string($pendingToken) ? $pendingToken : null,
+                        pendingToken: $pendingToken,
                         challenge: $challenge,
                         _rawResponse: $data,
                     );
@@ -236,9 +245,13 @@ final class PlankaClient implements PlankaClientInterface
             throw new AuthenticateException($e->getMessage(), $e->getCode(), $e);
         }
 
-        $data = $response instanceof ResponseInterface
-            ? $response->toArray(false)
-            : (is_array($response) ? $response : []);
+        if ($response instanceof ResponseInterface) {
+            $data = $response->toArray(false);
+        } elseif (is_array($response)) {
+            $data = $response;
+        } else {
+            $data = [];
+        }
 
         $token = $data['item'] ?? null;
 
@@ -282,9 +295,13 @@ final class PlankaClient implements PlankaClientInterface
     {
         $response = $this->client->post($action);
 
-        $data = $response instanceof ResponseInterface
-            ? $response->toArray(false)
-            : (is_array($response) ? $response : []);
+        if ($response instanceof ResponseInterface) {
+            $data = $response->toArray(false);
+        } elseif (is_array($response)) {
+            $data = $response;
+        } else {
+            $data = [];
+        }
 
         $token = $data['item'] ?? null;
 

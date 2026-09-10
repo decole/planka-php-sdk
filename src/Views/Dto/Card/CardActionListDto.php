@@ -7,7 +7,7 @@ namespace Planka\Bridge\Views\Dto\Card;
 use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
 use Planka\Bridge\Traits\OutputDtoTrait;
 
-class CardActionListDto implements OutputDtoInterface
+final class CardActionListDto implements OutputDtoInterface
 {
     use OutputDtoTrait;
 

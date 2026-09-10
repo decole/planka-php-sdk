@@ -8,7 +8,7 @@ use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
 use Planka\Bridge\Traits\OutputDtoTrait;
 use Planka\Bridge\Views\Dto\User\UserDto;
 
-class CardActionIncludedDto implements OutputDtoInterface
+final class CardActionIncludedDto implements OutputDtoInterface
 {
     use OutputDtoTrait;
 

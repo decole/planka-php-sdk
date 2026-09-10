@@ -13,4 +13,4 @@ use Planka\Bridge\Views\Dto\Config\ConfigDto;
  * OpenAPI (swagger.json) defines a single 'Config' schema. It exists to
  * maintain SDK-wide type consistency and Output Factory conventions.
  */
-class SystemConfigDto extends ConfigDto {}
+final class SystemConfigDto extends ConfigDto {}

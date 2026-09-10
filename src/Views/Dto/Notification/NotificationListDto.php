@@ -7,7 +7,7 @@ namespace Planka\Bridge\Views\Dto\Notification;
 use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
 use Planka\Bridge\Traits\OutputDtoTrait;
 
-class NotificationListDto implements OutputDtoInterface
+final class NotificationListDto implements OutputDtoInterface
 {
     use OutputDtoTrait;
 

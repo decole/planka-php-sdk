@@ -7,7 +7,7 @@ namespace Planka\Bridge\Views\Dto\User;
 use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
 use Planka\Bridge\Traits\OutputDtoTrait;
 
-class ApiKeyDto implements OutputDtoInterface
+final class ApiKeyDto implements OutputDtoInterface
 {
     use OutputDtoTrait;
 

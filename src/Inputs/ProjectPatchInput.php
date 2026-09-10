@@ -20,11 +20,23 @@ final class ProjectPatchInput implements PatchInputInterface
 
     public function toArray(): array
     {
+        $bgType = $this->backgroundType;
+
+        if ($this->backgroundType instanceof BackgroundTypeEnum) {
+            $bgType = $this->backgroundType->value;
+        }
+
+        $bgGrad = $this->backgroundGradient;
+
+        if ($this->backgroundGradient instanceof BackgroundGradientEnum) {
+            $bgGrad = $this->backgroundGradient->value;
+        }
+
         return array_filter([
             'name' => $this->name,
             'description' => $this->description,
-            'backgroundType' => $this->backgroundType instanceof BackgroundTypeEnum ? $this->backgroundType->value : $this->backgroundType,
-            'backgroundGradient' => $this->backgroundGradient instanceof BackgroundGradientEnum ? $this->backgroundGradient->value : $this->backgroundGradient,
+            'backgroundType' => $bgType,
+            'backgroundGradient' => $bgGrad,
             'backgroundImageId' => $this->backgroundImageId,
             'isHidden' => $this->isHidden,
         ], static fn ($v) => null !== $v);

@@ -7,7 +7,7 @@ namespace Planka\Bridge\Views\Dto\CustomField;
 use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
 use Planka\Bridge\Traits\OutputDtoTrait;
 
-class BaseCustomFieldGroupDto implements OutputDtoInterface
+final class BaseCustomFieldGroupDto implements OutputDtoInterface
 {
     use OutputDtoTrait;
 

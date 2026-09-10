@@ -8,7 +8,7 @@ use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
 use Planka\Bridge\Enum\NotificationServiceFormatEnum;
 use Planka\Bridge\Traits\OutputDtoTrait;
 
-class NotificationServiceDto implements OutputDtoInterface
+final class NotificationServiceDto implements OutputDtoInterface
 {
     use OutputDtoTrait;
 

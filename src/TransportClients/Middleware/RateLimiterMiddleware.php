@@ -17,7 +17,7 @@ final class RateLimiterMiddleware implements TransportMiddlewareInterface
     ) {}
 
     /**
-     * @throws ResponseException
+     * @throws ResponseException|\JsonException
      */
     public function handle(ActionInterface $action, string $method, callable $next): mixed
     {
@@ -36,6 +36,7 @@ final class RateLimiterMiddleware implements TransportMiddlewareInterface
                 }
 
                 $sleepMicros = max(0, (int) ($retryAfterSeconds * 1000000));
+
                 usleep($sleepMicros);
             }
         }
@@ -44,7 +45,7 @@ final class RateLimiterMiddleware implements TransportMiddlewareInterface
     private function extractRetryAfter(ResponseException $e): ?float
     {
         $message = $e->getMessage();
-        $data = json_decode($message, true);
+        $data = json_decode($message, true, 512, JSON_THROW_ON_ERROR);
 
         if (is_array($data) && isset($data['retryAfter']) && is_numeric($data['retryAfter'])) {
             return (float) $data['retryAfter'];

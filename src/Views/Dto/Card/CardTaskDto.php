@@ -13,4 +13,4 @@ use Planka\Bridge\Views\Dto\Task\TaskDto;
  * OpenAPI (swagger.json) defines a single 'Task' schema. It exists to
  * maintain SDK-wide type consistency and Output Factory conventions for list items.
  */
-class CardTaskDto extends TaskDto {}
+final class CardTaskDto extends TaskDto {}

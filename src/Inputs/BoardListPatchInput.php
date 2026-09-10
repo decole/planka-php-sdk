@@ -18,8 +18,17 @@ final class BoardListPatchInput implements PatchInputInterface
 
     public function toArray(): array
     {
-        $typeVal = $this->type instanceof ListTypeEnum ? $this->type->value : $this->type;
-        $colorVal = $this->color instanceof ListColorEnum ? $this->color->value : $this->color;
+        $typeVal = $this->type;
+
+        if ($this->type instanceof ListTypeEnum) {
+            $typeVal = $this->type->value;
+        }
+
+        $colorVal = $this->color;
+
+        if ($this->color instanceof ListColorEnum) {
+            $colorVal = $this->color->value;
+        }
 
         return array_filter([
             'name' => $this->name,

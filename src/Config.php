@@ -30,7 +30,14 @@ final class Config
         } else {
             $parsedPort = parse_url($this->baseUri, PHP_URL_PORT);
             $parsedScheme = parse_url($this->baseUri, PHP_URL_SCHEME);
-            $this->port = $parsedPort ?? ('https' === $parsedScheme ? 443 : 80);
+
+            if (is_int($parsedPort) && $parsedPort > 0) {
+                $this->port = $parsedPort;
+            } elseif ('https' === $parsedScheme) {
+                $this->port = 443;
+            } else {
+                $this->port = 80;
+            }
         }
     }
 
@@ -86,11 +93,17 @@ final class Config
      */
     public function __debugInfo(): array
     {
+        $maskedPassword = null;
+
+        if (null !== $this->password) {
+            $maskedPassword = '********';
+        }
+
         return [
             'baseUri' => $this->baseUri,
             'port' => $this->port,
             'user' => $this->user,
-            'password' => null !== $this->password ? '********' : null,
+            'password' => $maskedPassword,
             'tokenStorage' => $this->tokenStorage,
         ];
     }

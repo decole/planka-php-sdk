@@ -9,6 +9,7 @@ use Planka\Bridge\Contracts\Actions\ActionInterface;
 use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
 use Planka\Bridge\Contracts\Factory\OutputInterface;
+use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface as PsrClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
@@ -45,6 +46,10 @@ final class PsrTransportClient implements TransportClientInterface
         return $this->send('DELETE', $action);
     }
 
+    /**
+     * @throws ClientExceptionInterface
+     * @throws \JsonException
+     */
     private function send(string $method, ActionInterface $action): mixed
     {
         $url = $this->buildUrl($this->config, $action->url());
@@ -89,7 +94,7 @@ final class PsrTransportClient implements TransportClientInterface
             }
             $request = $request->withBody($this->streamFactory->createStream($bodyContent));
         } elseif (isset($options['json']) && null !== $this->streamFactory) {
-            $jsonBody = json_encode($options['json']);
+            $jsonBody = json_encode($options['json'], JSON_THROW_ON_ERROR);
 
             if (false !== $jsonBody) {
                 $request = $request
@@ -117,7 +122,7 @@ final class PsrTransportClient implements TransportClientInterface
                 $data = [];
 
                 try {
-                    $decoded = json_decode($content, true);
+                    $decoded = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
 
                     if (is_array($decoded)) {
                         $data = $decoded;

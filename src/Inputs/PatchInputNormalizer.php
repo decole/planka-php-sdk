@@ -15,7 +15,11 @@ final class PatchInputNormalizer
      */
     public static function normalize(array|PatchInputInterface $map): array
     {
-        $data = $map instanceof PatchInputInterface ? $map->toArray() : $map;
+        if ($map instanceof PatchInputInterface) {
+            $data = $map->toArray();
+        } else {
+            $data = $map;
+        }
 
         foreach ($data as $key => $value) {
             if ($value instanceof \BackedEnum) {

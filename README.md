@@ -440,4 +440,4 @@ For more details, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ### Support & License
 - 🐛 **Bug Reports & Requests:** Please open an Issue on [GitHub Issues](https://github.com/decole/planka-php-sdk/issues).
-- 📄 **License:** Released under the [AGPL-3.0 License](LICENSE).
+- 📄 **License:** Released under the [AGPL-3.0 License](https://choosealicense.com/licenses/agpl-3.0/).

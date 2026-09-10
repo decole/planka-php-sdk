@@ -23,7 +23,7 @@ final class MetricsMiddleware implements TransportMiddlewareInterface
 
         try {
             $result = $next($action, $method);
-            $durationMs = (microtime(true) - $startTime) * 1000;
+            $durationMs = (microtime(true) - $startTime) * 1000.0;
 
             $labels = [
                 'method' => $method,
@@ -36,7 +36,7 @@ final class MetricsMiddleware implements TransportMiddlewareInterface
 
             return $result;
         } catch (\Throwable $e) {
-            $durationMs = (microtime(true) - $startTime) * 1000;
+            $durationMs = (microtime(true) - $startTime) * 1000.0;
             $statusCode = (string) $e->getCode();
 
             $labels = [
@@ -60,6 +60,8 @@ final class MetricsMiddleware implements TransportMiddlewareInterface
         $path = explode('?', $url, 2)[0];
 
         // Replace IDs (numeric or 16+ character IDs) with placeholders for low metric cardinality
-        return preg_replace('#/[0-9a-fA-F-]{16,}#', '/:id', $path);
+        $replaced = preg_replace('#/[0-9a-fA-F-]{16,}#', '/:id', $path);
+
+        return is_string($replaced) ? $replaced : $path;
     }
 }

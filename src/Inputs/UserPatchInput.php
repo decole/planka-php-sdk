@@ -18,7 +18,11 @@ final class UserPatchInput implements PatchInputInterface
 
     public function toArray(): array
     {
-        $roleVal = $this->role instanceof UserRoleEnum ? $this->role->value : $this->role;
+        $roleVal = $this->role;
+
+        if ($this->role instanceof UserRoleEnum) {
+            $roleVal = $this->role->value;
+        }
 
         return array_filter([
             'name' => $this->name,

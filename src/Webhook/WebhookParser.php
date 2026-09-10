@@ -55,9 +55,12 @@ final class WebhookParser
         }
 
         $expectedSignature = hash_hmac($algo, $payload, $secret);
-        $cleanSignature = str_starts_with($signatureHeader, "{$algo}=")
-            ? substr($signatureHeader, strlen($algo) + 1)
-            : $signatureHeader;
+
+        $cleanSignature = $signatureHeader;
+
+        if (str_starts_with($signatureHeader, "{$algo}=")) {
+            $cleanSignature = substr($signatureHeader, strlen($algo) + 1);
+        }
 
         return hash_equals($expectedSignature, $cleanSignature);
     }
@@ -71,7 +74,11 @@ final class WebhookParser
      */
     public function parse(string|array $payload): WebhookEventDto
     {
-        $data = is_string($payload) ? json_decode($payload, true) : $payload;
+        if (is_string($payload)) {
+            $data = json_decode($payload, true, 512, JSON_THROW_ON_ERROR);
+        } else {
+            $data = $payload;
+        }
 
         if (!is_array($data)) {
             throw new \InvalidArgumentException('Invalid Webhook payload: expecting JSON string or array.');
@@ -79,25 +86,35 @@ final class WebhookParser
 
         $eventType = (string) ($data['action']['type'] ?? $data['type'] ?? $data['event'] ?? 'unknown');
 
-        $action = isset($data['action']) && is_array($data['action'])
-            ? $this->cardActionFactory->create($data['action'])
-            : null;
+        $action = null;
 
-        $card = isset($data['card']) && is_array($data['card'])
-            ? $this->cardFactory->create($data['card'])
-            : null;
+        if (isset($data['action']) && is_array($data['action'])) {
+            $action = $this->cardActionFactory->create($data['action']);
+        }
 
-        $board = isset($data['board']) && is_array($data['board'])
-            ? $this->boardFactory->create($data['board'])
-            : null;
+        $card = null;
 
-        $project = isset($data['project']) && is_array($data['project'])
-            ? $this->projectFactory->create($data['project'])
-            : null;
+        if (isset($data['card']) && is_array($data['card'])) {
+            $card = $this->cardFactory->create($data['card']);
+        }
 
-        $user = isset($data['user']) && is_array($data['user'])
-            ? $this->userFactory->create($data['user'])
-            : null;
+        $board = null;
+
+        if (isset($data['board']) && is_array($data['board'])) {
+            $board = $this->boardFactory->create($data['board']);
+        }
+
+        $project = null;
+
+        if (isset($data['project']) && is_array($data['project'])) {
+            $project = $this->projectFactory->create($data['project']);
+        }
+
+        $user = null;
+
+        if (isset($data['user']) && is_array($data['user'])) {
+            $user = $this->userFactory->create($data['user']);
+        }
 
         return new WebhookEventDto(
             eventType: $eventType,

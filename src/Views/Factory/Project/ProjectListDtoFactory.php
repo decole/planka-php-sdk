@@ -42,8 +42,11 @@ final class ProjectListDtoFactory implements OutputInterface
 
     private function getIncluded(array $data): ProjectIncludedDto
     {
-        /** @var array<string, mixed> $included */
-        $included = isset($data['included']) && is_array($data['included']) ? $data['included'] : [];
+        $included = [];
+
+        if (isset($data['included']) && is_array($data['included'])) {
+            $included = $data['included'];
+        }
 
         return (new ProjectIncludedDtoFactory())->create($included);
     }

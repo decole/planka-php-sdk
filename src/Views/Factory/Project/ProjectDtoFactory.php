@@ -45,12 +45,32 @@ final class ProjectDtoFactory implements OutputInterface
         if (!isset($item['id']) || !is_string($item['id'])) {
             throw new PlankaHydrationException('Failed to hydrate ProjectDto: missing or invalid "id" field.');
         }
-        $bgType = isset($item['backgroundType']) && is_string($item['backgroundType']) ? BackgroundTypeEnum::tryFrom($item['backgroundType']) : null;
-        $bgGrad = isset($item['backgroundGradient']) && is_string($item['backgroundGradient']) ? BackgroundGradientEnum::tryFrom($item['backgroundGradient']) : null;
 
-        $backgroundData = isset($item['background']) && is_array($item['background'])
-            ? $item['background']
-            : (is_array($item) ? $item : null);
+        $bgType = null;
+
+        if (isset($item['backgroundType']) && is_string($item['backgroundType'])) {
+            $bgType = BackgroundTypeEnum::tryFrom($item['backgroundType']);
+        }
+
+        $bgGrad = null;
+
+        if (isset($item['backgroundGradient']) && is_string($item['backgroundGradient'])) {
+            $bgGrad = BackgroundGradientEnum::tryFrom($item['backgroundGradient']);
+        }
+
+        $backgroundData = null;
+
+        if (isset($item['background']) && is_array($item['background'])) {
+            $backgroundData = $item['background'];
+        } elseif (is_array($item)) {
+            $backgroundData = $item;
+        }
+
+        $backgroundImage = null;
+
+        if (isset($item['backgroundImage']) && is_array($item['backgroundImage'])) {
+            $backgroundImage = (new BackgroundImageDtoFactory())->create($item['backgroundImage']);
+        }
 
         return new ProjectDto(
             id: $item['id'],
@@ -58,9 +78,7 @@ final class ProjectDtoFactory implements OutputInterface
             updatedAt: $this->convertToDateTime($item['updatedAt'] ?? null),
             name: $item['name'] ?? '',
             background: is_array($backgroundData) ? (new BackgroundDtoFactory())->create($backgroundData) : null,
-            backgroundImage: isset($item['backgroundImage']) && is_array($item['backgroundImage'])
-                ? (new BackgroundImageDtoFactory())->create($item['backgroundImage'])
-                : null,
+            backgroundImage: $backgroundImage,
             ownerProjectManagerId: $item['ownerProjectManagerId'] ?? null,
             backgroundImageId: $item['backgroundImageId'] ?? null,
             description: $item['description'] ?? null,

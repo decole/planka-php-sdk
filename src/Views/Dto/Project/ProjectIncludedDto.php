@@ -10,7 +10,7 @@ use Planka\Bridge\Views\Dto\Board\BoardItemDto;
 use Planka\Bridge\Views\Dto\Board\BoardMembershipDto;
 use Planka\Bridge\Views\Dto\User\UserDto;
 
-class ProjectIncludedDto implements OutputDtoInterface
+final class ProjectIncludedDto implements OutputDtoInterface
 {
     use OutputDtoTrait;
 

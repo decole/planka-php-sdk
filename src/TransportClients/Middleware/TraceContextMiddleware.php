@@ -40,7 +40,11 @@ final class TraceContextMiddleware implements TransportMiddlewareInterface
             public function getOptions(): array
             {
                 $options = $this->innerAction->getOptions();
-                $headers = is_array($options['headers'] ?? null) ? $options['headers'] : [];
+                $headers = [];
+
+                if (isset($options['headers']) && is_array($options['headers'])) {
+                    $headers = $options['headers'];
+                }
 
                 $headers[$this->headerName] = $this->reqId;
 
@@ -66,7 +70,11 @@ final class TraceContextMiddleware implements TransportMiddlewareInterface
         if (is_callable($generator)) {
             $val = $generator();
 
-            return is_string($val) ? $val : null;
+            if (is_string($val)) {
+                return $val;
+            }
+
+            return null;
         }
 
         return null;

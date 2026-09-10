@@ -33,13 +33,13 @@ final class PsrLoggerMiddleware implements TransportMiddlewareInterface
 
         try {
             $result = $next($action, $method);
-            $duration = round((microtime(true) - $start) * 1000, 2);
+            $duration = round((microtime(true) - $start) * 1000.0, 2);
 
             $logger->info(sprintf('[Planka SDK] %s Response for %s completed in %sms', $method, $url, $duration));
 
             return $result;
         } catch (\Throwable $e) {
-            $duration = round((microtime(true) - $start) * 1000, 2);
+            $duration = round((microtime(true) - $start) * 1000.0, 2);
             $logger->error(sprintf('[Planka SDK] %s Request failed for %s after %sms: %s', $method, $url, $duration, $e->getMessage()), [
                 'exception' => $e,
             ]);

@@ -31,7 +31,11 @@ final class CommentDtoFactory implements OutputInterface
     {
         $data = $data['item'] ?? $data;
         $text = $data['text'] ?? $data['data']['text'] ?? '';
-        $type = isset($data['type']) && is_string($data['type']) ? CommentTypeEnum::tryFrom($data['type']) : null;
+        $type = null;
+
+        if (isset($data['type']) && is_string($data['type'])) {
+            $type = CommentTypeEnum::tryFrom($data['type']);
+        }
 
         return new CommentDto(
             id: (string) $data['id'],

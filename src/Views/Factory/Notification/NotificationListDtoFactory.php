@@ -39,8 +39,11 @@ final class NotificationListDtoFactory implements OutputInterface
 
     private function getIncluded(array $data): NotificationIncludedDto
     {
-        /** @var array<string, mixed> $included */
-        $included = isset($data['included']) && is_array($data['included']) ? $data['included'] : [];
+        $included = [];
+
+        if (isset($data['included']) && is_array($data['included'])) {
+            $included = $data['included'];
+        }
 
         return (new NotificationIncludedDtoFactory())->create($included);
     }

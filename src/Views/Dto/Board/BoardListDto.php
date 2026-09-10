@@ -9,7 +9,7 @@ use Planka\Bridge\Enum\ListColorEnum;
 use Planka\Bridge\Enum\ListTypeEnum;
 use Planka\Bridge\Traits\OutputDtoTrait;
 
-class BoardListDto implements OutputDtoInterface
+final class BoardListDto implements OutputDtoInterface
 {
     use OutputDtoTrait;
 

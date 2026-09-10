@@ -29,8 +29,23 @@ final class ListDtoFactory implements OutputInterface
      */
     public function create(array $data): ListDto
     {
-        $typeEnum = isset($data['type']) && is_string($data['type']) ? ListTypeEnum::tryFrom($data['type']) : null;
-        $colorEnum = isset($data['color']) && is_string($data['color']) ? ListColorEnum::tryFrom($data['color']) : null;
+        $typeEnum = null;
+
+        if (isset($data['type']) && is_string($data['type'])) {
+            $typeEnum = ListTypeEnum::tryFrom($data['type']);
+        }
+
+        $colorEnum = null;
+
+        if (isset($data['color']) && is_string($data['color'])) {
+            $colorEnum = ListColorEnum::tryFrom($data['color']);
+        }
+
+        $name = null;
+
+        if (isset($data['name']) && is_string($data['name'])) {
+            $name = $data['name'];
+        }
 
         return new ListDto(
             id: (string) $data['id'],
@@ -38,7 +53,7 @@ final class ListDtoFactory implements OutputInterface
             createdAt: $this->convertToDateTime($data['createdAt'] ?? null) ?? new \DateTimeImmutable(),
             updatedAt: $this->convertToDateTime($data['updatedAt'] ?? null),
             position: (int) ($data['position'] ?? 0),
-            name: isset($data['name']) && is_string($data['name']) ? $data['name'] : null,
+            name: $name,
             type: $typeEnum,
             color: $colorEnum,
             _rawResponse: $data,

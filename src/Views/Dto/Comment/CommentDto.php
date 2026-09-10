@@ -8,7 +8,7 @@ use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
 use Planka\Bridge\Enum\CommentTypeEnum;
 use Planka\Bridge\Traits\OutputDtoTrait;
 
-class CommentDto implements OutputDtoInterface
+final class CommentDto implements OutputDtoInterface
 {
     use OutputDtoTrait;
 

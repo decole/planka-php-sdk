@@ -11,4 +11,4 @@ namespace Planka\Bridge\Views\Dto\Notification;
  * OpenAPI (swagger.json) defines a single 'Notification' schema. It exists to
  * maintain SDK-wide type consistency and Output Factory conventions for list items.
  */
-class NotificationItemDto extends NotificationDto {}
+final class NotificationItemDto extends NotificationDto {}

@@ -10,6 +10,11 @@ use Planka\Bridge\Contracts\Actions\ActionInterface;
 use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Exceptions\AuthenticateException;
 use Planka\Bridge\Exceptions\PlankaAccessDeniedException;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class TokenRefreshMiddleware implements TransportMiddlewareInterface
@@ -39,6 +44,14 @@ final class TokenRefreshMiddleware implements TransportMiddlewareInterface
         }
     }
 
+    /**
+     * @throws AuthenticateException
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
     private function refreshToken(callable $next): void
     {
         $this->isRefreshing = true;
@@ -51,9 +64,13 @@ final class TokenRefreshMiddleware implements TransportMiddlewareInterface
 
             $response = $next($authAction, 'POST');
 
-            $data = $response instanceof ResponseInterface
-                ? $response->toArray(false)
-                : (is_array($response) ? $response : []);
+            if ($response instanceof ResponseInterface) {
+                $data = $response->toArray(false);
+            } elseif (is_array($response)) {
+                $data = $response;
+            } else {
+                $data = [];
+            }
 
             $token = $data['item'] ?? null;
 

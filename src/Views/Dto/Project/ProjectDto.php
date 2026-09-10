@@ -11,7 +11,7 @@ use Planka\Bridge\Traits\OutputDtoTrait;
 use Planka\Bridge\Views\Dto\Background\BackgroundDto;
 use Planka\Bridge\Views\Dto\Background\BackgroundImageDto;
 
-class ProjectDto implements OutputDtoInterface
+final class ProjectDto implements OutputDtoInterface
 {
     use OutputDtoTrait;
 

@@ -14,15 +14,21 @@ final class BoardDtoFactory implements OutputInterface
      */
     public function create(array $data): BoardDto
     {
-        /** @var array<string, mixed> $itemData */
-        $itemData = isset($data['item']) && is_array($data['item']) ? $data['item'] : $data;
+        $itemData = $data;
 
-        /** @var array<string, mixed>|null $includedData */
-        $includedData = isset($data['included']) && is_array($data['included']) ? $data['included'] : null;
+        if (isset($data['item']) && is_array($data['item'])) {
+            $itemData = $data['item'];
+        }
+
+        $included = null;
+
+        if (isset($data['included']) && is_array($data['included'])) {
+            $included = (new BoardIncludedDtoFactory())->create($data['included']);
+        }
 
         return new BoardDto(
             item: (new BoardItemDtoFactory())->create($itemData),
-            included: null !== $includedData ? (new BoardIncludedDtoFactory())->create($includedData) : null,
+            included: $included,
             _rawResponse: $data,
         );
     }

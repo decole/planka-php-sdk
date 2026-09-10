@@ -23,9 +23,11 @@ final class IdempotencyMiddleware implements TransportMiddlewareInterface
             return $next($action, $method);
         }
 
-        $idempotencyKey = is_callable($this->keyGenerator)
-            ? ($this->keyGenerator)()
-            : $this->generateUuidV4();
+        if (is_callable($this->keyGenerator)) {
+            $idempotencyKey = ($this->keyGenerator)();
+        } else {
+            $idempotencyKey = $this->generateUuidV4();
+        }
 
         $actionWrapper = new class ($action, $this->headerName, $idempotencyKey) implements ActionInterface {
             public function __construct(
@@ -42,7 +44,11 @@ final class IdempotencyMiddleware implements TransportMiddlewareInterface
             public function getOptions(): array
             {
                 $options = $this->innerAction->getOptions();
-                $headers = is_array($options['headers'] ?? null) ? $options['headers'] : [];
+                $headers = [];
+
+                if (isset($options['headers']) && is_array($options['headers'])) {
+                    $headers = $options['headers'];
+                }
 
                 if (!isset($headers[$this->header]) && !isset($headers[strtolower($this->header)])) {
                     $headers[$this->header] = $this->key;

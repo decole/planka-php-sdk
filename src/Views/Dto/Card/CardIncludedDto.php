@@ -8,7 +8,7 @@ use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
 use Planka\Bridge\Traits\OutputDtoTrait;
 use Planka\Bridge\Views\Dto\Attachment\AttachmentDto;
 
-class CardIncludedDto implements OutputDtoInterface
+final class CardIncludedDto implements OutputDtoInterface
 {
     use OutputDtoTrait;
 

@@ -7,7 +7,7 @@ namespace Planka\Bridge\Views\Dto\Webhook;
 use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
 use Planka\Bridge\Traits\OutputDtoTrait;
 
-class WebhookDto implements OutputDtoInterface
+final class WebhookDto implements OutputDtoInterface
 {
     use OutputDtoTrait;
 

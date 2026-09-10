@@ -13,4 +13,4 @@ use Planka\Bridge\Views\Dto\Action\ActionDto;
  * OpenAPI (swagger.json) defines a single 'Action' schema. It exists to
  * maintain SDK-wide type consistency and Output Factory conventions for list items.
  */
-class CardActionItemDto extends ActionDto {}
+final class CardActionItemDto extends ActionDto {}

@@ -4,4 +4,4 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Exceptions;
 
-class ValidateException extends \Exception implements PlankaSdkExceptionInterface {}
+final class ValidateException extends \Exception implements PlankaSdkExceptionInterface {}

@@ -32,8 +32,18 @@ final class BoardListDtoFactory implements OutputInterface
     public function create(array $data): BoardListDto
     {
         $data = $data['item'] ?? $data;
-        $typeEnum = isset($data['type']) && is_string($data['type']) ? ListTypeEnum::tryFrom($data['type']) : null;
-        $colorEnum = isset($data['color']) && is_string($data['color']) ? ListColorEnum::tryFrom($data['color']) : null;
+
+        $typeEnum = null;
+
+        if (isset($data['type']) && is_string($data['type'])) {
+            $typeEnum = ListTypeEnum::tryFrom($data['type']);
+        }
+
+        $colorEnum = null;
+
+        if (isset($data['color']) && is_string($data['color'])) {
+            $colorEnum = ListColorEnum::tryFrom($data['color']);
+        }
 
         return new BoardListDto(
             id: (string) $data['id'],

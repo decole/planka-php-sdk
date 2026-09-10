@@ -129,10 +129,16 @@ final class Card implements CardResourceInterface
     /** 'PATCH /api/cards/:id' */
     public function triggerTimer(CardDto $card, bool $start): CardDto
     {
+        $startedAt = null;
+
+        if ($start) {
+            $startedAt = (new \DateTimeImmutable())->format(Config::DATE_FORMAT);
+        }
+
         return $this->client->patch(new CardTimerAction(
             cardId: $card->id,
             stopwatch: [
-                'startedAt' => $start ? (new \DateTimeImmutable())->format(Config::DATE_FORMAT) : null,
+                'startedAt' => $startedAt,
                 'total' => $card->stopwatch?->total ?? 0,
             ],
         ));

@@ -8,7 +8,7 @@ use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
 use Planka\Bridge\Enum\LabelColorEnum;
 use Planka\Bridge\Traits\OutputDtoTrait;
 
-class LabelDto implements OutputDtoInterface
+final class LabelDto implements OutputDtoInterface
 {
     use OutputDtoTrait;
 

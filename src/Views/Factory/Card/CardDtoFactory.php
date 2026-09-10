@@ -61,8 +61,13 @@ final class CardDtoFactory implements OutputInterface
             $typeEnum = BoardDefaultCardTypeEnum::tryFrom($item['type']);
         }
 
-        $isDueCompleted = isset($item['isDueCompleted']) ? (bool) $item['isDueCompleted'] :
-            (isset($item['isDueDateCompleted']) ? (bool) $item['isDueDateCompleted'] : null);
+        $isDueCompleted = null;
+
+        if (isset($item['isDueCompleted'])) {
+            $isDueCompleted = (bool) $item['isDueCompleted'];
+        } elseif (isset($item['isDueDateCompleted'])) {
+            $isDueCompleted = (bool) $item['isDueDateCompleted'];
+        }
 
         return new CardDto(
             id: $item['id'],
