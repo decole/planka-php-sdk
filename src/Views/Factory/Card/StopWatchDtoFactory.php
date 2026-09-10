@@ -14,7 +14,7 @@ final class StopWatchDtoFactory implements OutputInterface
 
     public function create(?array $data): ?StopWatchDto
     {
-        if (empty($data)) {
+        if (null === $data || [] === $data) {
             return null;
         }
 

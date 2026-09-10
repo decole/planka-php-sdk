@@ -9,11 +9,12 @@ use Planka\Bridge\Actions\Comment\CommentDeleteAction;
 use Planka\Bridge\Actions\Comment\CommentListAction;
 use Planka\Bridge\Actions\Comment\CommentUpdateAction;
 use Planka\Bridge\Actions\Common\CommonPatchAction;
+use Planka\Bridge\Contracts\Resources\CommentResourceInterface;
 use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\Comment\CommentDto;
 use Planka\Bridge\Views\Factory\Comment\CommentDtoFactory;
 
-final class Comment
+final class Comment implements CommentResourceInterface
 {
     public function __construct(private readonly TransportClientInterface $client) {}
 

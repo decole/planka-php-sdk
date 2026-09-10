@@ -10,13 +10,14 @@ use Planka\Bridge\Actions\NotificationService\NotificationServiceCreateInUserAct
 use Planka\Bridge\Actions\NotificationService\NotificationServiceDeleteAction;
 use Planka\Bridge\Actions\NotificationService\NotificationServiceTestAction;
 use Planka\Bridge\Actions\NotificationService\NotificationServiceUpdateAction;
+use Planka\Bridge\Contracts\Resources\NotificationServiceResourceInterface;
 use Planka\Bridge\Enum\NotificationServiceFormatEnum;
 use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\Common\TestResultDto;
 use Planka\Bridge\Views\Dto\NotificationService\NotificationServiceDto;
 use Planka\Bridge\Views\Factory\NotificationService\NotificationServiceDtoFactory;
 
-final class NotificationService
+final class NotificationService implements NotificationServiceResourceInterface
 {
     public function __construct(private readonly TransportClientInterface $client) {}
 

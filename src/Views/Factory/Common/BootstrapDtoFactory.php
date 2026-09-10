@@ -13,13 +13,13 @@ final class BootstrapDtoFactory implements OutputInterface
      * @param array<string, mixed> $data
      *
      * @see Payload structure:
-     *      array{
-     *          version?: ?string,
-     *          oidc?: ?array{authorizationUrl?: ?string, endSessionUrl?: ?string, isEnforced?: bool},
-     *          activeUsersLimit?: ?int,
-     *          customerPanelUrl?: ?string,
-     *          termsLanguages?: ?string
-     *      }
+     * array{
+     *     version?: ?string,
+     *     oidc?: ?array{authorizationUrl?: ?string, endSessionUrl?: ?string, isEnforced?: bool},
+     *     activeUsersLimit?: ?int,
+     *     customerPanelUrl?: ?string,
+     *     termsLanguages?: ?string
+     * }
      */
     public function create(array $data): BootstrapDto
     {

@@ -10,11 +10,12 @@ use Planka\Bridge\Views\Dto\AccessToken\AccessTokenDto;
 final class AccessTokenDtoFactory implements OutputInterface
 {
     /**
-     * @param array{
+     * @see Payload structure:
+     * array{
      *     item?: string,
      *     token?: string,
      *     user?: array
-     * } $data
+     * }
      */
     public function create(array $data): AccessTokenDto
     {

@@ -15,7 +15,7 @@ final class ItemDtoListFactory implements OutputInterface
         $items = $data['items'] ?? $data;
 
         return array_map(
-            fn(array $item) => $this->itemFactory->create($item),
+            fn(array $item): mixed => $this->itemFactory->create($item),
             $items,
         );
     }

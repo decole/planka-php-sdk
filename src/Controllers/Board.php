@@ -11,6 +11,7 @@ use Planka\Bridge\Actions\Board\BoardViewAction;
 use Planka\Bridge\Actions\CardAction\BoardActionListAction;
 use Planka\Bridge\Actions\Common\CommonPatchAction;
 use Planka\Bridge\Builders\BoardBuilder;
+use Planka\Bridge\Contracts\Resources\BoardResourceInterface;
 use Planka\Bridge\Inputs\BoardCreateInput;
 use Planka\Bridge\Inputs\PatchInputInterface;
 use Planka\Bridge\Inputs\PatchInputNormalizer;
@@ -19,7 +20,7 @@ use Planka\Bridge\Views\Dto\Board\BoardDto;
 use Planka\Bridge\Views\Dto\Card\CardActionListDto;
 use Planka\Bridge\Views\Factory\Board\BoardDtoFactory;
 
-final class Board
+final class Board implements BoardResourceInterface
 {
     public function __construct(private readonly TransportClientInterface $client) {}
 

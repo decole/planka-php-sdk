@@ -38,6 +38,7 @@ use Planka\Bridge\Enum\LanguageEnum;
 use Planka\Bridge\Exceptions\AuthenticateException;
 use Planka\Bridge\Exceptions\LogoutException;
 use Planka\Bridge\Exceptions\PlankaAccessDeniedException;
+use Planka\Bridge\TransportClients\BatchExecutor;
 use Planka\Bridge\TransportClients\Client;
 use Planka\Bridge\TransportClients\Middleware\TransportMiddlewareInterface;
 use Planka\Bridge\TransportClients\MiddlewareStackTransportClient;
@@ -48,7 +49,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @see https://plankanban.github.io/planka/swagger-ui/
  */
-final class PlankaClient
+final class PlankaClient implements PlankaClientInterface
 {
     private array $controllers = [];
 
@@ -206,8 +207,8 @@ final class PlankaClient
     {
         try {
             $response = $this->client->post(new AuthenticateAction(
-                $this->config->getUser(),
-                $this->config->getPassword(),
+                $this->config->getUser() ?? '',
+                $this->config->getPassword() ?? '',
                 $withHttpOnlyToken,
             ));
         } catch (PlankaAccessDeniedException $e) {
@@ -241,7 +242,7 @@ final class PlankaClient
 
         $token = $data['item'] ?? null;
 
-        if (empty($token) || !is_string($token)) {
+        if (!is_string($token) || '' === $token) {
             throw new AuthenticateException('Authentication failed: empty token returned');
         }
 
@@ -287,8 +288,8 @@ final class PlankaClient
 
         $token = $data['item'] ?? null;
 
-        if (empty($token) || !is_string($token)) {
-            throw new AuthenticateException($data['message'] ?? 'Authentication failed');
+        if (!is_string($token) || '' === $token) {
+            throw new AuthenticateException((string) ($data['message'] ?? 'Authentication failed'));
         }
 
         $this->config->setAuthToken($token);
@@ -326,5 +327,17 @@ final class PlankaClient
     public function getBootstrap(): Views\Dto\Common\BootstrapDto
     {
         return $this->client->get(new GetBootstrapAction());
+    }
+
+    /**
+     * Executes multiple actions in batch.
+     *
+     * @param array<string|int, ActionInterface> $actions
+     *
+     * @return array<string|int, mixed>
+     */
+    public function batch(array $actions, string $method = 'GET'): array
+    {
+        return (new BatchExecutor($this->client))->execute($actions, $method);
     }
 }

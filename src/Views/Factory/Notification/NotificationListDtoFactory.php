@@ -14,10 +14,11 @@ use function Fp\Collection\map;
 final class NotificationListDtoFactory implements OutputInterface
 {
     /**
-     * @param array{
+     * @see Payload structure:
+     * array{
      *     items: array,
      *     included: array
-     * } $data
+     * }
      */
     public function create(array $data): NotificationListDto
     {
@@ -38,6 +39,9 @@ final class NotificationListDtoFactory implements OutputInterface
 
     private function getIncluded(array $data): NotificationIncludedDto
     {
-        return (new NotificationIncludedDtoFactory())->create($data['included'] ?? []);
+        /** @var array<string, mixed> $included */
+        $included = isset($data['included']) && is_array($data['included']) ? $data['included'] : [];
+
+        return (new NotificationIncludedDtoFactory())->create($included);
     }
 }

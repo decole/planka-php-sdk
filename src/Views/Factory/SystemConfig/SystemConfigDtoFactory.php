@@ -16,34 +16,34 @@ final class SystemConfigDtoFactory implements OutputInterface
      * @param array<string, mixed> $data
      *
      * @see Payload structure:
-     *      array{
-     *          id: string,
-     *          smtpHost?: ?string,
-     *          smtpPort?: ?int,
-     *          smtpName?: ?string,
-     *          smtpSecure?: bool,
-     *          smtpTlsRejectUnauthorized?: bool,
-     *          smtpUser?: ?string,
-     *          smtpPassword?: ?string,
-     *          smtpFrom?: ?string,
-     *          createdAt?: ?string,
-     *          updatedAt?: ?string
-     *      }
+     * array{
+     *     id: string,
+     *     smtpHost?: ?string,
+     *     smtpPort?: ?int,
+     *     smtpName?: ?string,
+     *     smtpSecure?: bool,
+     *     smtpTlsRejectUnauthorized?: bool,
+     *     smtpUser?: ?string,
+     *     smtpPassword?: ?string,
+     *     smtpFrom?: ?string,
+     *     createdAt?: ?string,
+     *     updatedAt?: ?string
+     * }
      */
     public function create(array $data): SystemConfigDto
     {
         $data = $data['item'] ?? $data;
 
         return new SystemConfigDto(
-            id: $data['id'] ?? '',
-            smtpHost: $data['smtpHost'] ?? null,
+            id: (string) ($data['id'] ?? ''),
+            smtpHost: isset($data['smtpHost']) && is_string($data['smtpHost']) ? $data['smtpHost'] : null,
             smtpPort: isset($data['smtpPort']) ? (int) $data['smtpPort'] : null,
-            smtpName: $data['smtpName'] ?? null,
+            smtpName: isset($data['smtpName']) && is_string($data['smtpName']) ? $data['smtpName'] : null,
             smtpSecure: (bool) ($data['smtpSecure'] ?? false),
             smtpTlsRejectUnauthorized: (bool) ($data['smtpTlsRejectUnauthorized'] ?? true),
-            smtpUser: $data['smtpUser'] ?? null,
-            smtpPassword: $data['smtpPassword'] ?? null,
-            smtpFrom: $data['smtpFrom'] ?? null,
+            smtpUser: isset($data['smtpUser']) && is_string($data['smtpUser']) ? $data['smtpUser'] : null,
+            smtpPassword: isset($data['smtpPassword']) && is_string($data['smtpPassword']) ? $data['smtpPassword'] : null,
+            smtpFrom: isset($data['smtpFrom']) && is_string($data['smtpFrom']) ? $data['smtpFrom'] : null,
             createdAt: $this->convertToDateTime($data['createdAt'] ?? null),
             updatedAt: $this->convertToDateTime($data['updatedAt'] ?? null),
             _rawResponse: $data,

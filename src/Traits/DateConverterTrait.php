@@ -10,10 +10,20 @@ trait DateConverterTrait
 {
     final public function convertToDateTime(?string $date): ?\DateTimeImmutable
     {
-        if (null === $date) {
+        if (null === $date || '' === $date) {
             return null;
         }
 
-        return \DateTimeImmutable::createFromFormat(Config::DATE_FORMAT, $date);
+        $parsed = \DateTimeImmutable::createFromFormat(Config::DATE_FORMAT, $date);
+
+        if (false !== $parsed) {
+            return $parsed;
+        }
+
+        try {
+            return new \DateTimeImmutable($date);
+        } catch (\Throwable) {
+            return null;
+        }
     }
 }

@@ -53,10 +53,13 @@ final class PsrTransportClient implements TransportClientInterface
         $options = $action->getOptions();
 
         if ($action instanceof AuthenticateInterface) {
-            if (null !== $this->config->getApiKey()) {
-                $request = $request->withHeader('X-Api-Key', $this->config->getApiKey());
-            } elseif (null !== $this->config->getAuthToken()) {
-                $request = $request->withHeader('Authorization', 'Bearer ' . $this->config->getAuthToken());
+            $apiKey = $this->config->getApiKey();
+            $authToken = $this->config->getAuthToken();
+
+            if (null !== $apiKey) {
+                $request = $request->withHeader('X-Api-Key', $apiKey);
+            } elseif (null !== $authToken) {
+                $request = $request->withHeader('Authorization', 'Bearer ' . $authToken);
             }
         }
 
@@ -64,11 +67,28 @@ final class PsrTransportClient implements TransportClientInterface
             foreach ($options['headers'] as $headerName => $headerValue) {
                 if (is_string($headerName) && is_string($headerValue)) {
                     $request = $request->withHeader($headerName, $headerValue);
+                } elseif (is_int($headerName) && is_string($headerValue)) {
+                    $parts = explode(':', $headerValue, 2);
+
+                    if (2 === count($parts)) {
+                        $request = $request->withHeader(trim($parts[0]), trim($parts[1]));
+                    }
                 }
             }
         }
 
-        if (isset($options['json']) && null !== $this->streamFactory) {
+        if (isset($options['body']) && null !== $this->streamFactory) {
+            $bodyContent = '';
+
+            if (is_string($options['body'])) {
+                $bodyContent = $options['body'];
+            } elseif (is_iterable($options['body'])) {
+                foreach ($options['body'] as $chunk) {
+                    $bodyContent .= (string) $chunk;
+                }
+            }
+            $request = $request->withBody($this->streamFactory->createStream($bodyContent));
+        } elseif (isset($options['json']) && null !== $this->streamFactory) {
             $jsonBody = json_encode($options['json']);
 
             if (false !== $jsonBody) {

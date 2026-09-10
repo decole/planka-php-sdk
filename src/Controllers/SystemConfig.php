@@ -8,12 +8,13 @@ use Planka\Bridge\Actions\Common\CommonPatchAction;
 use Planka\Bridge\Actions\SystemConfig\SystemConfigGetAction;
 use Planka\Bridge\Actions\SystemConfig\SystemConfigTestSmtpAction;
 use Planka\Bridge\Actions\SystemConfig\SystemConfigUpdateAction;
+use Planka\Bridge\Contracts\Resources\SystemConfigResourceInterface;
 use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\Common\TestResultDto;
 use Planka\Bridge\Views\Dto\SystemConfig\SystemConfigDto;
 use Planka\Bridge\Views\Factory\SystemConfig\SystemConfigDtoFactory;
 
-final class SystemConfig
+final class SystemConfig implements SystemConfigResourceInterface
 {
     public function __construct(private readonly TransportClientInterface $client) {}
 

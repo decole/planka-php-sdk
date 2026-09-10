@@ -138,9 +138,7 @@ final class Client implements TransportClientInterface
                 return $factory->create($data);
             }
 
-            if (\is_callable($factory)) {
-                return $factory($response);
-            }
+            return $factory($response);
         }
 
         return $response;

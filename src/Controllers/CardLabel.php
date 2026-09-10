@@ -6,10 +6,11 @@ namespace Planka\Bridge\Controllers;
 
 use Planka\Bridge\Actions\CardLabel\CardLabelCreateAction;
 use Planka\Bridge\Actions\CardLabel\CardLabelDeleteAction;
-use Planka\Bridge\Views\Dto\Card\CardLabelDto;
+use Planka\Bridge\Contracts\Resources\CardLabelResourceInterface;
 use Planka\Bridge\TransportClients\TransportClientInterface;
+use Planka\Bridge\Views\Dto\Card\CardLabelDto;
 
-final class CardLabel
+final class CardLabel implements CardLabelResourceInterface
 {
     public function __construct(private readonly TransportClientInterface $client) {}
 

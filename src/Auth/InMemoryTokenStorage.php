@@ -30,4 +30,17 @@ final class InMemoryTokenStorage implements TokenStorageInterface
     {
         $this->apiKey = $apiKey;
     }
+
+    /**
+     * Masks sensitive token data in debug output.
+     *
+     * @return array<string, mixed>
+     */
+    public function __debugInfo(): array
+    {
+        return [
+            'authToken' => null !== $this->authToken ? '********' : null,
+            'apiKey' => null !== $this->apiKey ? '********' : null,
+        ];
+    }
 }

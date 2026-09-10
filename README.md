@@ -136,28 +136,48 @@ try {
 }
 ```
 
-### 2. Custom PSR-18 / PSR-17 HTTP Client
+### 2. Flexible Network Layer: Native Symfony HttpClient & PSR-18 / PSR-17 Transport
 
-The SDK provides `PsrTransportClient` implementing `TransportClientInterface` to allow using any PSR-18 HTTP Client (such as Guzzle, Buzz, or Symfony HTTP Client via PSR-18 adapter):
+Planka SDK is transport-agnostic. It works out-of-the-box with **Symfony HttpClient**, but seamlessly integrates with any **PSR-18 HTTP Client** (such as Guzzle, Buzz, or PSR-18 adapters) via `PsrTransportClient`:
 
+#### A. Custom Symfony HttpClient (Timeouts, Proxies, HTTP/2):
 ```php
+use Planka\Bridge\Config;
+use Planka\Bridge\PlankaClient;
+use Planka\Bridge\TransportClients\Client;
+use Symfony\Component\HttpClient\HttpClient;
+
+$symfonyClient = HttpClient::create([
+    'timeout' => 10.0,
+    'proxy' => 'http://proxy.corp:8080',
+]);
+
+$transport = new Client(config: $config, client: $symfonyClient);
+$planka = new PlankaClient(config: $config, client: $transport);
+```
+
+#### B. PSR-18 Client with Guzzle 7:
+```php
+use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Psr7\HttpFactory;
 use Planka\Bridge\Config;
 use Planka\Bridge\PlankaClient;
 use Planka\Bridge\TransportClients\PsrTransportClient;
 
-// $guzzleClient implements Psr\Http\Client\ClientInterface
-// $requestFactory implements Psr\Http\Message\RequestFactoryInterface
-// $streamFactory implements Psr\Http\Message\StreamFactoryInterface
+$guzzleClient = new GuzzleClient(['timeout' => 10.0]);
+$httpFactory = new HttpFactory();
 
 $psrTransport = new PsrTransportClient(
     config: $config,
-    httpClient: $guzzleClient,
-    requestFactory: $requestFactory,
-    streamFactory: $streamFactory,
+    httpClient: $guzzleClient,    // Psr\Http\Client\ClientInterface
+    requestFactory: $httpFactory, // Psr\Http\Message\RequestFactoryInterface
+    streamFactory: $httpFactory,  // Psr\Http\Message\StreamFactoryInterface
 );
 
-$planka = new PlankaClient($config, $psrTransport);
+$planka = new PlankaClient(config: $config, client: $psrTransport);
 ```
+
+> 📖 **Full Transport & Testing Guide:** See [docs/TRANSPORT_CLIENTS.md](docs/TRANSPORT_CLIENTS.md) for Buzz, Nyholm, Symfony PSR-18 adapter, and PHPUnit unit testing mock examples.
 
 ### 3. Custom Token Storage
 
@@ -318,6 +338,8 @@ All Planka API endpoints are accessible via explicit getter methods on `PlankaCl
 
 ## Documentation & Examples
 
+- [Enterprise Architecture & Production Readiness](docs/ENTERPRISE_ARCHITECTURE.md)
+- [Transport Layer Architecture & Multiple HTTP Clients](docs/TRANSPORT_CLIENTS.md)
 - [Two-Factor Authentication (2FA / TOTP) & Trusted Devices](docs/TWO_FACTOR_AUTHENTICATION.md)
 - [API Key Authentication](docs/API_KEY_AUTHENTICATION.md)
 - [Partial Updates with Patch Input DTOs](docs/PATCH_INPUTS.md)

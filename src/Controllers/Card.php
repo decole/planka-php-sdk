@@ -18,6 +18,7 @@ use Planka\Bridge\Actions\Card\CardViewAction;
 use Planka\Bridge\Actions\Common\CommonPatchAction;
 use Planka\Bridge\Builders\CardBuilder;
 use Planka\Bridge\Config;
+use Planka\Bridge\Contracts\Resources\CardResourceInterface;
 use Planka\Bridge\Enum\BoardDefaultCardTypeEnum;
 use Planka\Bridge\Inputs\CardCreateInput;
 use Planka\Bridge\Inputs\PatchInputInterface;
@@ -27,7 +28,7 @@ use Planka\Bridge\Views\Dto\Card\CardDto;
 use Planka\Bridge\Views\Dto\Card\CardMembershipDto;
 use Planka\Bridge\Views\Factory\Card\CardDtoFactory;
 
-final class Card
+final class Card implements CardResourceInterface
 {
     public function __construct(private readonly TransportClientInterface $client) {}
 
@@ -114,12 +115,12 @@ final class Card
     /** 'PATCH /api/cards/:id' */
     public function addSpentTime(CardDto $card, int $seconds): CardDto
     {
-        $total = ($card->stopwatch->total ?? 0) + $seconds;
+        $total = ($card->stopwatch?->total ?? 0) + $seconds;
 
         return $this->client->patch(new CardTimerAction(
             cardId: $card->id,
             stopwatch: [
-                'startedAt' => $card->stopwatch->startedAt?->format(Config::DATE_FORMAT),
+                'startedAt' => $card->stopwatch?->startedAt?->format(Config::DATE_FORMAT),
                 'total' => $total,
             ],
         ));
@@ -132,7 +133,7 @@ final class Card
             cardId: $card->id,
             stopwatch: [
                 'startedAt' => $start ? (new \DateTimeImmutable())->format(Config::DATE_FORMAT) : null,
-                'total' => $card->stopwatch->total ?? 0,
+                'total' => $card->stopwatch?->total ?? 0,
             ],
         ));
     }

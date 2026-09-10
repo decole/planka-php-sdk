@@ -17,28 +17,28 @@ final class LabelDtoFactory implements OutputInterface
      * @param array<string, mixed> $data
      *
      * @see Payload structure:
-     *      array{
-     *          id: string,
-     *          createdAt: string,
-     *          updatedAt: ?string,
-     *          position: int,
-     *          name: string,
-     *          color: ?string,
-     *          boardId: string
-     *      }
+     * array{
+     *     id: string,
+     *     createdAt: string,
+     *     updatedAt: ?string,
+     *     position: int,
+     *     name: string,
+     *     color: ?string,
+     *     boardId: string
+     * }
      */
     public function create(array $data): LabelDto
     {
         $data = $data['item'] ?? $data;
 
         return new LabelDto(
-            id: $data['id'],
-            boardId: $data['boardId'],
-            createdAt: $this->convertToDateTime($data['createdAt']),
-            updatedAt: $this->convertToDateTime($data['updatedAt']),
-            position: (int) $data['position'],
-            name: $data['name'],
-            color: LabelColorEnum::tryFrom($data['color']),
+            id: (string) $data['id'],
+            boardId: (string) $data['boardId'],
+            createdAt: $this->convertToDateTime($data['createdAt'] ?? null) ?? new \DateTimeImmutable(),
+            updatedAt: $this->convertToDateTime($data['updatedAt'] ?? null),
+            position: (int) ($data['position'] ?? 0),
+            name: (string) ($data['name'] ?? ''),
+            color: isset($data['color']) && is_string($data['color']) ? LabelColorEnum::tryFrom($data['color']) : null,
             _rawResponse: $data,
         );
     }

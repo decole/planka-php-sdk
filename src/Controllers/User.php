@@ -20,9 +20,13 @@ use Planka\Bridge\Actions\User\UserUpdateEmailAction;
 use Planka\Bridge\Actions\User\UserUpdatePasswordAction;
 use Planka\Bridge\Actions\User\UserUpdateUsernameAction;
 use Planka\Bridge\Actions\User\UserViewAction;
+use Planka\Bridge\Builders\UserBuilder;
+use Planka\Bridge\Contracts\Resources\UserResourceInterface;
 use Planka\Bridge\Enum\UserRoleEnum;
 use Planka\Bridge\Exceptions\FileExistException;
+use Planka\Bridge\Inputs\PatchInputInterface;
 use Planka\Bridge\Inputs\PatchInputNormalizer;
+use Planka\Bridge\Inputs\UserPatchInput;
 use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\User\ApiKeyDto;
 use Planka\Bridge\Views\Dto\User\TotpSetupDto;
@@ -32,9 +36,14 @@ use Planka\Bridge\Views\Factory\ItemDtoListFactory;
 use Planka\Bridge\Views\Factory\User\TrustedDeviceDtoFactory;
 use Planka\Bridge\Views\Factory\User\UserDtoFactory;
 
-final class User
+final class User implements UserResourceInterface
 {
     public function __construct(private readonly TransportClientInterface $client) {}
+
+    public function builder(?string $name = null): UserBuilder
+    {
+        return new UserBuilder($name);
+    }
 
     /**
      * 'GET /api/users'.
@@ -79,9 +88,9 @@ final class User
      *   email?: string,
      *   role?: 'admin'|'projectOwner'|'boardUser'|UserRoleEnum,
      *   isDeactivated?: bool
-     * } $map Associative array of fields to update
+     * }|UserPatchInput|PatchInputInterface $map Associative array or PatchInputInterface of fields to update
      */
-    public function patching(string $userId, array $map): UserDto
+    public function patching(string $userId, array|PatchInputInterface $map): UserDto
     {
         return $this->client->patch(new CommonPatchAction(
             urlPath: "api/users/{$userId}",
@@ -93,7 +102,7 @@ final class User
     /** 'PATCH /api/users/:id/email' */
     public function updateEmail(UserDto $dto): UserDto
     {
-        return $this->client->patch(new UserUpdateEmailAction(userId: $dto->id, email: $dto->email));
+        return $this->client->patch(new UserUpdateEmailAction(userId: $dto->id, email: (string) $dto->email));
     }
 
     /** 'PATCH /api/users/:id/password' */
@@ -109,7 +118,7 @@ final class User
     /** 'PATCH /api/users/:id/username' */
     public function updateUsername(UserDto $dto): UserDto
     {
-        return $this->client->patch(new UserUpdateUsernameAction(userId: $dto->id, username: $dto->username));
+        return $this->client->patch(new UserUpdateUsernameAction(userId: $dto->id, username: (string) $dto->username));
     }
 
     /**

@@ -17,15 +17,15 @@ final class CommentDtoFactory implements OutputInterface
      * @param array<string, mixed> $data
      *
      * @see Payload structure:
-     *      array{
-     *          id: string,
-     *          cardId: string,
-     *          userId?: ?string,
-     *          text?: ?string,
-     *          type?: ?string,
-     *          createdAt?: ?string,
-     *          updatedAt?: ?string
-     *      }
+     * array{
+     *     id: string,
+     *     cardId: string,
+     *     userId?: ?string,
+     *     text?: ?string,
+     *     type?: ?string,
+     *     createdAt?: ?string,
+     *     updatedAt?: ?string
+     * }
      */
     public function create(array $data): CommentDto
     {
@@ -34,14 +34,14 @@ final class CommentDtoFactory implements OutputInterface
         $type = isset($data['type']) && is_string($data['type']) ? CommentTypeEnum::tryFrom($data['type']) : null;
 
         return new CommentDto(
-            id: $data['id'],
-            createdAt: $this->convertToDateTime($data['createdAt'] ?? null),
+            id: (string) $data['id'],
+            createdAt: $this->convertToDateTime($data['createdAt'] ?? null) ?? new \DateTimeImmutable(),
             updatedAt: $this->convertToDateTime($data['updatedAt'] ?? null),
-            cardId: $data['cardId'] ?? '',
-            userId: $data['userId'] ?? '',
+            cardId: (string) ($data['cardId'] ?? ''),
+            userId: (string) ($data['userId'] ?? ''),
             type: $type,
-            dataText: $text,
-            text: $text,
+            dataText: (string) $text,
+            text: (string) $text,
             _rawResponse: $data,
         );
     }

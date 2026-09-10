@@ -15,17 +15,7 @@ trait TransportClientTrait
 {
     private function buildUrl(Config $config, string $path): string
     {
-        $base = rtrim($config->getBaseUri(), '/');
-
-        if (
-            80 !== $config->getPort()
-            && 443 !== $config->getPort()
-            && false === strpos($base, ':', 7)
-        ) {
-            $base .= ':' . $config->getPort();
-        }
-
-        return $base . '/' . ltrim($path, '/');
+        return EndpointUrlBuilder::build($config, $path);
     }
 
     /**
@@ -37,16 +27,6 @@ trait TransportClientTrait
      */
     private function handleResponseStatus(int $statusCode, string $content): void
     {
-        if ($statusCode >= 200 && $statusCode < 300) {
-            return;
-        }
-
-        match (true) {
-            404 === $statusCode => throw new PlankaNotFoundException($content, 404),
-            400 === $statusCode, 422 === $statusCode => throw new PlankaValidationException($content, $statusCode),
-            401 === $statusCode, 403 === $statusCode => throw new PlankaAccessDeniedException($content, $statusCode),
-            $statusCode >= 500 => throw new PlankaServerException($content, $statusCode),
-            default => throw new ResponseException($content, $statusCode),
-        };
+        HttpResponseErrorHandler::handle($statusCode, $content);
     }
 }

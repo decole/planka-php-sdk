@@ -13,16 +13,20 @@ use function Fp\Collection\map;
 final class CardActionListDtoFactory implements OutputInterface
 {
     /**
-     * @param array{
+     * @see Payload structure:
+     * array{
      *     items: array,
      *     included?: array
-     * } $data
+     * }
      */
     public function create(array $data): CardActionListDto
     {
+        /** @var array<string, mixed> $included */
+        $included = isset($data['included']) && is_array($data['included']) ? $data['included'] : [];
+
         return new CardActionListDto(
             items: $this->getItems($data),
-            included: (new CardActionIncludedDtoFactory())->create($data['included'] ?? null),
+            included: (new CardActionIncludedDtoFactory())->create($included),
             _rawResponse: $data,
         );
     }

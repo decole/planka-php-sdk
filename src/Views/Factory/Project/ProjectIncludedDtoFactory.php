@@ -4,19 +4,23 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Views\Factory\Project;
 
-use Planka\Bridge\Views\Factory\Board\BoardMembershipDtoFactory;
-use Planka\Bridge\Views\Factory\Board\BoardItemDtoFactory;
-use Planka\Bridge\Views\Dto\Project\ProjectIncludedDto;
-use Planka\Bridge\Views\Dto\Board\BoardMembershipDto;
 use Planka\Bridge\Contracts\Factory\OutputInterface;
-use Planka\Bridge\Views\Factory\User\UserDtoFactory;
 use Planka\Bridge\Views\Dto\Board\BoardItemDto;
+use Planka\Bridge\Views\Dto\Board\BoardMembershipDto;
+use Planka\Bridge\Views\Dto\Project\ProjectIncludedDto;
+use Planka\Bridge\Views\Dto\Project\ProjectManagerDto;
 use Planka\Bridge\Views\Dto\User\UserDto;
+use Planka\Bridge\Views\Factory\Board\BoardItemDtoFactory;
+use Planka\Bridge\Views\Factory\Board\BoardMembershipDtoFactory;
+use Planka\Bridge\Views\Factory\User\UserDtoFactory;
 
 use function Fp\Collection\map;
 
 final class ProjectIncludedDtoFactory implements OutputInterface
 {
+    /**
+     * @param array<string, mixed> $data
+     */
     public function create(array $data): ProjectIncludedDto
     {
         return new ProjectIncludedDto(

@@ -41,8 +41,8 @@ final class MiddlewareStackTransportClient implements TransportClientInterface
     {
         $pipeline = array_reduce(
             array_reverse($this->middlewares),
-            fn (callable $next, TransportMiddlewareInterface $middleware) => fn (ActionInterface $act, string $m) => $middleware->handle($act, $m, $next),
-            fn (ActionInterface $act, string $m) => match ($m) {
+            fn (callable $next, TransportMiddlewareInterface $middleware): \Closure => fn (ActionInterface $act, string $m): mixed => $middleware->handle($act, $m, $next),
+            fn (ActionInterface $act, string $m): mixed => match ($m) {
                 'GET' => $this->innerClient->get($act),
                 'POST' => $this->innerClient->post($act),
                 'PATCH' => $this->innerClient->patch($act),

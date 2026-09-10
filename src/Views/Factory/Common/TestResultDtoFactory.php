@@ -9,6 +9,9 @@ use Planka\Bridge\Views\Dto\Common\TestResultDto;
 
 final class TestResultDtoFactory implements OutputInterface
 {
+    /**
+     * @param array<string, mixed> $data
+     */
     public function create(array $data): TestResultDto
     {
         return new TestResultDto(

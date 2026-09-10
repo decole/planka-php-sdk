@@ -5,19 +5,29 @@ declare(strict_types=1);
 namespace Planka\Bridge\TransportClients\Middleware;
 
 use Planka\Bridge\Contracts\Actions\ActionInterface;
+use Planka\Bridge\Security\SensitiveDataMasker;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 final class PsrLoggerMiddleware implements TransportMiddlewareInterface
 {
-    public function __construct(private readonly ?LoggerInterface $logger = null) {}
+    public function __construct(
+        private readonly ?LoggerInterface $logger = null,
+        private readonly bool $logOptions = false,
+    ) {}
 
     public function handle(ActionInterface $action, string $method, callable $next): mixed
     {
         $logger = $this->logger ?? new NullLogger();
 
-        $url = $action->url();
-        $logger->info(sprintf('[Planka SDK] %s Request: %s', $method, $url));
+        $url = SensitiveDataMasker::maskUrl($action->url());
+        $context = [];
+
+        if ($this->logOptions) {
+            $context['options'] = SensitiveDataMasker::maskArray($action->getOptions());
+        }
+
+        $logger->info(sprintf('[Planka SDK] %s Request: %s', $method, $url), $context);
 
         $start = microtime(true);
 

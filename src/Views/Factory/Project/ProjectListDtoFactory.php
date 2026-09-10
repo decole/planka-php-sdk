@@ -14,10 +14,11 @@ use function Fp\Collection\map;
 final class ProjectListDtoFactory implements OutputInterface
 {
     /**
-     * @param array{
+     * @see Payload structure:
+     * array{
      *     items: array,
      *     included: array
-     * } $data
+     * }
      */
     public function create(array $data): ProjectListDto
     {
@@ -31,7 +32,7 @@ final class ProjectListDtoFactory implements OutputInterface
     /**
      * @return list<ProjectDto>
      */
-    private function getItems(mixed $data): array
+    private function getItems(array $data): array
     {
         return map(
             $data['items'] ?? [],
@@ -39,8 +40,11 @@ final class ProjectListDtoFactory implements OutputInterface
         );
     }
 
-    private function getIncluded(mixed $data): ProjectIncludedDto
+    private function getIncluded(array $data): ProjectIncludedDto
     {
-        return (new ProjectIncludedDtoFactory())->create($data['included'] ?? []);
+        /** @var array<string, mixed> $included */
+        $included = isset($data['included']) && is_array($data['included']) ? $data['included'] : [];
+
+        return (new ProjectIncludedDtoFactory())->create($included);
     }
 }

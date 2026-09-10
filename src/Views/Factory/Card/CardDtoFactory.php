@@ -21,29 +21,31 @@ final class CardDtoFactory implements OutputInterface
     /**
      * @param array<string, mixed> $data
      *
+     * @throws PlankaHydrationException
+     *
      * @see Payload structure:
-     *      array{
-     *          id: string,
-     *          boardId: string,
-     *          listId: string,
-     *          creatorUserId?: ?string,
-     *          prevListId?: ?string,
-     *          coverAttachmentId?: ?string,
-     *          type?: ?string,
-     *          position?: ?int,
-     *          name: string,
-     *          description?: ?string,
-     *          dueDate?: ?string,
-     *          isDueCompleted?: ?bool,
-     *          stopwatch?: ?array{startedAt?: string, total?: int},
-     *          commentsTotal?: int,
-     *          isClosed?: bool,
-     *          listChangedAt?: ?string,
-     *          createdAt?: ?string,
-     *          updatedAt?: ?string,
-     *          item?: array,
-     *          included?: array
-     *      }
+     * array{
+     *     id: string,
+     *     boardId: string,
+     *     listId: string,
+     *     creatorUserId?: ?string,
+     *     prevListId?: ?string,
+     *     coverAttachmentId?: ?string,
+     *     type?: ?string,
+     *     position?: ?int,
+     *     name: string,
+     *     description?: ?string,
+     *     dueDate?: ?string,
+     *     isDueCompleted?: ?bool,
+     *     stopwatch?: ?array{startedAt?: string, total?: int},
+     *     commentsTotal?: int,
+     *     isClosed?: bool,
+     *     listChangedAt?: ?string,
+     *     createdAt?: ?string,
+     *     updatedAt?: ?string,
+     *     item?: array,
+     *     included?: array
+     * }
      */
     public function create(array $data): CardDto
     {
@@ -64,7 +66,7 @@ final class CardDtoFactory implements OutputInterface
 
         return new CardDto(
             id: $item['id'],
-            createdAt: $this->convertToDateTime($item['createdAt'] ?? null),
+            createdAt: $this->convertToDateTime($item['createdAt'] ?? null) ?? new \DateTimeImmutable(),
             updatedAt: $this->convertToDateTime($item['updatedAt'] ?? null),
             position: (int) ($item['position'] ?? 0),
             name: $item['name'] ?? '',

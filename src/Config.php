@@ -78,4 +78,20 @@ final class Config
     {
         return $this->port;
     }
+
+    /**
+     * Masks sensitive properties when inspecting Config object via var_dump() or debuggers.
+     *
+     * @return array<string, mixed>
+     */
+    public function __debugInfo(): array
+    {
+        return [
+            'baseUri' => $this->baseUri,
+            'port' => $this->port,
+            'user' => $this->user,
+            'password' => null !== $this->password ? '********' : null,
+            'tokenStorage' => $this->tokenStorage,
+        ];
+    }
 }

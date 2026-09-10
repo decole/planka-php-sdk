@@ -9,13 +9,23 @@ use Planka\Bridge\Actions\Webhook\WebhookCreateAction;
 use Planka\Bridge\Actions\Webhook\WebhookDeleteAction;
 use Planka\Bridge\Actions\Webhook\WebhookListAction;
 use Planka\Bridge\Actions\Webhook\WebhookUpdateAction;
+use Planka\Bridge\Builders\WebhookBuilder;
+use Planka\Bridge\Contracts\Resources\WebhookResourceInterface;
+use Planka\Bridge\Inputs\PatchInputInterface;
+use Planka\Bridge\Inputs\PatchInputNormalizer;
+use Planka\Bridge\Inputs\WebhookPatchInput;
 use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\Webhook\WebhookDto;
 use Planka\Bridge\Views\Factory\Webhook\WebhookDtoFactory;
 
-final class Webhook
+final class Webhook implements WebhookResourceInterface
 {
     public function __construct(private readonly TransportClientInterface $client) {}
+
+    public function builder(?string $name = null): WebhookBuilder
+    {
+        return new WebhookBuilder($name);
+    }
 
     /**
      * 'GET /api/webhooks'.
@@ -94,13 +104,13 @@ final class Webhook
      *   accessToken?: string|null,
      *   events?: list<string>|null,
      *   excludedEvents?: list<string>|null
-     * } $map Associative array of fields to update
+     * }|WebhookPatchInput|PatchInputInterface $map Associative array or PatchInputInterface of fields to update
      */
-    public function patching(string $webhookId, array $map): WebhookDto
+    public function patching(string $webhookId, array|PatchInputInterface $map): WebhookDto
     {
         return $this->client->patch(new CommonPatchAction(
             urlPath: "api/webhooks/{$webhookId}",
-            data: $map,
+            data: PatchInputNormalizer::normalize($map),
             hydrateCallback: new WebhookDtoFactory(),
         ));
     }

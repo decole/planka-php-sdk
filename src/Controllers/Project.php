@@ -13,18 +13,19 @@ use Planka\Bridge\Actions\Project\ProjectUpdateAction;
 use Planka\Bridge\Actions\Project\ProjectUpdateBackgroundImageAction;
 use Planka\Bridge\Actions\Project\ProjectViewAction;
 use Planka\Bridge\Builders\ProjectBuilder;
+use Planka\Bridge\Contracts\Resources\ProjectResourceInterface;
 use Planka\Bridge\Enum\ProjectTypeEnum;
+use Planka\Bridge\Exceptions\FileExistException;
 use Planka\Bridge\Inputs\PatchInputInterface;
 use Planka\Bridge\Inputs\PatchInputNormalizer;
 use Planka\Bridge\Inputs\ProjectCreateInput;
-use Planka\Bridge\Exceptions\FileExistException;
 use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\Background\BackgroundImageDto;
 use Planka\Bridge\Views\Dto\Project\ProjectDto;
 use Planka\Bridge\Views\Dto\Project\ProjectListDto;
 use Planka\Bridge\Views\Factory\Project\ProjectDtoFactory;
 
-final class Project
+final class Project implements ProjectResourceInterface
 {
     public function __construct(private readonly TransportClientInterface $client) {}
 

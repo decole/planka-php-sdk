@@ -13,18 +13,18 @@ final class TotpSetupDtoFactory implements OutputInterface
      * @param array<string, mixed> $data
      *
      * @see Payload structure:
-     *      array{
-     *          secret?: ?string,
-     *          provisioningUri?: ?string
-     *      }
+     * array{
+     *     secret?: ?string,
+     *     provisioningUri?: ?string
+     * }
      */
     public function create(array $data): TotpSetupDto
     {
         $item = $data['item'] ?? $data;
 
         return new TotpSetupDto(
-            secret: $item['secret'] ?? null,
-            provisioningUri: $item['provisioningUri'] ?? null,
+            secret: isset($item['secret']) && is_string($item['secret']) ? $item['secret'] : null,
+            provisioningUri: isset($item['provisioningUri']) && is_string($item['provisioningUri']) ? $item['provisioningUri'] : null,
             _rawResponse: $data,
         );
     }

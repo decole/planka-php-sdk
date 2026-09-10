@@ -8,12 +8,13 @@ use Planka\Bridge\Actions\BoardMembership\BoardMembershipAddAction;
 use Planka\Bridge\Actions\BoardMembership\BoardMembershipDeleteAction;
 use Planka\Bridge\Actions\BoardMembership\BoardMembershipUpdateAction;
 use Planka\Bridge\Actions\Common\CommonPatchAction;
+use Planka\Bridge\Contracts\Resources\BoardMembershipResourceInterface;
 use Planka\Bridge\Enum\BoardMembershipRoleEnum;
 use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\Board\BoardMembershipDto;
 use Planka\Bridge\Views\Factory\Board\BoardMembershipDtoFactory;
 
-final class BoardMembership
+final class BoardMembership implements BoardMembershipResourceInterface
 {
     public function __construct(private readonly TransportClientInterface $client) {}
 

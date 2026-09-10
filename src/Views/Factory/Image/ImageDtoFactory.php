@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Views\Factory\Image;
 
-use Planka\Bridge\Contracts\Factory\OutputInterface;
 use Planka\Bridge\Views\Dto\Image\ImageDto;
 
-final class ImageDtoFactory implements OutputInterface
+final class ImageDtoFactory
 {
     /**
      * @param array{
@@ -17,13 +16,13 @@ final class ImageDtoFactory implements OutputInterface
      */
     public function create(?array $data): ?ImageDto
     {
-        if (empty($data)) {
+        if (null === $data) {
             return null;
         }
 
         return new ImageDto(
-            height: (int) $data['height'],
-            width: (int) $data['width'],
+            height: isset($data['height']) ? (int) $data['height'] : 0,
+            width: isset($data['width']) ? (int) $data['width'] : 0,
             _rawResponse: $data,
         );
     }

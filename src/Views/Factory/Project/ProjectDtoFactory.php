@@ -20,21 +20,23 @@ final class ProjectDtoFactory implements OutputInterface
     /**
      * @param array<string, mixed> $data
      *
+     * @throws PlankaHydrationException
+     *
      * @see Payload structure:
-     *      array{
-     *          id: string,
-     *          name: string,
-     *          description?: ?string,
-     *          ownerProjectManagerId?: ?string,
-     *          backgroundImageId?: ?string,
-     *          backgroundType?: ?string,
-     *          backgroundGradient?: ?string,
-     *          isHidden?: ?bool,
-     *          createdAt?: ?string,
-     *          updatedAt?: ?string,
-     *          background?: ?array,
-     *          backgroundImage?: ?array
-     *      }
+     * array{
+     *     id: string,
+     *     name: string,
+     *     description?: ?string,
+     *     ownerProjectManagerId?: ?string,
+     *     backgroundImageId?: ?string,
+     *     backgroundType?: ?string,
+     *     backgroundGradient?: ?string,
+     *     isHidden?: ?bool,
+     *     createdAt?: ?string,
+     *     updatedAt?: ?string,
+     *     background?: ?array,
+     *     backgroundImage?: ?array
+     * }
      */
     public function create(array $data): ProjectDto
     {
@@ -46,15 +48,19 @@ final class ProjectDtoFactory implements OutputInterface
         $bgType = isset($item['backgroundType']) && is_string($item['backgroundType']) ? BackgroundTypeEnum::tryFrom($item['backgroundType']) : null;
         $bgGrad = isset($item['backgroundGradient']) && is_string($item['backgroundGradient']) ? BackgroundGradientEnum::tryFrom($item['backgroundGradient']) : null;
 
-        $backgroundData = $item['background'] ?? $item;
+        $backgroundData = isset($item['background']) && is_array($item['background'])
+            ? $item['background']
+            : (is_array($item) ? $item : null);
 
         return new ProjectDto(
             id: $item['id'],
-            createdAt: $this->convertToDateTime($item['createdAt'] ?? null),
+            createdAt: $this->convertToDateTime($item['createdAt'] ?? null) ?? new \DateTimeImmutable(),
             updatedAt: $this->convertToDateTime($item['updatedAt'] ?? null),
             name: $item['name'] ?? '',
-            background: (new BackgroundDtoFactory())->create($backgroundData),
-            backgroundImage: (new BackgroundImageDtoFactory())->create($item['backgroundImage'] ?? null),
+            background: is_array($backgroundData) ? (new BackgroundDtoFactory())->create($backgroundData) : null,
+            backgroundImage: isset($item['backgroundImage']) && is_array($item['backgroundImage'])
+                ? (new BackgroundImageDtoFactory())->create($item['backgroundImage'])
+                : null,
             ownerProjectManagerId: $item['ownerProjectManagerId'] ?? null,
             backgroundImageId: $item['backgroundImageId'] ?? null,
             description: $item['description'] ?? null,

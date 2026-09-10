@@ -6,12 +6,13 @@ namespace Planka\Bridge\Controllers;
 
 use Planka\Bridge\Actions\Auth\AcceptTermsAction;
 use Planka\Bridge\Actions\Auth\GetTermsAction;
+use Planka\Bridge\Contracts\Resources\TermsResourceInterface;
 use Planka\Bridge\Enum\LanguageEnum;
 use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\AccessToken\AccessTokenDto;
 use Planka\Bridge\Views\Dto\Terms\TermsDto;
 
-final class Terms
+final class Terms implements TermsResourceInterface
 {
     public function __construct(private readonly TransportClientInterface $client) {}
 

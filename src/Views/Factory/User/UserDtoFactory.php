@@ -17,31 +17,31 @@ final class UserDtoFactory implements OutputInterface
      * @param array<string, mixed> $data
      *
      * @see Payload structure:
-     *      array{
-     *          id: string,
-     *          email?: ?string,
-     *          role?: ?string,
-     *          name?: ?string,
-     *          username?: ?string,
-     *          avatar?: ?array{url: string, thumbnailUrls: array},
-     *          avatarUrl?: ?string,
-     *          phone?: ?string,
-     *          organization?: ?string,
-     *          language?: ?string,
-     *          subscribeToOwnCards?: ?bool,
-     *          subscribeToCardWhenCommenting?: ?bool,
-     *          turnOffRecentCardHighlighting?: ?bool,
-     *          enableFavoritesByDefault?: ?bool,
-     *          defaultEditorMode?: ?string,
-     *          defaultHomeView?: ?string,
-     *          defaultProjectsOrder?: ?string,
-     *          isSsoUser?: ?bool,
-     *          isDeactivated?: ?bool,
-     *          isDefaultAdmin?: ?bool,
-     *          lockedFieldNames?: array,
-     *          createdAt?: ?string,
-     *          updatedAt?: ?string
-     *      }
+     * array{
+     *     id: string,
+     *     email?: ?string,
+     *     role?: ?string,
+     *     name?: ?string,
+     *     username?: ?string,
+     *     avatar?: ?array{url: string, thumbnailUrls: array},
+     *     avatarUrl?: ?string,
+     *     phone?: ?string,
+     *     organization?: ?string,
+     *     language?: ?string,
+     *     subscribeToOwnCards?: ?bool,
+     *     subscribeToCardWhenCommenting?: ?bool,
+     *     turnOffRecentCardHighlighting?: ?bool,
+     *     enableFavoritesByDefault?: ?bool,
+     *     defaultEditorMode?: ?string,
+     *     defaultHomeView?: ?string,
+     *     defaultProjectsOrder?: ?string,
+     *     isSsoUser?: ?bool,
+     *     isDeactivated?: ?bool,
+     *     isDefaultAdmin?: ?bool,
+     *     lockedFieldNames?: array,
+     *     createdAt?: ?string,
+     *     updatedAt?: ?string
+     * }
      */
     public function create(array $data): UserDto
     {
@@ -64,16 +64,16 @@ final class UserDtoFactory implements OutputInterface
         }
 
         return new UserDto(
-            id: $item['id'],
-            createdAt: $this->convertToDateTime($item['createdAt'] ?? null),
+            id: (string) $item['id'],
+            createdAt: $this->convertToDateTime($item['createdAt'] ?? null) ?? new \DateTimeImmutable(),
             updatedAt: $this->convertToDateTime($item['updatedAt'] ?? null),
-            email: $item['email'] ?? null,
+            email: isset($item['email']) && is_string($item['email']) ? $item['email'] : null,
             isAdmin: $isAdmin,
-            name: $item['name'] ?? null,
-            username: $item['username'] ?? null,
-            phone: $item['phone'] ?? null,
-            organization: $item['organization'] ?? null,
-            language: $item['language'] ?? null,
+            name: isset($item['name']) && is_string($item['name']) ? $item['name'] : null,
+            username: isset($item['username']) && is_string($item['username']) ? $item['username'] : null,
+            phone: isset($item['phone']) && is_string($item['phone']) ? $item['phone'] : null,
+            organization: isset($item['organization']) && is_string($item['organization']) ? $item['organization'] : null,
+            language: isset($item['language']) && is_string($item['language']) ? $item['language'] : null,
             subscribeToOwnCards: (bool) ($item['subscribeToOwnCards'] ?? false),
             deletedAt: $this->convertToDateTime($item['deletedAt'] ?? null),
             isLocked: (bool) ($item['isLocked'] ?? false),

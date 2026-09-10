@@ -31,7 +31,8 @@ use function Fp\Collection\map;
 final class BoardIncludedDtoFactory implements OutputInterface
 {
     /**
-     * @param array{
+     * @see Payload structure:
+     * array{
      *     users: array,
      *     boardMemberships: array,
      *     labels: array,
@@ -52,14 +53,10 @@ final class BoardIncludedDtoFactory implements OutputInterface
      *         image: array{height: int, width: int}
      *     }|null,
      *     projects: array
-     * }|null $data
+     * }
      */
-    public function create(?array $data): ?BoardIncludedDto
+    public function create(array $data): BoardIncludedDto
     {
-        if (null === $data) {
-            return null;
-        }
-
         return new BoardIncludedDto(
             users: $this->getUsers($data),
             boardMemberships: $this->getBoardMemberships($data),
@@ -161,7 +158,7 @@ final class BoardIncludedDtoFactory implements OutputInterface
     }
 
     /**
-     * @return list<AttachmentDto>|array
+     * @return list<AttachmentDto>
      */
     private function getAttachments(array $data): array
     {

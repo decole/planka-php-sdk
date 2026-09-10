@@ -9,12 +9,13 @@ use Planka\Bridge\Actions\Notification\NotificationListAction;
 use Planka\Bridge\Actions\Notification\NotificationReadAllAction;
 use Planka\Bridge\Actions\Notification\NotificationUpdateAction;
 use Planka\Bridge\Actions\Notification\NotificationVewAction;
+use Planka\Bridge\Contracts\Resources\NotificationResourceInterface;
 use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\Notification\NotificationItemDto;
 use Planka\Bridge\Views\Dto\Notification\NotificationListDto;
 use Planka\Bridge\Views\Factory\Notification\NotificationItemDtoFactory;
 
-final class Notification
+final class Notification implements NotificationResourceInterface
 {
     public function __construct(private readonly TransportClientInterface $client) {}
 

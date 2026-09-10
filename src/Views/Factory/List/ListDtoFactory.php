@@ -15,7 +15,8 @@ final class ListDtoFactory implements OutputInterface
     use DateConverterTrait;
 
     /**
-     * @param array{
+     * @see Payload structure:
+     * array{
      *     id: string,
      *     boardId: string,
      *     type?: ?string,
@@ -24,7 +25,7 @@ final class ListDtoFactory implements OutputInterface
      *     color?: ?string,
      *     createdAt?: ?string,
      *     updatedAt?: ?string
-     * } $data
+     * }
      */
     public function create(array $data): ListDto
     {
@@ -32,12 +33,12 @@ final class ListDtoFactory implements OutputInterface
         $colorEnum = isset($data['color']) && is_string($data['color']) ? ListColorEnum::tryFrom($data['color']) : null;
 
         return new ListDto(
-            id: $data['id'],
-            boardId: $data['boardId'] ?? '',
-            createdAt: $this->convertToDateTime($data['createdAt'] ?? null),
+            id: (string) $data['id'],
+            boardId: (string) ($data['boardId'] ?? ''),
+            createdAt: $this->convertToDateTime($data['createdAt'] ?? null) ?? new \DateTimeImmutable(),
             updatedAt: $this->convertToDateTime($data['updatedAt'] ?? null),
             position: (int) ($data['position'] ?? 0),
-            name: $data['name'] ?? null,
+            name: isset($data['name']) && is_string($data['name']) ? $data['name'] : null,
             type: $typeEnum,
             color: $colorEnum,
             _rawResponse: $data,

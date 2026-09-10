@@ -6,10 +6,11 @@ namespace Planka\Bridge\Controllers;
 
 use Planka\Bridge\Actions\CardAction\BoardActionListAction;
 use Planka\Bridge\Actions\CardAction\CardActionViewAction;
-use Planka\Bridge\Views\Dto\Card\CardActionListDto;
+use Planka\Bridge\Contracts\Resources\CardActionResourceInterface;
 use Planka\Bridge\TransportClients\TransportClientInterface;
+use Planka\Bridge\Views\Dto\Card\CardActionListDto;
 
-final class CardAction
+final class CardAction implements CardActionResourceInterface
 {
     public function __construct(private readonly TransportClientInterface $client) {}
 

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Traits;
 
+use Planka\Bridge\Config;
+use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
+
 trait OutputDtoTrait
 {
     /**
@@ -13,10 +16,31 @@ trait OutputDtoTrait
      */
     final public function toArray(): array
     {
-        if (property_exists($this, '_rawResponse') && is_array($this->_rawResponse) && !empty($this->_rawResponse)) {
-            return $this->_rawResponse;
+        $vars = get_object_vars($this);
+        unset($vars['_rawResponse']);
+
+        $result = [];
+
+        /** @var mixed $value */
+        foreach ($vars as $key => $value) {
+            if ($value instanceof OutputDtoInterface) {
+                $result[$key] = $value->toArray();
+            } elseif ($value instanceof \DateTimeInterface) {
+                $result[$key] = $value->format(Config::DATE_FORMAT);
+            } elseif (is_object($value) && property_exists($value, 'value')) {
+                $result[$key] = $value->value;
+            } elseif (is_array($value)) {
+                $result[$key] = array_map(
+                    static function (mixed $item): mixed {
+                        return $item instanceof OutputDtoInterface ? $item->toArray() : $item;
+                    },
+                    $value,
+                );
+            } else {
+                $result[$key] = $value;
+            }
         }
 
-        return get_object_vars($this);
+        return $result;
     }
 }

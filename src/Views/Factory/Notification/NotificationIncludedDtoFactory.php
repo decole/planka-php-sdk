@@ -18,11 +18,12 @@ use function Fp\Collection\map;
 final class NotificationIncludedDtoFactory implements OutputInterface
 {
     /**
-     * @param array{
+     * @see Payload structure:
+     * array{
      *     users: array,
      *     cards: array,
      *     actions: array
-     * } $data
+     * }
      */
     public function create(array $data): NotificationIncludedDto
     {

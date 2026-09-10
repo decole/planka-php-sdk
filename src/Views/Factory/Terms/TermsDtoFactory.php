@@ -10,7 +10,8 @@ use Planka\Bridge\Views\Dto\Terms\TermsDto;
 final class TermsDtoFactory implements OutputInterface
 {
     /**
-     * @param array{
+     * @see Payload structure:
+     * array{
      *     language?: ?string,
      *     content?: ?string,
      *     signature?: ?string,
