@@ -34,10 +34,13 @@ final class ProjectListDtoFactory implements OutputInterface
      */
     private function getItems(array $data): array
     {
-        return array_values(map(
-            $data['items'] ?? [],
+        /** @var list<array> $items */
+        $items = $data['items'] ?? [];
+
+        return map(
+            $items,
             fn(array $item) => (new ProjectDtoFactory())->create($item),
-        ));
+        );
     }
 
     private function getIncluded(array $data): ProjectIncludedDto

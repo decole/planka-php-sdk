@@ -40,7 +40,10 @@ final class NotificationIncludedDtoFactory implements OutputInterface
      */
     private function getUsers(array $data): array
     {
-        return array_values(map($data['users'] ?? [], fn(array $item) => (new UserDtoFactory())->create($item)));
+        /** @var list<array> $users */
+        $users = $data['users'] ?? [];
+
+        return map($users, fn(array $item) => (new UserDtoFactory())->create($item));
     }
 
     /**
@@ -48,10 +51,10 @@ final class NotificationIncludedDtoFactory implements OutputInterface
      */
     private function getCards(array $data): array
     {
-        return array_values(map(
-            $data['cards'] ?? [],
-            fn(array $item) => (new CardDtoFactory())->create(['item' => $item]),
-        ));
+        /** @var list<array> $cards */
+        $cards = $data['cards'] ?? [];
+
+        return map($cards, fn(array $item) => (new CardDtoFactory())->create(['item' => $item]));
     }
 
     /**
@@ -59,9 +62,9 @@ final class NotificationIncludedDtoFactory implements OutputInterface
      */
     private function getActions(array $data): array
     {
-        return array_values(map(
-            $data['actions'] ?? [],
-            fn(array $item) => (new CardActionItemDtoFactory())->create($item),
-        ));
+        /** @var list<array> $actions */
+        $actions = $data['actions'] ?? [];
+
+        return map($actions, fn(array $item) => (new CardActionItemDtoFactory())->create($item));
     }
 }

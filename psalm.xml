@@ -23,10 +23,5 @@
                 <directory name="src" />
             </errorLevel>
         </MissingOverrideAttribute>
-        <RedundantFunctionCallGivenDocblockType>
-            <errorLevel type="suppress">
-                <directory name="src/Views/Factory" />
-            </errorLevel>
-        </RedundantFunctionCallGivenDocblockType>
     </issueHandlers>
 </psalm>

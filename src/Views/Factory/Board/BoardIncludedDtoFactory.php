@@ -77,7 +77,10 @@ final class BoardIncludedDtoFactory implements OutputInterface
      */
     private function getUsers(array $data): array
     {
-        return array_values(map($data['users'] ?? [], fn(array $item) => (new UserDtoFactory())->create($item)));
+        /** @var list<array> $users */
+        $users = $data['users'] ?? [];
+
+        return map($users, fn(array $item) => (new UserDtoFactory())->create($item));
     }
 
     /**
@@ -85,10 +88,10 @@ final class BoardIncludedDtoFactory implements OutputInterface
      */
     private function getBoardMemberships(array $data): array
     {
-        return array_values(map(
-            $data['boardMemberships'] ?? [],
-            fn(array $item) => (new BoardMembershipDtoFactory())->create($item),
-        ));
+        /** @var list<array> $boardMemberships */
+        $boardMemberships = $data['boardMemberships'] ?? [];
+
+        return map($boardMemberships, fn(array $item) => (new BoardMembershipDtoFactory())->create($item));
     }
 
     /**
@@ -96,10 +99,10 @@ final class BoardIncludedDtoFactory implements OutputInterface
      */
     private function getLabels(array $data): array
     {
-        return array_values(map(
-            $data['labels'] ?? [],
-            fn(array $item) => (new LabelDtoFactory())->create($item),
-        ));
+        /** @var list<array> $labels */
+        $labels = $data['labels'] ?? [];
+
+        return map($labels, fn(array $item) => (new LabelDtoFactory())->create($item));
     }
 
     /**
@@ -107,10 +110,10 @@ final class BoardIncludedDtoFactory implements OutputInterface
      */
     private function getLists(array $data): array
     {
-        return array_values(map(
-            $data['lists'] ?? [],
-            fn(array $item) => (new ListDtoFactory())->create($item),
-        ));
+        /** @var list<array> $lists */
+        $lists = $data['lists'] ?? [];
+
+        return map($lists, fn(array $item) => (new ListDtoFactory())->create($item));
     }
 
     /**
@@ -118,10 +121,10 @@ final class BoardIncludedDtoFactory implements OutputInterface
      */
     private function getCards(array $data): array
     {
-        return array_values(map(
-            $data['cards'] ?? [],
-            fn(array $item) => (new CardDtoFactory())->create(['item' => $item]),
-        ));
+        /** @var list<array> $cards */
+        $cards = $data['cards'] ?? [];
+
+        return map($cards, fn(array $item) => (new CardDtoFactory())->create(['item' => $item]));
     }
 
     /**
@@ -129,10 +132,10 @@ final class BoardIncludedDtoFactory implements OutputInterface
      */
     private function getCardMemberships(array $data): array
     {
-        return array_values(map(
-            $data['cardMemberships'] ?? [],
-            fn(array $item) => (new CardMembershipDtoFactory())->create($item),
-        ));
+        /** @var list<array> $cardMemberships */
+        $cardMemberships = $data['cardMemberships'] ?? [];
+
+        return map($cardMemberships, fn(array $item) => (new CardMembershipDtoFactory())->create($item));
     }
 
     /**
@@ -140,10 +143,10 @@ final class BoardIncludedDtoFactory implements OutputInterface
      */
     private function getCardLabels(array $data): array
     {
-        return array_values(map(
-            $data['cardLabels'] ?? [],
-            fn(array $item) => (new CardLabelDtoFactory())->create($item),
-        ));
+        /** @var list<array> $cardLabels */
+        $cardLabels = $data['cardLabels'] ?? [];
+
+        return map($cardLabels, fn(array $item) => (new CardLabelDtoFactory())->create($item));
     }
 
     /**
@@ -151,10 +154,10 @@ final class BoardIncludedDtoFactory implements OutputInterface
      */
     private function getTasks(array $data): array
     {
-        return array_values(map(
-            $data['tasks'] ?? [],
-            fn(array $item) => (new CardTaskDtoFactory())->create($item),
-        ));
+        /** @var list<array> $tasks */
+        $tasks = $data['tasks'] ?? [];
+
+        return map($tasks, fn(array $item) => (new CardTaskDtoFactory())->create($item));
     }
 
     /**
@@ -162,10 +165,10 @@ final class BoardIncludedDtoFactory implements OutputInterface
      */
     private function getAttachments(array $data): array
     {
-        return array_values(map(
-            $data['attachments'] ?? [],
-            fn(array $item) => (new AttachmentDtoFactory())->create($item),
-        ));
+        /** @var list<array> $attachments */
+        $attachments = $data['attachments'] ?? [];
+
+        return map($attachments, fn(array $item) => (new AttachmentDtoFactory())->create($item));
     }
 
     /**
@@ -173,9 +176,9 @@ final class BoardIncludedDtoFactory implements OutputInterface
      */
     private function getProjects(array $data): array
     {
-        return array_values(map(
-            $data['projects'] ?? [],
-            fn(array $item) => (new ProjectDtoFactory())->create($item),
-        ));
+        /** @var list<array> $projects */
+        $projects = $data['projects'] ?? [];
+
+        return map($projects, fn(array $item) => (new ProjectDtoFactory())->create($item));
     }
 }

@@ -39,6 +39,9 @@ final class CardActionListDtoFactory implements OutputInterface
      */
     private function getItems(array $data): array
     {
-        return array_values(map($data['items'] ?? [], fn(array $item) => (new CardActionItemDtoFactory())->create($item)));
+        /** @var list<array> $items */
+        $items = $data['items'] ?? [];
+
+        return map($items, fn(array $item) => (new CardActionItemDtoFactory())->create($item));
     }
 }

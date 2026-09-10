@@ -106,11 +106,23 @@ final class CardDtoFactory implements OutputInterface
             );
         }
 
+        /** @var list<array> $cardMemberships */
+        $cardMemberships = $data['included']['cardMemberships'] ?? [];
+
+        /** @var list<array> $cardLabels */
+        $cardLabels = $data['included']['cardLabels'] ?? [];
+
+        /** @var list<array> $tasks */
+        $tasks = $data['included']['tasks'] ?? [];
+
+        /** @var list<array> $attachments */
+        $attachments = $data['included']['attachments'] ?? [];
+
         return new CardIncludedDto(
-            cardMemberships: array_values(map($data['included']['cardMemberships'] ?? [], fn (array $item) => (new CardMembershipDtoFactory())->create($item))),
-            cardLabels: array_values(map($data['included']['cardLabels'] ?? [], fn (array $item) => (new CardLabelDtoFactory())->create($item))),
-            tasks: array_values(map($data['included']['tasks'] ?? [], fn (array $item) => (new CardTaskDtoFactory())->create($item))),
-            attachments: array_values(map($data['included']['attachments'] ?? [], fn (array $item) => (new AttachmentDtoFactory())->create($item))),
+            cardMemberships: map($cardMemberships, fn (array $item) => (new CardMembershipDtoFactory())->create($item)),
+            cardLabels: map($cardLabels, fn (array $item) => (new CardLabelDtoFactory())->create($item)),
+            tasks: map($tasks, fn (array $item) => (new CardTaskDtoFactory())->create($item)),
+            attachments: map($attachments, fn (array $item) => (new AttachmentDtoFactory())->create($item)),
             _rawResponse: $data['included'],
         );
     }

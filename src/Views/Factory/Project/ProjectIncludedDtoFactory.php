@@ -37,7 +37,10 @@ final class ProjectIncludedDtoFactory implements OutputInterface
      */
     private function getUsers(array $data): array
     {
-        return array_values(map($data['users'] ?? [], fn(array $item) => (new UserDtoFactory())->create($item)));
+        /** @var list<array> $users */
+        $users = $data['users'] ?? [];
+
+        return map($users, fn(array $item) => (new UserDtoFactory())->create($item));
     }
 
     /**
@@ -45,7 +48,10 @@ final class ProjectIncludedDtoFactory implements OutputInterface
      */
     private function getProjectManagers(array $data): array
     {
-        return array_values(map($data['projectManagers'] ?? [], fn(array $item) => (new ProjectManagerDtoFactory())->create($item)));
+        /** @var list<array> $projectManagers */
+        $projectManagers = $data['projectManagers'] ?? [];
+
+        return map($projectManagers, fn(array $item) => (new ProjectManagerDtoFactory())->create($item));
     }
 
     /**
@@ -53,7 +59,10 @@ final class ProjectIncludedDtoFactory implements OutputInterface
      */
     private function getBoards(array $data): array
     {
-        return array_values(map($data['boards'] ?? [], fn(array $item) => (new BoardItemDtoFactory())->create($item)));
+        /** @var list<array> $boards */
+        $boards = $data['boards'] ?? [];
+
+        return map($boards, fn(array $item) => (new BoardItemDtoFactory())->create($item));
     }
 
     /**
@@ -61,9 +70,12 @@ final class ProjectIncludedDtoFactory implements OutputInterface
      */
     private function getBoardMemberships(array $data): array
     {
-        return array_values(map(
-            $data['boardMemberships'] ?? [],
+        /** @var list<array> $boardMemberships */
+        $boardMemberships = $data['boardMemberships'] ?? [];
+
+        return map(
+            $boardMemberships,
             fn(array $item) => (new BoardMembershipDtoFactory())->create($item),
-        ));
+        );
     }
 }
