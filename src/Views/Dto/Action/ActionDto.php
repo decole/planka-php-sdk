@@ -6,9 +6,12 @@ namespace Planka\Bridge\Views\Dto\Action;
 
 use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
 use Planka\Bridge\Enum\CommentTypeEnum;
+use Planka\Bridge\Traits\OutputDtoTrait;
 
 class ActionDto implements OutputDtoInterface
 {
+    use OutputDtoTrait;
+
     public function __construct(
         public readonly string $id,
         public readonly \DateTimeImmutable $createdAt,
@@ -19,6 +22,7 @@ class ActionDto implements OutputDtoInterface
         public readonly ?string $userId = null,
         public readonly ?string $boardId = null,
         public readonly array $data = [],
+        /** @var array<string, mixed> Diagnostic raw response array from Planka API to verify DTO field hydration. */
         public readonly array $_rawResponse = [],
     ) {}
 }

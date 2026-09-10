@@ -9,6 +9,9 @@ use Planka\Bridge\Views\Dto\Common\ServerInfoDto;
 
 final class ServerInfoDtoFactory implements OutputInterface
 {
+    /**
+     * @param array<string, mixed> $data
+     */
     public function create(array $data): ServerInfoDto
     {
         $statusCode = (int) ($data['statusCode'] ?? $data['code'] ?? $data['status'] ?? 200);

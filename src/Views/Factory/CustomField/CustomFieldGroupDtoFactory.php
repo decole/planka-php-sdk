@@ -16,28 +16,28 @@ final class CustomFieldGroupDtoFactory implements OutputInterface
      * @param array<string, mixed> $data
      *
      * @see Payload structure:
-     *      array{
-     *          id: string,
-     *          boardId?: ?string,
-     *          cardId?: ?string,
-     *          baseCustomFieldGroupId?: ?string,
-     *          position: int,
-     *          name?: ?string,
-     *          createdAt?: ?string,
-     *          updatedAt?: ?string
-     *      }
+     * array{
+     *     id: string,
+     *     boardId?: ?string,
+     *     cardId?: ?string,
+     *     baseCustomFieldGroupId?: ?string,
+     *     position: int,
+     *     name?: ?string,
+     *     createdAt?: ?string,
+     *     updatedAt?: ?string
+     * }
      */
     public function create(array $data): CustomFieldGroupDto
     {
         $data = $data['item'] ?? $data;
 
         return new CustomFieldGroupDto(
-            id: $data['id'],
-            boardId: $data['boardId'] ?? null,
-            cardId: $data['cardId'] ?? null,
-            baseCustomFieldGroupId: $data['baseCustomFieldGroupId'] ?? null,
-            position: (int) $data['position'],
-            name: $data['name'] ?? null,
+            id: (string) $data['id'],
+            boardId: isset($data['boardId']) && is_string($data['boardId']) ? $data['boardId'] : null,
+            cardId: isset($data['cardId']) && is_string($data['cardId']) ? $data['cardId'] : null,
+            baseCustomFieldGroupId: isset($data['baseCustomFieldGroupId']) && is_string($data['baseCustomFieldGroupId']) ? $data['baseCustomFieldGroupId'] : null,
+            position: (int) ($data['position'] ?? 0),
+            name: isset($data['name']) && is_string($data['name']) ? $data['name'] : null,
             createdAt: $this->convertToDateTime($data['createdAt'] ?? null),
             updatedAt: $this->convertToDateTime($data['updatedAt'] ?? null),
             _rawResponse: $data,

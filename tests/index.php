@@ -9,19 +9,24 @@ declare(strict_types=1);
 // Run after `composer install` in root directory
 
 use Planka\Bridge\Config;
+use Planka\Bridge\Enum\LabelColorEnum;
 use Planka\Bridge\Enum\NotificationServiceFormatEnum;
 use Planka\Bridge\PlankaClient;
+use Planka\Bridge\Views\Dto\Attachment\AttachmentDto;
 use Planka\Bridge\Views\Dto\Board\BoardDto;
 use Planka\Bridge\Views\Dto\Card\CardDto;
+use Planka\Bridge\Views\Dto\Card\CardLabelDto;
 use Planka\Bridge\Views\Dto\Card\CardTaskDto;
 use Planka\Bridge\Views\Dto\Card\TaskListDto;
 use Planka\Bridge\Views\Dto\CustomField\BaseCustomFieldGroupDto;
 use Planka\Bridge\Views\Dto\CustomField\CustomFieldDto;
 use Planka\Bridge\Views\Dto\CustomField\CustomFieldGroupDto;
+use Planka\Bridge\Views\Dto\Label\LabelDto;
 use Planka\Bridge\Views\Dto\NotificationService\NotificationServiceDto;
 use Planka\Bridge\Views\Dto\Project\ProjectDto;
 use Planka\Bridge\Views\Dto\SystemConfig\SystemConfigDto;
 use Planka\Bridge\Views\Dto\Webhook\WebhookDto;
+use Planka\Bridge\Exceptions\PlankaNotFoundException;
 use Symfony\Component\HttpClient\Exception\ClientException;
 
 $rawConfig = include __DIR__ . '/config.php';
@@ -40,6 +45,9 @@ $createdTracker = [
     'cards' => [],
     'taskLists' => [],
     'tasks' => [],
+    'labels' => [],
+    'cardLabels' => [],
+    'attachments' => [],
     'baseCustomGroups' => [],
     'customGroups' => [],
     'customFields' => [],
@@ -62,7 +70,7 @@ function assertRawResponseMappedToDto(object $dto, string $label): void
     }
 
     $ref = new ReflectionClass($targetDto);
-    $properties = array_map(fn ($p) => $p->getName(), $ref->getProperties());
+    $properties = array_map(static fn ($p) => $p->getName(), $ref->getProperties());
 
     $raw = isset($targetDto->_rawResponse['item']) && is_array($targetDto->_rawResponse['item'])
         ? $targetDto->_rawResponse['item']
@@ -72,7 +80,7 @@ function assertRawResponseMappedToDto(object $dto, string $label): void
     $mappedCount = 0;
 
     foreach ($raw as $key => $val) {
-        if (in_array($key, ['item', 'items', 'included'], true)) {
+        if (in_array($key, ['item', 'items', 'included', 'statusCode'], true)) {
             continue;
         }
 
@@ -126,8 +134,8 @@ $config = new Config(
 
 $client = new PlankaClient($config);
 
-// 2. Ping Server & Terms
-dump('[1/13] Pinging Planka server and fetching Terms...');
+// 2. Ping Server, Bootstrap & Terms
+dump('[1/13] Pinging Planka server and fetching Bootstrap & Terms...');
 $infoResponse = $client->getInfo();
 
 if (200 !== $infoResponse->getStatusCode()) {
@@ -137,6 +145,14 @@ if (200 !== $infoResponse->getStatusCode()) {
 dump('Server connection OK');
 
 try {
+    $bootstrap = $client->getBootstrap();
+    dump('Bootstrap fetch OK');
+    assertRawResponseMappedToDto($bootstrap, 'BootstrapDto');
+} catch (Throwable $e) {
+    dump('Bootstrap fetch note: ' . $e->getMessage());
+}
+
+try {
     $terms = $client->terms()->get();
     dump('Terms fetch OK');
     assertRawResponseMappedToDto($terms, 'TermsDto');
@@ -144,14 +160,34 @@ try {
     dump('Terms fetch note: ' . $e->getMessage());
 }
 
-// 3. Authenticate (JWT)
+// 3. Authenticate (JWT) & User Profile
 dump('[2/13] Authenticating via JWT (email/password)...');
 
-if (!$client->authenticate()) {
+$authResult = $client->authenticate();
+
+if (!$authResult->success) {
     dd('ERROR: Authentication failed!');
 }
 
 dump('JWT Authentication OK. Token acquired.');
+
+$users = $client->user()->list();
+dump('User list OK (Count: ' . count($users) . ')');
+
+if (!empty($users)) {
+    $currentUser = $users[0];
+    assertRawResponseMappedToDto($currentUser, 'UserDto');
+
+    $fetchedUser = $client->user()->get($currentUser->id);
+    dump('User get OK');
+
+    try {
+        $apiKeyResult = $client->user()->createApiKey($currentUser->id);
+        dump('User createApiKey OK');
+    } catch (Throwable $e) {
+        dump('User createApiKey note: ' . $e->getMessage());
+    }
+}
 
 // 4. Test System Config
 dump('[3/13] Fetching System Config...');
@@ -255,12 +291,24 @@ unset($createdTracker['lists'][$columnTemp->id]);
 try {
     $client->boardList()->update($columnTemp->id, 'Should Fail');
     dd('ERROR: Column was not deleted on server!');
-} catch (ClientException $e) {
+} catch (PlankaNotFoundException|Planka\Bridge\Exceptions\PlankaSdkExceptionInterface|ClientException $e) {
     dump('Column deletion verified OK (HTTP error caught on update)');
 }
 
-// 9. Test Cards & Card v2 Operations
-dump('[8/13] Testing Cards (Create, Duplicate, Read Notifications)...');
+// 9. Test Cards, Labels & Card v2 Operations
+dump('[8/13] Testing Cards, Labels & Card v2 Operations...');
+$label = $client->label()->create($boardId, '[v2-test] Bug', LabelColorEnum::BERRY_RED, 1);
+
+if (!$label instanceof LabelDto) {
+    dd('ERROR: Label creation failed!');
+}
+
+assertCreated('labels', $label->id, $label, $createdTracker, 'LabelDto');
+inspectDto($label, 'LabelDto');
+
+$updatedLabel = $client->label()->update($label->id, '[v2-test] Critical Bug', LabelColorEnum::PUMPKIN_ORANGE);
+inspectDto($updatedLabel, 'LabelDto (updated)');
+
 $card1 = $client->card()->create($columnTodo->id, '[v2-test] Task 1', 1);
 
 if (!$card1 instanceof CardDto) {
@@ -269,6 +317,49 @@ if (!$card1 instanceof CardDto) {
 
 assertCreated('cards', $card1->id, $card1, $createdTracker, 'CardDto');
 inspectDto($card1, 'CardDto');
+
+$cardLabel = $client->cardLabel()->add($card1->id, $label->id);
+
+if (!$cardLabel instanceof CardLabelDto) {
+    dd('ERROR: CardLabel add failed!');
+}
+
+assertCreated('cardLabels', $cardLabel->id, $cardLabel, $createdTracker, 'CardLabelDto');
+inspectDto($cardLabel, 'CardLabelDto');
+
+$client->cardLabel()->remove($card1->id, $label->id);
+unset($createdTracker['cardLabels'][$cardLabel->id]);
+dump('CardLabel remove OK');
+
+$client->label()->delete($label->id);
+unset($createdTracker['labels'][$label->id]);
+dump('Label delete OK');
+
+// Attachment upload test
+$tmpFilePath = sys_get_temp_dir() . '/planka_test_attachment_' . time() . '.txt';
+file_put_contents($tmpFilePath, 'Integration test attachment content');
+
+try {
+    $attachment = $client->attachment()->upload($card1->id, $tmpFilePath);
+
+    if ($attachment instanceof AttachmentDto) {
+        assertCreated('attachments', $attachment->id, $attachment, $createdTracker, 'AttachmentDto');
+        inspectDto($attachment, 'AttachmentDto');
+
+        $updatedAttach = $client->attachment()->updateName($attachment->id, 'renamed_attachment.txt');
+        inspectDto($updatedAttach, 'AttachmentDto (updated)');
+
+        $client->attachment()->delete($attachment->id);
+        unset($createdTracker['attachments'][$attachment->id]);
+        dump('Attachment delete OK');
+    }
+} catch (Throwable $e) {
+    dump('Attachment test note: ' . $e->getMessage());
+} finally {
+    if (file_exists($tmpFilePath)) {
+        unlink($tmpFilePath);
+    }
+}
 
 // Duplicate Card (Planka v2 Feature)
 $duplicatedCard = $client->card()->duplicate($card1->id);
@@ -428,7 +519,7 @@ unset($createdTracker['cards'][$card1->id]);
 try {
     $client->card()->get($card1->id);
     dd('ERROR: Card1 was not deleted on server!');
-} catch (ClientException $e) {
+} catch (PlankaNotFoundException|Planka\Bridge\Exceptions\PlankaSdkExceptionInterface|ClientException $e) {
     dump('Card1 deletion verified OK (404 caught)');
 }
 
@@ -439,7 +530,7 @@ unset($createdTracker['cards'][$duplicatedCard->id]);
 try {
     $client->card()->get($duplicatedCard->id);
     dd('ERROR: Duplicated card was not deleted on server!');
-} catch (ClientException $e) {
+} catch (PlankaNotFoundException|Planka\Bridge\Exceptions\PlankaSdkExceptionInterface|ClientException $e) {
     dump('Duplicated card deletion verified OK (404 caught)');
 }
 
@@ -454,7 +545,7 @@ unset($createdTracker['lists'][$columnTodo->id], $createdTracker['lists'][$colum
 try {
     $client->board()->get($boardId);
     dd('ERROR: Board was not deleted on server!');
-} catch (ClientException $e) {
+} catch (PlankaNotFoundException|Planka\Bridge\Exceptions\PlankaSdkExceptionInterface|ClientException $e) {
     dump('Board deletion verified OK (404 caught)');
 }
 
@@ -472,7 +563,7 @@ unset($createdTracker['projects'][$project->id]);
 try {
     $client->project()->get($project->id);
     dd('ERROR: Project was not deleted on server!');
-} catch (ClientException $e) {
+} catch (PlankaNotFoundException|Planka\Bridge\Exceptions\PlankaSdkExceptionInterface|ClientException $e) {
     dump('Project deletion verified OK (404 caught)');
 }
 

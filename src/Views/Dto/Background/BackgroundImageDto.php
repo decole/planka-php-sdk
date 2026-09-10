@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Planka\Bridge\Views\Dto\Background;
 
 use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
+use Planka\Bridge\Traits\OutputDtoTrait;
 
-class BackgroundImageDto implements OutputDtoInterface
+final class BackgroundImageDto implements OutputDtoInterface
 {
+    use OutputDtoTrait;
+
     public function __construct(
         public readonly ?string $id = null,
         public readonly ?string $projectId = null,
@@ -17,6 +20,7 @@ class BackgroundImageDto implements OutputDtoInterface
         public readonly array $thumbnailUrls = [],
         public readonly ?\DateTimeImmutable $createdAt = null,
         public readonly ?\DateTimeImmutable $updatedAt = null,
+        /** @var array<string, mixed> Diagnostic raw response array from Planka API to verify DTO field hydration. */
         public readonly array $_rawResponse = [],
     ) {}
 }

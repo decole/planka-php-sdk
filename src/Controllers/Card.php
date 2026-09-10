@@ -16,29 +16,49 @@ use Planka\Bridge\Actions\Card\CardUnsubscribeMembershipAction;
 use Planka\Bridge\Actions\Card\CardUpdateAction;
 use Planka\Bridge\Actions\Card\CardViewAction;
 use Planka\Bridge\Actions\Common\CommonPatchAction;
+use Planka\Bridge\Builders\CardBuilder;
+use Planka\Bridge\Config;
+use Planka\Bridge\Contracts\Resources\CardResourceInterface;
 use Planka\Bridge\Enum\BoardDefaultCardTypeEnum;
+use Planka\Bridge\Inputs\CardCreateInput;
 use Planka\Bridge\Inputs\PatchInputInterface;
+use Planka\Bridge\Inputs\PatchInputNormalizer;
 use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\Card\CardDto;
 use Planka\Bridge\Views\Dto\Card\CardMembershipDto;
 use Planka\Bridge\Views\Factory\Card\CardDtoFactory;
 
-final class Card
+final class Card implements CardResourceInterface
 {
-    public function __construct(
-        private readonly TransportClientInterface $client,
-    ) {}
+    public function __construct(private readonly TransportClientInterface $client) {}
+
+    public function builder(?string $name = null): CardBuilder
+    {
+        return new CardBuilder($name);
+    }
 
     /** 'POST /api/lists/:listId/cards' */
     public function create(
         string $listId,
-        string $name,
+        string|CardCreateInput|CardBuilder $nameOrInput,
         int $position = 65536,
         BoardDefaultCardTypeEnum $type = BoardDefaultCardTypeEnum::PROJECT,
     ): CardDto {
+        if ($nameOrInput instanceof CardBuilder) {
+            $nameOrInput = $nameOrInput->build();
+        }
+
+        if ($nameOrInput instanceof CardCreateInput) {
+            return $this->client->post(new CommonPatchAction(
+                urlPath: "api/lists/{$listId}/cards",
+                data: $nameOrInput->toArray(),
+                hydrateCallback: new CardDtoFactory(),
+            ));
+        }
+
         return $this->client->post(new CardCreateAction(
             listId: $listId,
-            name: $name,
+            name: $nameOrInput,
             position: $position,
             type: $type,
         ));
@@ -67,19 +87,9 @@ final class Card
      */
     public function patching(string $cardId, array|PatchInputInterface $map): CardDto
     {
-        $data = $map instanceof PatchInputInterface ? $map->toArray() : $map;
-
-        if (isset($data['dueDate']) && $data['dueDate'] instanceof \DateTimeInterface) {
-            $data['dueDate'] = $data['dueDate']->format('Y-m-d\TH:i:s.v\Z');
-        }
-
-        if (isset($data['type']) && $data['type'] instanceof BoardDefaultCardTypeEnum) {
-            $data['type'] = $data['type']->value;
-        }
-
         return $this->client->patch(new CommonPatchAction(
             urlPath: "api/cards/{$cardId}",
-            data: $data,
+            data: PatchInputNormalizer::normalize($map),
             hydrateCallback: new CardDtoFactory(),
         ));
     }
@@ -105,12 +115,12 @@ final class Card
     /** 'PATCH /api/cards/:id' */
     public function addSpentTime(CardDto $card, int $seconds): CardDto
     {
-        $total = ($card->stopwatch->total ?? 0) + $seconds;
+        $total = ($card->stopwatch?->total ?? 0) + $seconds;
 
         return $this->client->patch(new CardTimerAction(
             cardId: $card->id,
             stopwatch: [
-                'startedAt' => $card->stopwatch->startedAt?->format('Y-m-d\TH:i:s.v\Z'),
+                'startedAt' => $card->stopwatch?->startedAt?->format(Config::DATE_FORMAT),
                 'total' => $total,
             ],
         ));
@@ -119,11 +129,17 @@ final class Card
     /** 'PATCH /api/cards/:id' */
     public function triggerTimer(CardDto $card, bool $start): CardDto
     {
+        $startedAt = null;
+
+        if ($start) {
+            $startedAt = (new \DateTimeImmutable())->format(Config::DATE_FORMAT);
+        }
+
         return $this->client->patch(new CardTimerAction(
             cardId: $card->id,
             stopwatch: [
-                'startedAt' => $start ? (new \DateTimeImmutable())->format('Y-m-d\TH:i:s.v\Z') : null,
-                'total' => $card->stopwatch->total ?? 0,
+                'startedAt' => $startedAt,
+                'total' => $card->stopwatch?->total ?? 0,
             ],
         ));
     }

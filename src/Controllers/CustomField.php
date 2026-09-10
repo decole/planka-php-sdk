@@ -9,16 +9,17 @@ use Planka\Bridge\Actions\CustomField\CustomFieldCreateInBaseGroupAction;
 use Planka\Bridge\Actions\CustomField\CustomFieldCreateInGroupAction;
 use Planka\Bridge\Actions\CustomField\CustomFieldDeleteAction;
 use Planka\Bridge\Actions\CustomField\CustomFieldUpdateAction;
-use Planka\Bridge\Exceptions\ResponseException;
+use Planka\Bridge\Contracts\Resources\CustomFieldResourceInterface;
+use Planka\Bridge\Inputs\CustomFieldPatchInput;
+use Planka\Bridge\Inputs\PatchInputInterface;
+use Planka\Bridge\Inputs\PatchInputNormalizer;
 use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\CustomField\CustomFieldDto;
 use Planka\Bridge\Views\Factory\CustomField\CustomFieldDtoFactory;
 
-final class CustomField
+final class CustomField implements CustomFieldResourceInterface
 {
-    public function __construct(
-        private readonly TransportClientInterface $client,
-    ) {}
+    public function __construct(private readonly TransportClientInterface $client) {}
 
     /** 'POST /api/base-custom-field-groups/:baseGroupId/custom-fields' */
     public function createInBaseGroup(string $baseGroupId, string $name, int $position = 65536, ?bool $showOnFrontOfCard = null): CustomFieldDto
@@ -49,7 +50,7 @@ final class CustomField
             'name' => $name,
             'position' => $position,
             'showOnFrontOfCard' => $showOnFrontOfCard,
-        ], fn ($v) => null !== $v);
+        ], static fn ($v) => null !== $v);
 
         return $this->client->patch(new CustomFieldUpdateAction(
             customFieldId: $id,
@@ -65,22 +66,14 @@ final class CustomField
      *   name?: string,
      *   position?: int,
      *   showOnFrontOfCard?: bool
-     * } $map Associative array of fields to update
+     * }|CustomFieldPatchInput|PatchInputInterface $map Associative array or PatchInputInterface of fields to update
      */
-    public function patching(string $id, array $map): CustomFieldDto
+    public function patching(string $id, array|PatchInputInterface $map): CustomFieldDto
     {
         return $this->client->patch(new CommonPatchAction(
             urlPath: "api/custom-fields/{$id}",
-            data: $map,
-            hydrateCallback: function ($response): CustomFieldDto {
-                $result = $response->toArray();
-
-                if (array_key_exists('item', $result)) {
-                    return (new CustomFieldDtoFactory())->create($result['item']);
-                }
-
-                throw new ResponseException($response->getContent());
-            },
+            data: PatchInputNormalizer::normalize($map),
+            hydrateCallback: new CustomFieldDtoFactory(),
         ));
     }
 

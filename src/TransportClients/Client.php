@@ -15,11 +15,14 @@ use Planka\Bridge\Exceptions\PlankaServerException;
 use Planka\Bridge\Exceptions\PlankaValidationException;
 use Planka\Bridge\Exceptions\ResponseException;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class Client implements TransportClientInterface
 {
+    use TransportClientTrait;
+
     private HttpClientInterface $client;
 
     public function __construct(
@@ -29,65 +32,90 @@ final class Client implements TransportClientInterface
         $this->client = $client ?? HttpClient::create();
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ResponseException
+     * @throws PlankaNotFoundException
+     * @throws PlankaValidationException
+     * @throws PlankaAccessDeniedException
+     * @throws PlankaServerException
+     */
     public function get(ActionInterface $action): mixed
     {
         $response = $this->client->request(
             method: 'GET',
-            url: $this->buildUrl($action->url()),
+            url: $this->buildUrl($this->config, $action->url()),
             options: $this->compileOptions($action),
         );
 
         return $this->getResult($action, $response);
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ResponseException
+     * @throws PlankaNotFoundException
+     * @throws PlankaValidationException
+     * @throws PlankaAccessDeniedException
+     * @throws PlankaServerException
+     */
     public function post(ActionInterface $action): mixed
     {
         $response = $this->client->request(
             method: 'POST',
-            url: $this->buildUrl($action->url()),
+            url: $this->buildUrl($this->config, $action->url()),
             options: $this->compileOptions($action),
         );
 
         return $this->getResult($action, $response);
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ResponseException
+     * @throws PlankaNotFoundException
+     * @throws PlankaValidationException
+     * @throws PlankaAccessDeniedException
+     * @throws PlankaServerException
+     */
     public function patch(ActionInterface $action): mixed
     {
         $response = $this->client->request(
             method: 'PATCH',
-            url: $this->buildUrl($action->url()),
+            url: $this->buildUrl($this->config, $action->url()),
             options: $this->compileOptions($action),
         );
 
         return $this->getResult($action, $response);
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ResponseException
+     * @throws PlankaNotFoundException
+     * @throws PlankaValidationException
+     * @throws PlankaAccessDeniedException
+     * @throws PlankaServerException
+     */
     public function delete(ActionInterface $action): mixed
     {
         $response = $this->client->request(
             method: 'DELETE',
-            url: $this->buildUrl($action->url()),
+            url: $this->buildUrl($this->config, $action->url()),
             options: $this->compileOptions($action),
         );
 
         return $this->getResult($action, $response);
     }
 
-    private function buildUrl(string $path): string
-    {
-        $base = rtrim($this->config->getBaseUri(), '/');
-
-        if (
-            80 !== $this->config->getPort()
-            && 443 !== $this->config->getPort()
-            && false === strpos($base, ':', 7)
-        ) {
-            $base .= ':' . $this->config->getPort();
-        }
-
-        return $base . '/' . ltrim($path, '/');
-    }
-
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ResponseException
+     * @throws PlankaNotFoundException
+     * @throws PlankaAccessDeniedException
+     * @throws PlankaServerException
+     * @throws PlankaValidationException
+     */
     private function getResult(ActionInterface $action, ResponseInterface $response): mixed
     {
         $this->checkResponseStatusCode($response);
@@ -110,22 +138,22 @@ final class Client implements TransportClientInterface
                 return $factory->create($data);
             }
 
-            if (\is_callable($factory)) {
-                return $factory($response);
-            }
+            return $factory($response);
         }
 
         return $response;
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ResponseException
+     * @throws PlankaNotFoundException
+     * @throws PlankaAccessDeniedException
+     * @throws PlankaServerException
+     * @throws PlankaValidationException
+     */
     private function checkResponseStatusCode(ResponseInterface $response): void
     {
-        $statusCode = $response->getStatusCode();
-
-        if ($statusCode >= 200 && $statusCode < 300) {
-            return;
-        }
-
         $content = '';
 
         try {
@@ -133,13 +161,7 @@ final class Client implements TransportClientInterface
         } catch (\Throwable) {
         }
 
-        match (true) {
-            404 === $statusCode => throw new PlankaNotFoundException($content, 404),
-            400 === $statusCode, 422 === $statusCode => throw new PlankaValidationException($content, $statusCode),
-            401 === $statusCode, 403 === $statusCode => throw new PlankaAccessDeniedException($content, $statusCode),
-            $statusCode >= 500 => throw new PlankaServerException($content, $statusCode),
-            default => throw new ResponseException($content, $statusCode),
-        };
+        $this->handleResponseStatus($response->getStatusCode(), $content);
     }
 
     private function compileOptions(ActionInterface $action): array

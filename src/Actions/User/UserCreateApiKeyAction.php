@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Planka\Bridge\Actions\User;
 
 use Planka\Bridge\Contracts\Actions\ActionInterface;
+use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
 use Planka\Bridge\Contracts\Factory\OutputInterface;
 use Planka\Bridge\Views\Factory\User\ApiKeyDtoFactory;
 
-final class UserCreateApiKeyAction implements ActionInterface, ResponseResultInterface
+final class UserCreateApiKeyAction implements ActionInterface, AuthenticateInterface, ResponseResultInterface
 {
     public function __construct(private readonly string $userId) {}
 

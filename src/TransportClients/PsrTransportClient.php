@@ -9,11 +9,7 @@ use Planka\Bridge\Contracts\Actions\ActionInterface;
 use Planka\Bridge\Contracts\Actions\AuthenticateInterface;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
 use Planka\Bridge\Contracts\Factory\OutputInterface;
-use Planka\Bridge\Exceptions\PlankaAccessDeniedException;
-use Planka\Bridge\Exceptions\PlankaNotFoundException;
-use Planka\Bridge\Exceptions\PlankaServerException;
-use Planka\Bridge\Exceptions\PlankaValidationException;
-use Planka\Bridge\Exceptions\ResponseException;
+use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface as PsrClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
@@ -21,6 +17,8 @@ use Psr\Http\Message\StreamFactoryInterface;
 
 final class PsrTransportClient implements TransportClientInterface
 {
+    use TransportClientTrait;
+
     public function __construct(
         private readonly Config $config,
         private readonly PsrClientInterface $httpClient,
@@ -48,18 +46,25 @@ final class PsrTransportClient implements TransportClientInterface
         return $this->send('DELETE', $action);
     }
 
+    /**
+     * @throws ClientExceptionInterface
+     * @throws \JsonException
+     */
     private function send(string $method, ActionInterface $action): mixed
     {
-        $url = $this->buildUrl($action->url());
+        $url = $this->buildUrl($this->config, $action->url());
         $request = $this->requestFactory->createRequest($method, $url);
 
         $options = $action->getOptions();
 
         if ($action instanceof AuthenticateInterface) {
-            if (null !== $this->config->getApiKey()) {
-                $request = $request->withHeader('X-Api-Key', $this->config->getApiKey());
-            } elseif (null !== $this->config->getAuthToken()) {
-                $request = $request->withHeader('Authorization', 'Bearer ' . $this->config->getAuthToken());
+            $apiKey = $this->config->getApiKey();
+            $authToken = $this->config->getAuthToken();
+
+            if (null !== $apiKey) {
+                $request = $request->withHeader('X-Api-Key', $apiKey);
+            } elseif (null !== $authToken) {
+                $request = $request->withHeader('Authorization', 'Bearer ' . $authToken);
             }
         }
 
@@ -67,18 +72,33 @@ final class PsrTransportClient implements TransportClientInterface
             foreach ($options['headers'] as $headerName => $headerValue) {
                 if (is_string($headerName) && is_string($headerValue)) {
                     $request = $request->withHeader($headerName, $headerValue);
+                } elseif (is_int($headerName) && is_string($headerValue)) {
+                    $parts = explode(':', $headerValue, 2);
+
+                    if (2 === count($parts)) {
+                        $request = $request->withHeader(trim($parts[0]), trim($parts[1]));
+                    }
                 }
             }
         }
 
-        if (isset($options['json']) && null !== $this->streamFactory) {
-            $jsonBody = json_encode($options['json']);
+        if (isset($options['body']) && null !== $this->streamFactory) {
+            $bodyContent = '';
 
-            if (false !== $jsonBody) {
-                $request = $request
-                    ->withHeader('Content-Type', 'application/json')
-                    ->withBody($this->streamFactory->createStream($jsonBody));
+            if (is_string($options['body'])) {
+                $bodyContent = $options['body'];
+            } elseif (is_iterable($options['body'])) {
+                foreach ($options['body'] as $chunk) {
+                    $bodyContent .= (string) $chunk;
+                }
             }
+            $request = $request->withBody($this->streamFactory->createStream($bodyContent));
+        } elseif (isset($options['json']) && null !== $this->streamFactory) {
+            $jsonBody = json_encode($options['json'], JSON_THROW_ON_ERROR);
+
+            $request = $request
+                ->withHeader('Content-Type', 'application/json')
+                ->withBody($this->streamFactory->createStream($jsonBody));
         }
 
         $response = $this->httpClient->sendRequest($request);
@@ -86,35 +106,12 @@ final class PsrTransportClient implements TransportClientInterface
         return $this->getResult($action, $response);
     }
 
-    private function buildUrl(string $path): string
-    {
-        $base = rtrim($this->config->getBaseUri(), '/');
-
-        if (
-            80 !== $this->config->getPort()
-            && 443 !== $this->config->getPort()
-            && false === strpos($base, ':', 7)
-        ) {
-            $base .= ':' . $this->config->getPort();
-        }
-
-        return $base . '/' . ltrim($path, '/');
-    }
-
     private function getResult(ActionInterface $action, PsrResponseInterface $response): mixed
     {
         $statusCode = $response->getStatusCode();
-        $content = (string) $response->getBody();
+        $content = $response->getBody()->getContents();
 
-        if ($statusCode < 200 || $statusCode >= 300) {
-            match (true) {
-                404 === $statusCode => throw new PlankaNotFoundException($content, 404),
-                400 === $statusCode, 422 === $statusCode => throw new PlankaValidationException($content, $statusCode),
-                401 === $statusCode, 403 === $statusCode => throw new PlankaAccessDeniedException($content, $statusCode),
-                $statusCode >= 500 => throw new PlankaServerException($content, $statusCode),
-                default => throw new ResponseException($content, $statusCode),
-            };
-        }
+        $this->handleResponseStatus($statusCode, $content);
 
         if ($action instanceof ResponseResultInterface) {
             $factory = $action->getFactory();
@@ -123,7 +120,7 @@ final class PsrTransportClient implements TransportClientInterface
                 $data = [];
 
                 try {
-                    $decoded = json_decode($content, true);
+                    $decoded = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
 
                     if (is_array($decoded)) {
                         $data = $decoded;

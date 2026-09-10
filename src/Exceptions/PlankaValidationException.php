@@ -4,4 +4,4 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Exceptions;
 
-class PlankaValidationException extends PlankaException {}
+final class PlankaValidationException extends PlankaException {}

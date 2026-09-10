@@ -26,6 +26,6 @@ final class BoardPatchInput implements PatchInputInterface
             'limitCardTypesToDefaultOne' => $this->limitCardTypesToDefaultOne,
             'alwaysDisplayCardCreator' => $this->alwaysDisplayCardCreator,
             'expandTaskListsByDefault' => $this->expandTaskListsByDefault,
-        ], fn ($v) => null !== $v);
+        ], static fn ($v) => null !== $v);
     }
 }

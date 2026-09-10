@@ -8,16 +8,15 @@ use Planka\Bridge\Actions\Common\CommonPatchAction;
 use Planka\Bridge\Actions\Label\LabelCreateAction;
 use Planka\Bridge\Actions\Label\LabelDeleteAction;
 use Planka\Bridge\Actions\Label\LabelUpdateAction;
+use Planka\Bridge\Contracts\Resources\LabelResourceInterface;
 use Planka\Bridge\Enum\LabelColorEnum;
 use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\Label\LabelDto;
 use Planka\Bridge\Views\Factory\Label\LabelDtoFactory;
 
-final class Label
+final class Label implements LabelResourceInterface
 {
-    public function __construct(
-        private readonly TransportClientInterface $client,
-    ) {}
+    public function __construct(private readonly TransportClientInterface $client) {}
 
     /** 'POST /api/boards/:boardId/labels' */
     public function create(string $boardId, string $name, LabelColorEnum $color, int $position): LabelDto

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Views\Dto\Card;
 
+use Planka\Bridge\Config;
 use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
 use Planka\Bridge\Enum\BoardDefaultCardTypeEnum;
 
@@ -31,6 +32,7 @@ final class CardDto implements OutputDtoInterface
         public bool $isClosed = false,
         public ?\DateTimeImmutable $listChangedAt = null,
         public readonly ?bool $isDueCompleted = null,
+        /** @var array<string, mixed> Diagnostic raw response array from Planka API to verify DTO field hydration. */
         public readonly array $_rawResponse = [],
     ) {}
 
@@ -40,16 +42,16 @@ final class CardDto implements OutputDtoInterface
         return array_filter([
             'name' => $this->name,
             'description' => $this->description,
-            'dueDate' => $this->dueDate?->format('Y-m-d\TH:i:s.v\Z'),
+            'dueDate' => $this->dueDate?->format(Config::DATE_FORMAT),
             'isDueCompleted' => $this->isDueCompleted ?? $this->isDueDateCompleted,
             'position' => $this->position,
             'listId' => $this->listId,
             'isClosed' => $this->isClosed,
             'type' => $this->type?->value,
             'stopwatch' => $this->stopwatch ? array_filter([
-                'startedAt' => $this->stopwatch->startedAt?->format('Y-m-d\TH:i:s.v\Z'),
+                'startedAt' => $this->stopwatch->startedAt?->format(Config::DATE_FORMAT),
                 'total' => $this->stopwatch->total,
-            ], fn ($v) => null !== $v) : null,
-        ], fn ($v) => null !== $v);
+            ], static fn ($v) => null !== $v) : null,
+        ], static fn ($v) => null !== $v);
     }
 }

@@ -13,9 +13,13 @@ use Planka\Bridge\Views\Dto\Label\LabelDto;
 use Planka\Bridge\Views\Dto\List\ListDto;
 use Planka\Bridge\Views\Dto\User\UserDto;
 use Planka\Bridge\Views\Dto\Card\CardDto;
+use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
+use Planka\Bridge\Traits\OutputDtoTrait;
 
-final class BoardIncludedDto
+final class BoardIncludedDto implements OutputDtoInterface
 {
+    use OutputDtoTrait;
+
     /**
      * @param list<UserDto>            $users
      * @param list<BoardMembershipDto> $boardMemberships
@@ -39,6 +43,7 @@ final class BoardIncludedDto
         public array $tasks,
         public array $attachments,
         public array $projects,
+        /** @var array<string, mixed> Diagnostic raw response array from Planka API to verify DTO field hydration. */
         public readonly array $_rawResponse = [],
     ) {}
 }

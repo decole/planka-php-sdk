@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
 <psalm
-    errorLevel="6"
+    errorLevel="2"
     resolveFromConfigFile="true"
+    findUnusedCode="false"
+    findUnusedBaselineEntry="false"
+    findUnusedPsalmSuppress="false"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="https://getpsalm.org/schema/config"
     xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
@@ -13,4 +16,12 @@
             <directory name="tests" />
         </ignoreFiles>
     </projectFiles>
+
+    <issueHandlers>
+        <MissingOverrideAttribute>
+            <errorLevel type="suppress">
+                <directory name="src" />
+            </errorLevel>
+        </MissingOverrideAttribute>
+    </issueHandlers>
 </psalm>

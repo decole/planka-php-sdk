@@ -8,16 +8,17 @@ use Planka\Bridge\Actions\Common\CommonPatchAction;
 use Planka\Bridge\Actions\CustomField\BaseCustomFieldGroupCreateAction;
 use Planka\Bridge\Actions\CustomField\BaseCustomFieldGroupDeleteAction;
 use Planka\Bridge\Actions\CustomField\BaseCustomFieldGroupUpdateAction;
-use Planka\Bridge\Exceptions\ResponseException;
+use Planka\Bridge\Contracts\Resources\BaseCustomFieldGroupResourceInterface;
+use Planka\Bridge\Inputs\BaseCustomFieldGroupPatchInput;
+use Planka\Bridge\Inputs\PatchInputInterface;
+use Planka\Bridge\Inputs\PatchInputNormalizer;
 use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\CustomField\BaseCustomFieldGroupDto;
 use Planka\Bridge\Views\Factory\CustomField\BaseCustomFieldGroupDtoFactory;
 
-final class BaseCustomFieldGroup
+final class BaseCustomFieldGroup implements BaseCustomFieldGroupResourceInterface
 {
-    public function __construct(
-        private readonly TransportClientInterface $client,
-    ) {}
+    public function __construct(private readonly TransportClientInterface $client) {}
 
     /** 'POST /api/projects/:projectId/base-custom-field-groups' */
     public function create(string $projectId, string $name): BaseCustomFieldGroupDto
@@ -37,22 +38,14 @@ final class BaseCustomFieldGroup
      * @param string $id Base custom field group ID
      * @param array{
      *   name?: string
-     * } $map Associative array of fields to update
+     * }|BaseCustomFieldGroupPatchInput|PatchInputInterface $map Associative array or PatchInputInterface of fields to update
      */
-    public function patching(string $id, array $map): BaseCustomFieldGroupDto
+    public function patching(string $id, array|PatchInputInterface $map): BaseCustomFieldGroupDto
     {
         return $this->client->patch(new CommonPatchAction(
             urlPath: "api/base-custom-field-groups/{$id}",
-            data: $map,
-            hydrateCallback: function ($response): BaseCustomFieldGroupDto {
-                $result = $response->toArray();
-
-                if (array_key_exists('item', $result)) {
-                    return (new BaseCustomFieldGroupDtoFactory())->create($result['item']);
-                }
-
-                throw new ResponseException($response->getContent());
-            },
+            data: PatchInputNormalizer::normalize($map),
+            hydrateCallback: new BaseCustomFieldGroupDtoFactory(),
         ));
     }
 

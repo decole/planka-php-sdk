@@ -9,11 +9,26 @@ use Planka\Bridge\Views\Dto\Board\BoardDto;
 
 final class BoardDtoFactory implements OutputInterface
 {
+    /**
+     * @param array<string, mixed> $data
+     */
     public function create(array $data): BoardDto
     {
+        $itemData = $data;
+
+        if (isset($data['item']) && is_array($data['item'])) {
+            $itemData = $data['item'];
+        }
+
+        $included = null;
+
+        if (isset($data['included']) && is_array($data['included'])) {
+            $included = (new BoardIncludedDtoFactory())->create($data['included']);
+        }
+
         return new BoardDto(
-            item: (new BoardItemDtoFactory())->create($data['item']),
-            included: (new BoardIncludedDtoFactory())->create($data['included'] ?? null),
+            item: (new BoardItemDtoFactory())->create($itemData),
+            included: $included,
             _rawResponse: $data,
         );
     }

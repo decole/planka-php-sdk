@@ -9,13 +9,22 @@ use Planka\Bridge\Actions\Webhook\WebhookCreateAction;
 use Planka\Bridge\Actions\Webhook\WebhookDeleteAction;
 use Planka\Bridge\Actions\Webhook\WebhookListAction;
 use Planka\Bridge\Actions\Webhook\WebhookUpdateAction;
+use Planka\Bridge\Builders\WebhookBuilder;
+use Planka\Bridge\Contracts\Resources\WebhookResourceInterface;
+use Planka\Bridge\Inputs\PatchInputInterface;
+use Planka\Bridge\Inputs\PatchInputNormalizer;
 use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\Webhook\WebhookDto;
 use Planka\Bridge\Views\Factory\Webhook\WebhookDtoFactory;
 
-final class Webhook
+final class Webhook implements WebhookResourceInterface
 {
     public function __construct(private readonly TransportClientInterface $client) {}
+
+    public function builder(?string $name = null): WebhookBuilder
+    {
+        return new WebhookBuilder($name);
+    }
 
     /**
      * 'GET /api/webhooks'.
@@ -71,7 +80,11 @@ final class Webhook
         }
 
         if (null !== $events) {
-            $data['events'] = \is_string($events) ? array_map('trim', explode(',', $events)) : $events;
+            if (\is_string($events)) {
+                $data['events'] = array_map('trim', explode(',', $events));
+            } else {
+                $data['events'] = $events;
+            }
         }
 
         if (null !== $excludedEvents) {
@@ -88,19 +101,21 @@ final class Webhook
      * 'PATCH /api/webhooks/:id' - Partially updates webhook properties.
      *
      * @param string $webhookId Webhook ID
-     * @param array{
+     *
+     * @see Payload structure:
+     * array{
      *   name?: string,
      *   url?: string,
      *   accessToken?: string|null,
      *   events?: list<string>|null,
      *   excludedEvents?: list<string>|null
-     * } $map Associative array of fields to update
+     * }
      */
-    public function patching(string $webhookId, array $map): WebhookDto
+    public function patching(string $webhookId, array|PatchInputInterface $map): WebhookDto
     {
         return $this->client->patch(new CommonPatchAction(
             urlPath: "api/webhooks/{$webhookId}",
-            data: $map,
+            data: PatchInputNormalizer::normalize($map),
             hydrateCallback: new WebhookDtoFactory(),
         ));
     }

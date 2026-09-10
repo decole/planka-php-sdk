@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Views\Dto\Attachment;
 
+use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
+use Planka\Bridge\Traits\OutputDtoTrait;
 use Planka\Bridge\Views\Dto\Image\ImageDto;
 
-class AttachmentDto
+final class AttachmentDto implements OutputDtoInterface
 {
+    use OutputDtoTrait;
+
     public function __construct(
         public readonly string $id,
         public readonly string $name,
@@ -20,6 +24,7 @@ class AttachmentDto
         public readonly ?ImageDto $image = null,
         public readonly ?string $type = null,
         public readonly array $data = [],
+        /** @var array<string, mixed> Diagnostic raw response array from Planka API to verify DTO field hydration. */
         public readonly array $_rawResponse = [],
     ) {}
 }

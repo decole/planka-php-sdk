@@ -9,19 +9,25 @@ use Planka\Bridge\Actions\CustomField\CustomFieldGroupCreateInBoardAction;
 use Planka\Bridge\Actions\CustomField\CustomFieldGroupCreateInCardAction;
 use Planka\Bridge\Actions\CustomField\CustomFieldGroupDeleteAction;
 use Planka\Bridge\Actions\CustomField\CustomFieldGroupUpdateAction;
+use Planka\Bridge\Contracts\Resources\CustomFieldGroupResourceInterface;
+use Planka\Bridge\Inputs\CustomFieldGroupPatchInput;
+use Planka\Bridge\Inputs\PatchInputInterface;
+use Planka\Bridge\Inputs\PatchInputNormalizer;
 use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\CustomField\CustomFieldGroupDto;
 use Planka\Bridge\Views\Factory\CustomField\CustomFieldGroupDtoFactory;
 
-final class CustomFieldGroup
+final class CustomFieldGroup implements CustomFieldGroupResourceInterface
 {
-    public function __construct(
-        private readonly TransportClientInterface $client,
-    ) {}
+    public function __construct(private readonly TransportClientInterface $client) {}
 
     /** 'POST /api/boards/:boardId/custom-field-groups' */
-    public function createInBoard(string $boardId, ?string $name = null, ?string $baseCustomFieldGroupId = null, int $position = 65536): CustomFieldGroupDto
-    {
+    public function createInBoard(
+        string $boardId,
+        ?string $name = null,
+        ?string $baseCustomFieldGroupId = null,
+        int $position = 65536,
+    ): CustomFieldGroupDto {
         return $this->client->post(new CustomFieldGroupCreateInBoardAction(
             boardId: $boardId,
             name: $name,
@@ -31,8 +37,12 @@ final class CustomFieldGroup
     }
 
     /** 'POST /api/cards/:cardId/custom-field-groups' */
-    public function createInCard(string $cardId, ?string $name = null, ?string $baseCustomFieldGroupId = null, int $position = 65536): CustomFieldGroupDto
-    {
+    public function createInCard(
+        string $cardId,
+        ?string $name = null,
+        ?string $baseCustomFieldGroupId = null,
+        int $position = 65536,
+    ): CustomFieldGroupDto {
         return $this->client->post(new CustomFieldGroupCreateInCardAction(
             cardId: $cardId,
             name: $name,
@@ -67,13 +77,13 @@ final class CustomFieldGroup
      * @param array{
      *   name?: string|null,
      *   position?: int
-     * } $map Associative array of fields to update
+     * }|CustomFieldGroupPatchInput|PatchInputInterface $map Associative array or PatchInputInterface of fields to update
      */
-    public function patching(string $id, array $map): CustomFieldGroupDto
+    public function patching(string $id, array|PatchInputInterface $map): CustomFieldGroupDto
     {
         return $this->client->patch(new CommonPatchAction(
             urlPath: "api/custom-field-groups/{$id}",
-            data: $map,
+            data: PatchInputNormalizer::normalize($map),
             hydrateCallback: new CustomFieldGroupDtoFactory(),
         ));
     }

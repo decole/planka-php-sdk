@@ -17,16 +17,16 @@ final class CardActionItemDtoFactory implements OutputInterface
      * @param array<string, mixed> $data
      *
      * @see Payload structure:
-     *      array{
-     *          id: string,
-     *          createdAt?: ?string,
-     *          updatedAt?: ?string,
-     *          type?: string,
-     *          data?: array,
-     *          cardId?: ?string,
-     *          userId?: ?string,
-     *          boardId?: ?string
-     *      }
+     * array{
+     *     id: string,
+     *     createdAt?: ?string,
+     *     updatedAt?: ?string,
+     *     type?: string,
+     *     data?: array,
+     *     cardId?: ?string,
+     *     userId?: ?string,
+     *     boardId?: ?string
+     * }
      */
     public function create(array $data): CardActionItemDto
     {
@@ -37,14 +37,14 @@ final class CardActionItemDtoFactory implements OutputInterface
         $dataText = $data['data']['text'] ?? $data['text'] ?? '';
 
         return new CardActionItemDto(
-            id: $data['id'],
-            createdAt: $this->convertToDateTime($data['createdAt'] ?? null),
+            id: (string) ($data['id'] ?? ''),
+            createdAt: $this->convertToDateTime($data['createdAt'] ?? null) ?? new \DateTimeImmutable(),
             updatedAt: $this->convertToDateTime($data['updatedAt'] ?? null),
             type: $type,
             dataText: $dataText,
-            cardId: $data['cardId'] ?? null,
-            userId: $data['userId'] ?? null,
-            boardId: $data['boardId'] ?? null,
+            cardId: isset($data['cardId']) && is_string($data['cardId']) ? $data['cardId'] : null,
+            userId: isset($data['userId']) && is_string($data['userId']) ? $data['userId'] : null,
+            boardId: isset($data['boardId']) && is_string($data['boardId']) ? $data['boardId'] : null,
             data: $actionData,
             _rawResponse: $data,
         );
