@@ -40,7 +40,7 @@ final class NotificationIncludedDtoFactory implements OutputInterface
      */
     private function getUsers(array $data): array
     {
-        return map($data['users'] ?? [], fn(array $item) => (new UserDtoFactory())->create($item));
+        return array_values(map($data['users'] ?? [], fn(array $item) => (new UserDtoFactory())->create($item)));
     }
 
     /**
@@ -48,10 +48,10 @@ final class NotificationIncludedDtoFactory implements OutputInterface
      */
     private function getCards(array $data): array
     {
-        return map(
+        return array_values(map(
             $data['cards'] ?? [],
             fn(array $item) => (new CardDtoFactory())->create(['item' => $item]),
-        );
+        ));
     }
 
     /**
@@ -59,9 +59,9 @@ final class NotificationIncludedDtoFactory implements OutputInterface
      */
     private function getActions(array $data): array
     {
-        return map(
+        return array_values(map(
             $data['actions'] ?? [],
             fn(array $item) => (new CardActionItemDtoFactory())->create($item),
-        );
+        ));
     }
 }

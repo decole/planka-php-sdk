@@ -33,6 +33,7 @@ final class PsrTransportClientTest extends TestCase
 
         $mockStream = $this->createMock(StreamInterface::class);
         $mockStream->method('__toString')->willReturn($fixtureContent);
+        $mockStream->method('getContents')->willReturn($fixtureContent);
 
         $mockResponse = $this->createMock(PsrResponseInterface::class);
         $mockResponse->method('getStatusCode')->willReturn(200);
@@ -80,6 +81,7 @@ final class PsrTransportClientTest extends TestCase
 
         $mockStream = $this->createMock(StreamInterface::class);
         $mockStream->method('__toString')->willReturn($fixtureContent);
+        $mockStream->method('getContents')->willReturn($fixtureContent);
 
         $mockResponse = $this->createMock(PsrResponseInterface::class);
         $mockResponse->method('getStatusCode')->willReturn(200);
@@ -124,6 +126,7 @@ final class PsrTransportClientTest extends TestCase
 
         $mockStream = $this->createMock(StreamInterface::class);
         $mockStream->method('__toString')->willReturn(json_encode(['message' => 'Card not found']));
+        $mockStream->method('getContents')->willReturn(json_encode(['message' => 'Card not found']));
 
         $mockResponse = $this->createMock(PsrResponseInterface::class);
         $mockResponse->method('getStatusCode')->willReturn(404);

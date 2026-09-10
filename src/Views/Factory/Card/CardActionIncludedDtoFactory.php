@@ -21,7 +21,7 @@ final class CardActionIncludedDtoFactory implements OutputInterface
     public function create(array $data): CardActionIncludedDto
     {
         return new CardActionIncludedDto(
-            users: map($data['users'] ?? [], fn(array $item) => (new UserDtoFactory())->create($item)),
+            users: array_values(map($data['users'] ?? [], fn(array $item) => (new UserDtoFactory())->create($item))),
             _rawResponse: $data,
         );
     }

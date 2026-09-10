@@ -31,7 +31,7 @@ final class RetryMiddleware implements TransportMiddlewareInterface
                 }
 
                 $multiplier = (float) (2 ** ($attempts - 1));
-                $delayMs = max(0, (int) ($this->baseDelayMs * $multiplier));
+                $delayMs = max(0, (int) ((float) $this->baseDelayMs * $multiplier));
 
                 usleep($delayMs * 1000);
             }

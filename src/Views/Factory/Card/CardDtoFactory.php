@@ -107,10 +107,10 @@ final class CardDtoFactory implements OutputInterface
         }
 
         return new CardIncludedDto(
-            cardMemberships: map($data['included']['cardMemberships'] ?? [], fn (array $item) => (new CardMembershipDtoFactory())->create($item)),
-            cardLabels: map($data['included']['cardLabels'] ?? [], fn (array $item) => (new CardLabelDtoFactory())->create($item)),
-            tasks: map($data['included']['tasks'] ?? [], fn (array $item) => (new CardTaskDtoFactory())->create($item)),
-            attachments: map($data['included']['attachments'] ?? [], fn (array $item) => (new AttachmentDtoFactory())->create($item)),
+            cardMemberships: array_values(map($data['included']['cardMemberships'] ?? [], fn (array $item) => (new CardMembershipDtoFactory())->create($item))),
+            cardLabels: array_values(map($data['included']['cardLabels'] ?? [], fn (array $item) => (new CardLabelDtoFactory())->create($item))),
+            tasks: array_values(map($data['included']['tasks'] ?? [], fn (array $item) => (new CardTaskDtoFactory())->create($item))),
+            attachments: array_values(map($data['included']['attachments'] ?? [], fn (array $item) => (new AttachmentDtoFactory())->create($item))),
             _rawResponse: $data['included'],
         );
     }

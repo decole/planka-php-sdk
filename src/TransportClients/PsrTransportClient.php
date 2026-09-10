@@ -96,11 +96,9 @@ final class PsrTransportClient implements TransportClientInterface
         } elseif (isset($options['json']) && null !== $this->streamFactory) {
             $jsonBody = json_encode($options['json'], JSON_THROW_ON_ERROR);
 
-            if (false !== $jsonBody) {
-                $request = $request
-                    ->withHeader('Content-Type', 'application/json')
-                    ->withBody($this->streamFactory->createStream($jsonBody));
-            }
+            $request = $request
+                ->withHeader('Content-Type', 'application/json')
+                ->withBody($this->streamFactory->createStream($jsonBody));
         }
 
         $response = $this->httpClient->sendRequest($request);
@@ -111,7 +109,7 @@ final class PsrTransportClient implements TransportClientInterface
     private function getResult(ActionInterface $action, PsrResponseInterface $response): mixed
     {
         $statusCode = $response->getStatusCode();
-        $content = (string) $response->getBody();
+        $content = $response->getBody()->getContents();
 
         $this->handleResponseStatus($statusCode, $content);
 

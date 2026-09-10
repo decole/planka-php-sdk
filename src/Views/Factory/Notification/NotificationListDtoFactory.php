@@ -34,7 +34,7 @@ final class NotificationListDtoFactory implements OutputInterface
      */
     private function getItems(array $data): array
     {
-        return map($data['items'] ?? [], fn(array $item) => (new NotificationItemDtoFactory())->create($item));
+        return array_values(map($data['items'] ?? [], fn(array $item) => (new NotificationItemDtoFactory())->create($item)));
     }
 
     private function getIncluded(array $data): NotificationIncludedDto

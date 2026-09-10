@@ -35,7 +35,7 @@ final class RateLimiterMiddleware implements TransportMiddlewareInterface
                     throw $e;
                 }
 
-                $sleepMicros = max(0, (int) ($retryAfterSeconds * 1000000));
+                $sleepMicros = max(0, (int) ($retryAfterSeconds * 1000000.0));
 
                 usleep($sleepMicros);
             }
