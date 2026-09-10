@@ -9,10 +9,13 @@ use Planka\Bridge\Views\Dto\Image\ImageDto;
 final class ImageDtoFactory
 {
     /**
-     * @param array{
+     * @param array<string, mixed>|null $data
+     *
+     * @see Payload structure:
+     * array{
      *     height: int,
      *     width: int
-     * }|null $data
+     * }
      */
     public function create(?array $data): ?ImageDto
     {
