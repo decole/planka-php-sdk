@@ -11,16 +11,24 @@ use Planka\Bridge\Actions\BoardList\BoardListMoveCardsAction;
 use Planka\Bridge\Actions\BoardList\BoardListSortAction;
 use Planka\Bridge\Actions\BoardList\BoardListUpdateAction;
 use Planka\Bridge\Actions\Common\CommonPatchAction;
+use Planka\Bridge\Builders\BoardListBuilder;
+use Planka\Bridge\Contracts\Resources\BoardListResourceInterface;
 use Planka\Bridge\Enum\ListTypeEnum;
+use Planka\Bridge\Inputs\BoardListPatchInput;
+use Planka\Bridge\Inputs\PatchInputInterface;
+use Planka\Bridge\Inputs\PatchInputNormalizer;
 use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\Board\BoardListDto;
 use Planka\Bridge\Views\Factory\Board\BoardListDtoFactory;
 
-final class BoardList
+final class BoardList implements BoardListResourceInterface
 {
-    public function __construct(
-        private readonly TransportClientInterface $client,
-    ) {}
+    public function __construct(private readonly TransportClientInterface $client) {}
+
+    public function builder(?string $name = null): BoardListBuilder
+    {
+        return new BoardListBuilder($name);
+    }
 
     /** 'POST /api/boards/:boardId/lists' */
     public function create(
@@ -55,13 +63,13 @@ final class BoardList
      *   position?: int,
      *   type?: 'active'|'closed'|'archive'|'trash',
      *   color?: string|null
-     * } $map Associative array of fields to update
+     * }|BoardListPatchInput|PatchInputInterface $map Associative array or PatchInputInterface of fields to update
      */
-    public function patching(string $listId, array $map): BoardListDto
+    public function patching(string $listId, array|PatchInputInterface $map): BoardListDto
     {
         return $this->client->patch(new CommonPatchAction(
             urlPath: "api/lists/{$listId}",
-            data: $map,
+            data: PatchInputNormalizer::normalize($map),
             hydrateCallback: new BoardListDtoFactory(),
         ));
     }

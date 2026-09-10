@@ -14,7 +14,7 @@ final class SystemConfigGetAction implements ActionInterface, AuthenticateInterf
 {
     public function url(): string
     {
-        return 'api/system-settings';
+        return 'api/config';
     }
 
     public function getOptions(): array

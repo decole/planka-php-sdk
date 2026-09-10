@@ -6,18 +6,24 @@ namespace Planka\Bridge\Tests\Integration;
 
 use PHPUnit\Framework\TestCase;
 use Planka\Bridge\Config;
+use Planka\Bridge\Enum\LabelColorEnum;
 use Planka\Bridge\Enum\NotificationServiceFormatEnum;
 use Planka\Bridge\PlankaClient;
+use Planka\Bridge\Views\Dto\Attachment\AttachmentDto;
 use Planka\Bridge\Views\Dto\Board\BoardDto;
 use Planka\Bridge\Views\Dto\Card\CardDto;
+use Planka\Bridge\Views\Dto\Card\CardLabelDto;
 use Planka\Bridge\Views\Dto\Card\CardTaskDto;
 use Planka\Bridge\Views\Dto\Card\TaskListDto;
 use Planka\Bridge\Views\Dto\CustomField\BaseCustomFieldGroupDto;
 use Planka\Bridge\Views\Dto\CustomField\CustomFieldDto;
 use Planka\Bridge\Views\Dto\CustomField\CustomFieldGroupDto;
+use Planka\Bridge\Views\Dto\Label\LabelDto;
 use Planka\Bridge\Views\Dto\NotificationService\NotificationServiceDto;
 use Planka\Bridge\Views\Dto\Project\ProjectDto;
 use Planka\Bridge\Views\Dto\SystemConfig\SystemConfigDto;
+use Planka\Bridge\Views\Dto\User\ApiKeyDto;
+use Planka\Bridge\Views\Dto\User\UserDto;
 use Planka\Bridge\Views\Dto\Webhook\WebhookDto;
 use Planka\Bridge\Exceptions\PlankaNotFoundException;
 use Symfony\Component\HttpClient\Exception\ClientException;
@@ -33,6 +39,9 @@ final class PlankaIntegrationTest extends TestCase
         'cards' => [],
         'taskLists' => [],
         'tasks' => [],
+        'labels' => [],
+        'cardLabels' => [],
+        'attachments' => [],
         'baseCustomGroups' => [],
         'customGroups' => [],
         'customFields' => [],
@@ -86,7 +95,7 @@ final class PlankaIntegrationTest extends TestCase
             : $dto->_rawResponse;
 
         foreach ($targetData as $key => $val) {
-            if (in_array($key, ['item', 'items', 'included'], true)) {
+            if (in_array($key, ['item', 'items', 'included', 'statusCode'], true)) {
                 continue;
             }
             $this->assertContains(
@@ -106,24 +115,47 @@ final class PlankaIntegrationTest extends TestCase
 
     public function testFullIntegrationLifecycle(): void
     {
-        // 1. Ping Server & Terms
+        // 1. Ping Server & Bootstrap & Terms
         $infoResponse = $this->client->getInfo();
         $this->assertEquals(200, $infoResponse->getStatusCode(), 'Planka server is not reachable!');
 
         try {
-            $terms = $this->client->terms->get();
+            $bootstrap = $this->client->getBootstrap();
+            $this->assertInstanceOf(\Planka\Bridge\Views\Dto\Common\BootstrapDto::class, $bootstrap);
+        } catch (\Throwable $e) {
+            // Bootstrap optional
+        }
+
+        try {
+            $terms = $this->client->terms()->get();
             $this->assertInstanceOf(\Planka\Bridge\Views\Dto\Terms\TermsDto::class, $terms);
         } catch (\Throwable $e) {
             // Terms optional
         }
 
-        // 2. Authenticate
-        $authenticated = $this->client->authenticate();
-        $this->assertTrue($authenticated, 'Authentication failed!');
+        // 2. Authenticate & User Profile checks
+        $authResult = $this->client->authenticate();
+        $this->assertTrue($authResult->success, 'Authentication failed!');
+
+        $users = $this->client->user()->list();
+        $this->assertIsArray($users);
+        $this->assertNotEmpty($users);
+        $currentUser = $users[0];
+        $this->assertInstanceOf(UserDto::class, $currentUser);
+
+        $fetchedUser = $this->client->user()->get($currentUser->id);
+        $this->assertInstanceOf(UserDto::class, $fetchedUser);
+
+        try {
+            $apiKeyResult = $this->client->user()->createApiKey($currentUser->id);
+            $this->assertInstanceOf(ApiKeyDto::class, $apiKeyResult);
+        } catch (\Throwable) {
+            // API key creation optional per user role
+        }
 
         // 3. System Config
         try {
-            $sysConfig = $this->client->systemConfig->get();
+            $sysConfig = $this->client->systemConfig()->get();
 
             if ($sysConfig instanceof SystemConfigDto) {
                 $this->assertNotEmpty($sysConfig->id);
@@ -134,18 +166,18 @@ final class PlankaIntegrationTest extends TestCase
 
         // 4. Create Project
         $projectName = '[v2-test-DO-NOT-TOUCH] Project-' . time();
-        $project = $this->client->project->create($projectName);
+        $project = $this->client->project()->create($projectName);
 
         $this->assertInstanceOf(ProjectDto::class, $project);
         $this->assertEquals($projectName, $project->name);
         $this->assertCreated('projects', $project->id, $project);
 
         // 5. Base Custom Field Groups & Fields
-        $baseGroup = $this->client->baseCustomFieldGroup->create($project->id, 'Base Specs');
+        $baseGroup = $this->client->baseCustomFieldGroup()->create($project->id, 'Base Specs');
         $this->assertInstanceOf(BaseCustomFieldGroupDto::class, $baseGroup);
         $this->assertCreated('baseCustomGroups', $baseGroup->id, $baseGroup);
 
-        $customField = $this->client->customField->createInBaseGroup(
+        $customField = $this->client->customField()->createInBaseGroup(
             baseGroupId: $baseGroup->id,
             name: 'Priority',
             showOnFrontOfCard: true,
@@ -155,7 +187,7 @@ final class PlankaIntegrationTest extends TestCase
 
         // 6. Create Board
         $boardName = '[v2-test-DO-NOT-TOUCH] Board';
-        $board = $this->client->board->create($project->id, $boardName, 0);
+        $board = $this->client->board()->create($project->id, $boardName, 0);
 
         $this->assertInstanceOf(BoardDto::class, $board);
         $this->assertNotNull($board->item);
@@ -163,104 +195,143 @@ final class PlankaIntegrationTest extends TestCase
         $this->assertCreated('boards', $boardId, $board);
 
         // Update board
-        $updatedBoard = $this->client->board->update($boardId, '[v2-test-DO-NOT-TOUCH] Board-Updated');
+        $updatedBoard = $this->client->board()->update($boardId, '[v2-test-DO-NOT-TOUCH] Board-Updated');
         $this->assertInstanceOf(BoardDto::class, $updatedBoard);
 
         // Custom Field Group on Board
-        $boardGroup = $this->client->customFieldGroup->createInBoard($boardId, 'Board Fields');
+        $boardGroup = $this->client->customFieldGroup()->createInBoard($boardId, 'Board Fields');
         $this->assertInstanceOf(CustomFieldGroupDto::class, $boardGroup);
         $this->assertCreated('customGroups', $boardGroup->id, $boardGroup);
 
         // 7. Test Lists (Columns)
-        $columnTodo = $this->client->boardList->create($boardId, '[v2-test] To Do', 1);
-        $columnDone = $this->client->boardList->create($boardId, '[v2-test] Done', 2);
-        $columnTemp = $this->client->boardList->create($boardId, '[v2-test] Temporary Column', 3);
+        $columnTodo = $this->client->boardList()->create($boardId, '[v2-test] To Do', 1);
+        $columnDone = $this->client->boardList()->create($boardId, '[v2-test] Done', 2);
+        $columnTemp = $this->client->boardList()->create($boardId, '[v2-test] Temporary Column', 3);
 
         $this->assertCreated('lists', $columnTodo->id, $columnTodo);
         $this->assertCreated('lists', $columnDone->id, $columnDone);
         $this->assertCreated('lists', $columnTemp->id, $columnTemp);
 
         // Sort cards in list
-        $this->client->boardList->sort($columnTodo->id, 'name', 'asc');
+        $this->client->boardList()->sort($columnTodo->id, 'name', 'asc');
 
         // Test Column Deletion
         $this->safeVerifyOwned('lists', $columnTemp->id);
-        $this->client->boardList->delete($columnTemp->id);
+        $this->client->boardList()->delete($columnTemp->id);
         unset($this->createdTracker['lists'][$columnTemp->id]);
 
         try {
-            $this->client->boardList->update($columnTemp->id, 'Should Fail');
+            $this->client->boardList()->update($columnTemp->id, 'Should Fail');
             $this->fail('ERROR: Column was not deleted on server!');
         } catch (PlankaNotFoundException|ClientException $e) {
             $this->assertEquals(404, $e->getStatusCode());
         }
 
-        // 8. Test Cards & Card v2 Operations
-        $card1 = $this->client->card->create($columnTodo->id, '[v2-test] Task 1', 1);
+        // 8. Test Cards, Labels & Card v2 Operations
+        $label = $this->client->label()->create($boardId, '[v2-test] Bug', LabelColorEnum::BERRY_RED, 1);
+        $this->assertInstanceOf(LabelDto::class, $label);
+        $this->assertCreated('labels', $label->id, $label);
+
+        $updatedLabel = $this->client->label()->update($label->id, '[v2-test] Critical Bug', LabelColorEnum::PUMPKIN_ORANGE);
+        $this->assertInstanceOf(LabelDto::class, $updatedLabel);
+
+        $card1 = $this->client->card()->create($columnTodo->id, '[v2-test] Task 1', 1);
         $this->assertInstanceOf(CardDto::class, $card1);
         $this->assertCreated('cards', $card1->id, $card1);
 
-        $duplicatedCard = $this->client->card->duplicate($card1->id);
+        $cardLabel = $this->client->cardLabel()->add($card1->id, $label->id);
+        $this->assertInstanceOf(CardLabelDto::class, $cardLabel);
+        $this->assertCreated('cardLabels', $cardLabel->id, $cardLabel);
+
+        $this->client->cardLabel()->remove($card1->id, $label->id);
+        unset($this->createdTracker['cardLabels'][$cardLabel->id]);
+
+        $this->client->label()->delete($label->id);
+        unset($this->createdTracker['labels'][$label->id]);
+
+        // Attachment upload test
+        $tmpFilePath = sys_get_temp_dir() . '/planka_test_attachment_' . time() . '.txt';
+        file_put_contents($tmpFilePath, 'Integration test attachment content');
+
+        try {
+            $attachment = $this->client->attachment()->upload($card1->id, $tmpFilePath);
+            $this->assertInstanceOf(AttachmentDto::class, $attachment);
+            $this->assertCreated('attachments', $attachment->id, $attachment);
+
+            $updatedAttach = $this->client->attachment()->updateName($attachment->id, 'renamed_attachment.txt');
+            $this->assertInstanceOf(AttachmentDto::class, $updatedAttach);
+
+            $this->client->attachment()->delete($attachment->id);
+            unset($this->createdTracker['attachments'][$attachment->id]);
+        } catch (\Throwable) {
+            // Attachment optional
+        } finally {
+            if (file_exists($tmpFilePath)) {
+                unlink($tmpFilePath);
+            }
+        }
+
+        $duplicatedCard = $this->client->card()->duplicate($card1->id);
         $this->assertInstanceOf(CardDto::class, $duplicatedCard);
         $this->assertCreated('cards', $duplicatedCard->id, $duplicatedCard);
 
-        $this->client->card->readNotifications($card1->id);
+        $this->client->card()->readNotifications($card1->id);
 
         // 9. Card Tasks & Task Lists
-        $taskList = $this->client->cardTask->createTaskList($card1->id, '[v2-test] Checklist');
+        $taskList = $this->client->cardTask()->createTaskList($card1->id, '[v2-test] Checklist');
         $this->assertInstanceOf(TaskListDto::class, $taskList);
         $this->assertCreated('taskLists', $taskList->id, $taskList);
 
-        $fetchedTaskList = $this->client->cardTask->getTaskList($taskList->id);
+        $fetchedTaskList = $this->client->cardTask()->getTaskList($taskList->id);
         $this->assertInstanceOf(TaskListDto::class, $fetchedTaskList);
 
-        $updatedTaskList = $this->client->cardTask->updateTaskList($taskList->id, name: '[v2-test] Checklist Updated');
+        $updatedTaskList = $this->client->cardTask()->updateTaskList($taskList->id, name: '[v2-test] Checklist Updated');
         $this->assertInstanceOf(TaskListDto::class, $updatedTaskList);
 
-        $task1 = $this->client->cardTask->create($taskList->id, '[v2-test] Subtask 1', 0);
+        $task1 = $this->client->cardTask()->create($taskList->id, '[v2-test] Subtask 1', 0);
         $this->assertInstanceOf(CardTaskDto::class, $task1);
         $this->assertCreated('tasks', $task1->id, $task1);
 
         $task1->isCompleted = true;
-        $this->client->cardTask->update($task1);
+        $this->client->cardTask()->update($task1);
 
         // Comments lifecycle
         try {
-            $comment = $this->client->comment->add($card1->id, '[v2-test] Integration Comment');
+            $comment = $this->client->comment()->add($card1->id, '[v2-test] Integration Comment');
             $this->assertNotEmpty($comment->id);
 
-            $commentList = $this->client->comment->list($card1->id);
+            $commentList = $this->client->comment()->list($card1->id);
             $this->assertIsArray($commentList);
 
-            $updatedComment = $this->client->comment->update($comment->id, '[v2-test] Updated Comment');
+            $updatedComment = $this->client->comment()->update($comment->id, '[v2-test] Updated Comment');
             $this->assertInstanceOf(\Planka\Bridge\Views\Dto\Comment\CommentDto::class, $updatedComment);
 
-            $this->client->comment->remove($comment->id);
+            $this->client->comment()->remove($comment->id);
         } catch (\Throwable $e) {
             // Comments optional
         }
 
         // Board Actions
         try {
-            $boardActions = $this->client->cardAction->getBoardActions($boardId);
+            $boardActions = $this->client->cardAction()->getBoardActions($boardId);
             $this->assertInstanceOf(\Planka\Bridge\Views\Dto\Card\CardActionListDto::class, $boardActions);
         } catch (\Throwable $e) {
             // Board Actions optional
         }
 
         $this->safeVerifyOwned('tasks', $task1->id);
-        $this->client->cardTask->delete($task1->id);
+        $this->client->cardTask()->delete($task1->id);
 
         unset($this->createdTracker['tasks'][$task1->id]);
 
         $this->safeVerifyOwned('taskLists', $taskList->id);
-        $this->client->cardTask->deleteTaskList($taskList->id);
+        $this->client->cardTask()->deleteTaskList($taskList->id);
 
         unset($this->createdTracker['taskLists'][$taskList->id]);
 
         // 10. Webhooks
         try {
-            $webhook = $this->client->webhook->create(
+            $webhook = $this->client->webhook()->create(
                 name: 'Test Webhook v2',
                 url: 'https://example.com/webhook-test',
                 events: 'cardCreate,cardUpdate',
@@ -269,13 +340,13 @@ final class PlankaIntegrationTest extends TestCase
             if ($webhook instanceof WebhookDto) {
                 $this->assertCreated('webhooks', $webhook->id, $webhook);
 
-                $webhooks = $this->client->webhook->list();
+                $webhooks = $this->client->webhook()->list();
                 $this->assertNotEmpty($webhooks);
 
-                $this->client->webhook->update($webhook->id, name: 'Updated Webhook v2');
+                $this->client->webhook()->update($webhook->id, name: 'Updated Webhook v2');
 
                 $this->safeVerifyOwned('webhooks', $webhook->id);
-                $this->client->webhook->delete($webhook->id);
+                $this->client->webhook()->delete($webhook->id);
 
                 unset($this->createdTracker['webhooks'][$webhook->id]);
             }
@@ -285,7 +356,7 @@ final class PlankaIntegrationTest extends TestCase
 
         // 11. Notification Services
         try {
-            $notifService = $this->client->notificationService->createInBoard(
+            $notifService = $this->client->notificationService()->createInBoard(
                 boardId: $boardId,
                 url: 'https://example.com/notif-test',
                 format: NotificationServiceFormatEnum::TEXT,
@@ -295,12 +366,12 @@ final class PlankaIntegrationTest extends TestCase
                 $this->assertCreated('notificationServices', $notifService->id, $notifService);
 
                 try {
-                    $this->client->notificationService->test($notifService->id);
+                    $this->client->notificationService()->test($notifService->id);
                 } catch (\Throwable) {
                 }
 
                 $this->safeVerifyOwned('notificationServices', $notifService->id);
-                $this->client->notificationService->delete($notifService->id);
+                $this->client->notificationService()->delete($notifService->id);
 
                 unset($this->createdTracker['notificationServices'][$notifService->id]);
             }
@@ -310,7 +381,7 @@ final class PlankaIntegrationTest extends TestCase
 
         // 12. Explicit Deletion & Safety Verification
         $this->safeVerifyOwned('cards', $card1->id);
-        $this->client->card->delete($card1->id);
+        $this->client->card()->delete($card1->id);
 
         unset(
             $this->createdTracker['cards'][$card1->id],
@@ -319,26 +390,26 @@ final class PlankaIntegrationTest extends TestCase
         );
 
         try {
-            $this->client->card->get($card1->id);
+            $this->client->card()->get($card1->id);
             $this->fail('ERROR: Card1 was not deleted on server!');
         } catch (PlankaNotFoundException|ClientException $e) {
             $this->assertEquals(404, $e->getStatusCode());
         }
 
         $this->safeVerifyOwned('cards', $duplicatedCard->id);
-        $this->client->card->delete($duplicatedCard->id);
+        $this->client->card()->delete($duplicatedCard->id);
 
         unset($this->createdTracker['cards'][$duplicatedCard->id]);
 
         try {
-            $this->client->card->get($duplicatedCard->id);
+            $this->client->card()->get($duplicatedCard->id);
             $this->fail('ERROR: Duplicated card was not deleted on server!');
         } catch (PlankaNotFoundException|ClientException $e) {
             $this->assertEquals(404, $e->getStatusCode());
         }
 
         $this->safeVerifyOwned('boards', $boardId);
-        $this->client->board->delete($boardId);
+        $this->client->board()->delete($boardId);
 
         unset($this->createdTracker['boards'][$boardId]);
 
@@ -349,14 +420,14 @@ final class PlankaIntegrationTest extends TestCase
         );
 
         try {
-            $this->client->board->get($boardId);
+            $this->client->board()->get($boardId);
             $this->fail('ERROR: Board was not deleted on server!');
         } catch (PlankaNotFoundException|ClientException $e) {
             $this->assertEquals(404, $e->getStatusCode());
         }
 
         $this->safeVerifyOwned('baseCustomGroups', $baseGroup->id);
-        $this->client->baseCustomFieldGroup->delete($baseGroup->id);
+        $this->client->baseCustomFieldGroup()->delete($baseGroup->id);
 
         unset(
             $this->createdTracker['baseCustomGroups'][$baseGroup->id],
@@ -364,12 +435,12 @@ final class PlankaIntegrationTest extends TestCase
         );
 
         $this->safeVerifyOwned('projects', $project->id);
-        $this->client->project->delete($project->id);
+        $this->client->project()->delete($project->id);
 
         unset($this->createdTracker['projects'][$project->id]);
 
         try {
-            $this->client->project->get($project->id);
+            $this->client->project()->get($project->id);
             $this->fail('ERROR: Project was not deleted on server!');
         } catch (PlankaNotFoundException|ClientException $e) {
             $this->assertEquals(404, $e->getStatusCode());

@@ -18,11 +18,12 @@ use function Fp\Collection\map;
 final class NotificationIncludedDtoFactory implements OutputInterface
 {
     /**
-     * @param array{
+     * @see Payload structure:
+     * array{
      *     users: array,
      *     cards: array,
      *     actions: array
-     * } $data
+     * }
      */
     public function create(array $data): NotificationIncludedDto
     {
@@ -39,7 +40,10 @@ final class NotificationIncludedDtoFactory implements OutputInterface
      */
     private function getUsers(array $data): array
     {
-        return map($data['users'] ?? [], fn(array $item) => (new UserDtoFactory())->create($item));
+        /** @var list<array> $users */
+        $users = $data['users'] ?? [];
+
+        return map($users, fn(array $item) => (new UserDtoFactory())->create($item));
     }
 
     /**
@@ -47,10 +51,10 @@ final class NotificationIncludedDtoFactory implements OutputInterface
      */
     private function getCards(array $data): array
     {
-        return map(
-            $data['cards'] ?? [],
-            fn(array $item) => (new CardDtoFactory())->create(['item' => $item]),
-        );
+        /** @var list<array> $cards */
+        $cards = $data['cards'] ?? [];
+
+        return map($cards, fn(array $item) => (new CardDtoFactory())->create(['item' => $item]));
     }
 
     /**
@@ -58,9 +62,9 @@ final class NotificationIncludedDtoFactory implements OutputInterface
      */
     private function getActions(array $data): array
     {
-        return map(
-            $data['actions'] ?? [],
-            fn(array $item) => (new CardActionItemDtoFactory())->create($item),
-        );
+        /** @var list<array> $actions */
+        $actions = $data['actions'] ?? [];
+
+        return map($actions, fn(array $item) => (new CardActionItemDtoFactory())->create($item));
     }
 }

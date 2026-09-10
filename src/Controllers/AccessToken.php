@@ -6,10 +6,11 @@ namespace Planka\Bridge\Controllers;
 
 use Planka\Bridge\Actions\Auth\ExchangeWithOidcAction;
 use Planka\Bridge\Actions\Auth\RevokePendingTokenAction;
+use Planka\Bridge\Contracts\Resources\AccessTokenResourceInterface;
 use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\AccessToken\AccessTokenDto;
 
-final class AccessToken
+final class AccessToken implements AccessTokenResourceInterface
 {
     public function __construct(private readonly TransportClientInterface $client) {}
 

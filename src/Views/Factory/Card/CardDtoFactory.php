@@ -6,6 +6,7 @@ namespace Planka\Bridge\Views\Factory\Card;
 
 use Planka\Bridge\Contracts\Factory\OutputInterface;
 use Planka\Bridge\Enum\BoardDefaultCardTypeEnum;
+use Planka\Bridge\Exceptions\PlankaHydrationException;
 use Planka\Bridge\Traits\DateConverterTrait;
 use Planka\Bridge\Views\Dto\Card\CardDto;
 use Planka\Bridge\Views\Dto\Card\CardIncludedDto;
@@ -20,33 +21,39 @@ final class CardDtoFactory implements OutputInterface
     /**
      * @param array<string, mixed> $data
      *
+     * @throws PlankaHydrationException
+     *
      * @see Payload structure:
-     *      array{
-     *          id: string,
-     *          boardId: string,
-     *          listId: string,
-     *          creatorUserId?: ?string,
-     *          prevListId?: ?string,
-     *          coverAttachmentId?: ?string,
-     *          type?: ?string,
-     *          position?: ?int,
-     *          name: string,
-     *          description?: ?string,
-     *          dueDate?: ?string,
-     *          isDueCompleted?: ?bool,
-     *          stopwatch?: ?array{startedAt?: string, total?: int},
-     *          commentsTotal?: int,
-     *          isClosed?: bool,
-     *          listChangedAt?: ?string,
-     *          createdAt?: ?string,
-     *          updatedAt?: ?string,
-     *          item?: array,
-     *          included?: array
-     *      }
+     * array{
+     *     id: string,
+     *     boardId: string,
+     *     listId: string,
+     *     creatorUserId?: ?string,
+     *     prevListId?: ?string,
+     *     coverAttachmentId?: ?string,
+     *     type?: ?string,
+     *     position?: ?int,
+     *     name: string,
+     *     description?: ?string,
+     *     dueDate?: ?string,
+     *     isDueCompleted?: ?bool,
+     *     stopwatch?: ?array{startedAt?: string, total?: int},
+     *     commentsTotal?: int,
+     *     isClosed?: bool,
+     *     listChangedAt?: ?string,
+     *     createdAt?: ?string,
+     *     updatedAt?: ?string,
+     *     item?: array,
+     *     included?: array
+     * }
      */
     public function create(array $data): CardDto
     {
         $item = $data['item'] ?? $data;
+
+        if (!isset($item['id']) || !is_string($item['id'])) {
+            throw new PlankaHydrationException('Failed to hydrate CardDto: missing or invalid "id" field.');
+        }
 
         $typeEnum = null;
 
@@ -54,12 +61,17 @@ final class CardDtoFactory implements OutputInterface
             $typeEnum = BoardDefaultCardTypeEnum::tryFrom($item['type']);
         }
 
-        $isDueCompleted = isset($item['isDueCompleted']) ? (bool) $item['isDueCompleted'] :
-            (isset($item['isDueDateCompleted']) ? (bool) $item['isDueDateCompleted'] : null);
+        $isDueCompleted = null;
+
+        if (isset($item['isDueCompleted'])) {
+            $isDueCompleted = (bool) $item['isDueCompleted'];
+        } elseif (isset($item['isDueDateCompleted'])) {
+            $isDueCompleted = (bool) $item['isDueDateCompleted'];
+        }
 
         return new CardDto(
             id: $item['id'],
-            createdAt: $this->convertToDateTime($item['createdAt'] ?? null),
+            createdAt: $this->convertToDateTime($item['createdAt'] ?? null) ?? new \DateTimeImmutable(),
             updatedAt: $this->convertToDateTime($item['updatedAt'] ?? null),
             position: (int) ($item['position'] ?? 0),
             name: $item['name'] ?? '',
@@ -94,11 +106,23 @@ final class CardDtoFactory implements OutputInterface
             );
         }
 
+        /** @var list<array> $cardMemberships */
+        $cardMemberships = $data['included']['cardMemberships'] ?? [];
+
+        /** @var list<array> $cardLabels */
+        $cardLabels = $data['included']['cardLabels'] ?? [];
+
+        /** @var list<array> $tasks */
+        $tasks = $data['included']['tasks'] ?? [];
+
+        /** @var list<array> $attachments */
+        $attachments = $data['included']['attachments'] ?? [];
+
         return new CardIncludedDto(
-            cardMemberships: map($data['included']['cardMemberships'] ?? [], fn (array $item) => (new CardMembershipDtoFactory())->create($item)),
-            cardLabels: map($data['included']['cardLabels'] ?? [], fn (array $item) => (new CardLabelDtoFactory())->create($item)),
-            tasks: map($data['included']['tasks'] ?? [], fn (array $item) => (new CardTaskDtoFactory())->create($item)),
-            attachments: map($data['included']['attachments'] ?? [], fn (array $item) => (new AttachmentDtoFactory())->create($item)),
+            cardMemberships: map($cardMemberships, fn (array $item) => (new CardMembershipDtoFactory())->create($item)),
+            cardLabels: map($cardLabels, fn (array $item) => (new CardLabelDtoFactory())->create($item)),
+            tasks: map($tasks, fn (array $item) => (new CardTaskDtoFactory())->create($item)),
+            attachments: map($attachments, fn (array $item) => (new AttachmentDtoFactory())->create($item)),
             _rawResponse: $data['included'],
         );
     }

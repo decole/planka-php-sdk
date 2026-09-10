@@ -12,17 +12,20 @@ use Planka\Bridge\Actions\CardTask\TaskListDeleteAction;
 use Planka\Bridge\Actions\CardTask\TaskListUpdateAction;
 use Planka\Bridge\Actions\CardTask\TaskListViewAction;
 use Planka\Bridge\Actions\Common\CommonPatchAction;
+use Planka\Bridge\Contracts\Resources\CardTaskResourceInterface;
+use Planka\Bridge\Inputs\CardTaskPatchInput;
+use Planka\Bridge\Inputs\PatchInputInterface;
+use Planka\Bridge\Inputs\PatchInputNormalizer;
+use Planka\Bridge\Inputs\TaskListPatchInput;
 use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\Card\CardTaskDto;
 use Planka\Bridge\Views\Dto\Card\TaskListDto;
 use Planka\Bridge\Views\Factory\Card\CardTaskDtoFactory;
 use Planka\Bridge\Views\Factory\Card\TaskListDtoFactory;
 
-final class CardTask
+final class CardTask implements CardTaskResourceInterface
 {
-    public function __construct(
-        private readonly TransportClientInterface $client,
-    ) {}
+    public function __construct(private readonly TransportClientInterface $client) {}
 
     /** 'POST /api/cards/:cardId/task-lists' */
     public function createTaskList(string $cardId, string $name, int $position = 65536): TaskListDto
@@ -81,13 +84,13 @@ final class CardTask
      *   position?: int,
      *   showOnFrontOfCard?: bool,
      *   hideCompletedTasks?: bool
-     * } $map Associative array of fields to update
+     * }|TaskListPatchInput|PatchInputInterface $map Associative array or PatchInputInterface of fields to update
      */
-    public function patchingTaskList(string $taskListId, array $map): TaskListDto
+    public function patchingTaskList(string $taskListId, array|PatchInputInterface $map): TaskListDto
     {
         return $this->client->patch(new CommonPatchAction(
             urlPath: "api/task-lists/{$taskListId}",
-            data: $map,
+            data: PatchInputNormalizer::normalize($map),
             hydrateCallback: new TaskListDtoFactory(),
         ));
     }
@@ -131,13 +134,13 @@ final class CardTask
      *   isCompleted?: bool,
      *   linkedCardId?: string|null,
      *   assigneeUserId?: string|null
-     * } $map Associative array of fields to update
+     * }|CardTaskPatchInput|PatchInputInterface $map Associative array or PatchInputInterface of fields to update
      */
-    public function patching(string $taskId, array $map): CardTaskDto
+    public function patching(string $taskId, array|PatchInputInterface $map): CardTaskDto
     {
         return $this->client->patch(new CommonPatchAction(
             urlPath: "api/tasks/{$taskId}",
-            data: $map,
+            data: PatchInputNormalizer::normalize($map),
             hydrateCallback: new CardTaskDtoFactory(),
         ));
     }

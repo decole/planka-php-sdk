@@ -4,7 +4,9 @@ Planka v2 allows creating Base Custom Field Groups in Projects, Custom Field Gro
 
 ---
 
-## 1. Base Custom Field Groups (in Project)
+## 1. Prerequisites: Client Setup & Authentication
+
+Before managing custom fields, initialize and authenticate your client using **API Key** or **Username/Password**:
 
 ```php
 <?php
@@ -12,14 +14,25 @@ Planka v2 allows creating Base Custom Field Groups in Projects, Custom Field Gro
 use Planka\Bridge\Config;
 use Planka\Bridge\PlankaClient;
 
+// Option A: API Key (Recommended)
 $config = new Config(
     baseUri: 'http://192.168.1.100',
     port: 3000,
     apiKey: 'your_api_key'
 );
-
 $client = new PlankaClient($config);
 
+// OR Option B: Username & Password (JWT)
+// $config = new Config(user: 'admin@example.com', password: 'password', baseUri: 'http://192.168.1.100', port: 3000);
+// $client = new PlankaClient($config);
+// $client->authenticate();
+```
+
+---
+
+## 2. Base Custom Field Groups (in Project)
+
+```php
 // Create base custom field group in project
 $baseGroup = $client->baseCustomFieldGroup()->create(
     projectId: '1357158568008091264',
@@ -36,7 +49,7 @@ $customField = $client->customField()->createInBaseGroup(
 
 ---
 
-## 2. Custom Field Groups (on Board or Card)
+## 3. Custom Field Groups (on Board or Card)
 
 ```php
 // Create custom field group on a board
@@ -55,7 +68,7 @@ $field = $client->customField()->createInGroup(
 
 ---
 
-## 3. Update & Delete Custom Fields
+## 4. Update & Delete Custom Fields
 
 ```php
 // Update field
@@ -64,6 +77,17 @@ $updated = $client->customField()->update(
     name: 'Estimated Time (Hours)',
     position: 65536,
     showOnFrontOfCard: true
+);
+
+// Partially update field via CustomFieldPatchInput
+use Planka\Bridge\Inputs\CustomFieldPatchInput;
+
+$patchedField = $client->customField()->patching(
+    id: $field->id,
+    map: new CustomFieldPatchInput(
+        name: 'Story Points (SP)',
+        showOnFrontOfCard: true
+    )
 );
 
 // Delete field

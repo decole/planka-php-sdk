@@ -12,19 +12,19 @@ use function Fp\Collection\map;
 
 final class CardActionIncludedDtoFactory implements OutputInterface
 {
-    /**
-     * @param array{
+    /**\
+     * @see Payload structure:
+     * array{
      *     users?: array
-     * }|null $data
+     * }
      */
-    public function create(?array $data): CardActionIncludedDto
+    public function create(array $data): CardActionIncludedDto
     {
-        if (null === $data) {
-            return new CardActionIncludedDto();
-        }
+        /** @var list<array> $users */
+        $users = $data['users'] ?? [];
 
         return new CardActionIncludedDto(
-            users: map($data['users'] ?? [], fn(array $item) => (new UserDtoFactory())->create($item)),
+            users: map($users, fn(array $item) => (new UserDtoFactory())->create($item)),
             _rawResponse: $data,
         );
     }

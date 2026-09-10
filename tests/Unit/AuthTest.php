@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Tests\Unit;
 
+use Planka\Bridge\Views\Dto\Auth\AuthenticateResultDto;
+
 final class AuthTest extends AbstractUnitTestCase
 {
     public function testAuthenticateSuccess(): void
@@ -11,7 +13,8 @@ final class AuthTest extends AbstractUnitTestCase
         $client = $this->createMockClient('Auth/authenticate_success.json');
         $result = $client->authenticate();
 
-        $this->assertTrue($result);
+        $this->assertInstanceOf(AuthenticateResultDto::class, $result);
+        $this->assertTrue($result->success);
         $this->assertNotEmpty($this->config->getAuthToken());
     }
 

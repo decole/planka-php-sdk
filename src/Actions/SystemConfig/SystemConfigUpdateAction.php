@@ -21,7 +21,7 @@ final class SystemConfigUpdateAction implements ActionInterface, AuthenticateInt
 
     public function url(): string
     {
-        return 'api/system-settings';
+        return 'api/config';
     }
 
     public function getOptions(): array

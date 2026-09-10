@@ -9,6 +9,9 @@ use Planka\Bridge\Views\Dto\User\ApiKeyDto;
 
 final class ApiKeyDtoFactory implements OutputInterface
 {
+    /**
+     * @param array<string, mixed> $data
+     */
     public function create(array $data): ApiKeyDto
     {
         $key = $data['item'] ?? $data['apiKey'] ?? null;

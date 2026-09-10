@@ -6,6 +6,8 @@ namespace Planka\Bridge\Actions\Common;
 
 use Planka\Bridge\Contracts\Actions\ActionInterface;
 use Planka\Bridge\Contracts\Actions\ResponseResultInterface;
+use Planka\Bridge\Contracts\Factory\OutputInterface;
+use Planka\Bridge\Views\Factory\Common\BootstrapDtoFactory;
 
 final class GetBootstrapAction implements ActionInterface, ResponseResultInterface
 {
@@ -19,8 +21,8 @@ final class GetBootstrapAction implements ActionInterface, ResponseResultInterfa
         return [];
     }
 
-    public function getFactory(): callable
+    public function getFactory(): OutputInterface
     {
-        return static fn(array $data): array => $data;
+        return new BootstrapDtoFactory();
     }
 }

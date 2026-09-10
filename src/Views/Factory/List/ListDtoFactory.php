@@ -15,7 +15,8 @@ final class ListDtoFactory implements OutputInterface
     use DateConverterTrait;
 
     /**
-     * @param array{
+     * @see Payload structure:
+     * array{
      *     id: string,
      *     boardId: string,
      *     type?: ?string,
@@ -24,20 +25,35 @@ final class ListDtoFactory implements OutputInterface
      *     color?: ?string,
      *     createdAt?: ?string,
      *     updatedAt?: ?string
-     * } $data
+     * }
      */
     public function create(array $data): ListDto
     {
-        $typeEnum = isset($data['type']) && is_string($data['type']) ? ListTypeEnum::tryFrom($data['type']) : null;
-        $colorEnum = isset($data['color']) && is_string($data['color']) ? ListColorEnum::tryFrom($data['color']) : null;
+        $typeEnum = null;
+
+        if (isset($data['type']) && is_string($data['type'])) {
+            $typeEnum = ListTypeEnum::tryFrom($data['type']);
+        }
+
+        $colorEnum = null;
+
+        if (isset($data['color']) && is_string($data['color'])) {
+            $colorEnum = ListColorEnum::tryFrom($data['color']);
+        }
+
+        $name = null;
+
+        if (isset($data['name']) && is_string($data['name'])) {
+            $name = $data['name'];
+        }
 
         return new ListDto(
-            id: $data['id'],
-            boardId: $data['boardId'] ?? '',
-            createdAt: $this->convertToDateTime($data['createdAt'] ?? null),
+            id: (string) $data['id'],
+            boardId: (string) ($data['boardId'] ?? ''),
+            createdAt: $this->convertToDateTime($data['createdAt'] ?? null) ?? new \DateTimeImmutable(),
             updatedAt: $this->convertToDateTime($data['updatedAt'] ?? null),
             position: (int) ($data['position'] ?? 0),
-            name: $data['name'] ?? null,
+            name: $name,
             type: $typeEnum,
             color: $colorEnum,
             _rawResponse: $data,

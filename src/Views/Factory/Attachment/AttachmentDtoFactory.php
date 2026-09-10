@@ -14,43 +14,40 @@ final class AttachmentDtoFactory implements OutputInterface
     use DateConverterTrait;
 
     /**
-     * @param array<string, mixed>|null $data
+     * @param array<string, mixed> $data
      *
      * @see Payload structure:
-     *      array{
-     *          id: string,
-     *          createdAt: string,
-     *          updatedAt: ?string,
-     *          name: string,
-     *          cardId: string,
-     *          url?: ?string,
-     *          coverUrl?: ?string,
-     *          creatorUserId?: ?string,
-     *          type?: ?string,
-     *          data?: array,
-     *          image?: array{height: int, width: int}
-     *      }
+     * array{
+     *     id: string,
+     *     createdAt: string,
+     *     updatedAt: ?string,
+     *     name: string,
+     *     cardId: string,
+     *     url?: ?string,
+     *     coverUrl?: ?string,
+     *     creatorUserId?: ?string,
+     *     type?: ?string,
+     *     data?: array,
+     *     image?: array{height: int, width: int}
+     * }
      */
-    public function create(?array $data): ?AttachmentDto
+    public function create(array $data): AttachmentDto
     {
-        if (empty($data)) {
-            return null;
-        }
-
-        $data = $data['item'] ?? $data;
+        /** @var array<string, mixed> $item */
+        $item = isset($data['item']) && is_array($data['item']) ? $data['item'] : $data;
 
         return new AttachmentDto(
-            id: $data['id'],
-            name: $data['name'],
-            cardId: $data['cardId'],
-            url: $data['url'] ?? null,
-            creatorUserId: $data['creatorUserId'] ?? null,
-            createdAt: $this->convertToDateTime($data['createdAt']),
-            updatedAt: $this->convertToDateTime($data['updatedAt']),
-            coverUrl: $data['coverUrl'] ?? null,
-            image: (new ImageDtoFactory())->create($data['image'] ?? null),
-            type: $data['type'] ?? null,
-            data: $data['data'] ?? [],
+            id: (string) ($item['id'] ?? ''),
+            name: (string) ($item['name'] ?? ''),
+            cardId: (string) ($item['cardId'] ?? ''),
+            url: isset($item['url']) && is_string($item['url']) ? $item['url'] : null,
+            creatorUserId: isset($item['creatorUserId']) && is_string($item['creatorUserId']) ? $item['creatorUserId'] : null,
+            createdAt: $this->convertToDateTime($item['createdAt'] ?? null) ?? new \DateTimeImmutable(),
+            updatedAt: $this->convertToDateTime($item['updatedAt'] ?? null),
+            coverUrl: isset($item['coverUrl']) && is_string($item['coverUrl']) ? $item['coverUrl'] : null,
+            image: isset($item['image']) && is_array($item['image']) ? (new ImageDtoFactory())->create($item['image']) : null,
+            type: (string) ($item['type'] ?? 'file'),
+            data: is_array($item['data'] ?? null) ? $item['data'] : [],
             _rawResponse: $data,
         );
     }

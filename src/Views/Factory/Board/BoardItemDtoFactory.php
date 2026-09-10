@@ -15,7 +15,8 @@ final class BoardItemDtoFactory implements OutputInterface
     use DateConverterTrait;
 
     /**
-     * @param array{
+     * @see Payload structure:
+     * array{
      *     id: string,
      *     projectId: string,
      *     position: int|float,
@@ -28,23 +29,23 @@ final class BoardItemDtoFactory implements OutputInterface
      *     displayCardAges?: ?bool,
      *     createdAt?: ?string,
      *     updatedAt?: ?string
-     * } $data
+     * }
      */
     public function create(array $data): BoardItemDto
     {
         return new BoardItemDto(
-            id: $data['id'] ?? null,
-            projectId: $data['projectId'] ?? null,
+            id: isset($data['id']) && is_string($data['id']) ? $data['id'] : null,
+            projectId: isset($data['projectId']) && is_string($data['projectId']) ? $data['projectId'] : null,
             position: isset($data['position']) ? (int) $data['position'] : null,
-            name: $data['name'] ?? null,
-            defaultView: isset($data['defaultView']) ? BoardDefaultViewEnum::tryFrom($data['defaultView']) : null,
-            defaultCardType: isset($data['defaultCardType']) ? BoardDefaultCardTypeEnum::tryFrom($data['defaultCardType']) : null,
+            name: isset($data['name']) && is_string($data['name']) ? $data['name'] : null,
+            defaultView: isset($data['defaultView']) && is_string($data['defaultView']) ? BoardDefaultViewEnum::tryFrom($data['defaultView']) : null,
+            defaultCardType: isset($data['defaultCardType']) && is_string($data['defaultCardType']) ? BoardDefaultCardTypeEnum::tryFrom($data['defaultCardType']) : null,
             limitCardTypesToDefaultOne: (bool) ($data['limitCardTypesToDefaultOne'] ?? false),
             alwaysDisplayCardCreator: (bool) ($data['alwaysDisplayCardCreator'] ?? false),
             expandTaskListsByDefault: (bool) ($data['expandTaskListsByDefault'] ?? false),
             displayCardAges: (bool) ($data['displayCardAges'] ?? false),
-            createdAt: $this->convertToDateTime($data['createdAt'] ?? null),
-            updatedAt: $this->convertToDateTime($data['updatedAt'] ?? null),
+            createdAt: isset($data['createdAt']) && is_string($data['createdAt']) ? $this->convertToDateTime($data['createdAt']) : null,
+            updatedAt: isset($data['updatedAt']) && is_string($data['updatedAt']) ? $this->convertToDateTime($data['updatedAt']) : null,
             _rawResponse: $data,
         );
     }

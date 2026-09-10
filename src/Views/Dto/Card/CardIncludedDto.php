@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Planka\Bridge\Views\Dto\Card;
 
+use Planka\Bridge\Contracts\Dto\OutputDtoInterface;
+use Planka\Bridge\Traits\OutputDtoTrait;
 use Planka\Bridge\Views\Dto\Attachment\AttachmentDto;
 
-class CardIncludedDto
+final class CardIncludedDto implements OutputDtoInterface
 {
+    use OutputDtoTrait;
+
     /**
      * @param list<CardMembershipDto|null> $cardMemberships
      * @param list<CardLabelDto|null>      $cardLabels
@@ -19,6 +23,7 @@ class CardIncludedDto
         public array $cardLabels,
         public array $tasks,
         public array $attachments,
+        /** @var array<string, mixed> Diagnostic raw response array from Planka API to verify DTO field hydration. */
         public readonly array $_rawResponse = [],
     ) {}
 }

@@ -6,14 +6,13 @@ namespace Planka\Bridge\Controllers;
 
 use Planka\Bridge\Actions\CardMembership\CardMembershipCreateAction;
 use Planka\Bridge\Actions\CardMembership\CardMembershipDeleteAction;
-use Planka\Bridge\Views\Dto\Card\CardMembershipDto;
+use Planka\Bridge\Contracts\Resources\CardMembershipResourceInterface;
 use Planka\Bridge\TransportClients\TransportClientInterface;
+use Planka\Bridge\Views\Dto\Card\CardMembershipDto;
 
-final class CardMembership
+final class CardMembership implements CardMembershipResourceInterface
 {
-    public function __construct(
-        private readonly TransportClientInterface $client,
-    ) {}
+    public function __construct(private readonly TransportClientInterface $client) {}
 
     /** 'POST /api/cards/:cardId/memberships' */
     public function add(string $cardId, string $userId): CardMembershipDto

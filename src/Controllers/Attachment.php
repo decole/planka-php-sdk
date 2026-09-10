@@ -8,16 +8,18 @@ use Planka\Bridge\Actions\Attachment\AttachmentCreateAction;
 use Planka\Bridge\Actions\Attachment\AttachmentDeleteAction;
 use Planka\Bridge\Actions\Attachment\AttachmentUpdateAction;
 use Planka\Bridge\Actions\Common\CommonPatchAction;
+use Planka\Bridge\Contracts\Resources\AttachmentResourceInterface;
 use Planka\Bridge\Exceptions\FileExistException;
+use Planka\Bridge\Inputs\AttachmentPatchInput;
+use Planka\Bridge\Inputs\PatchInputInterface;
+use Planka\Bridge\Inputs\PatchInputNormalizer;
 use Planka\Bridge\TransportClients\TransportClientInterface;
 use Planka\Bridge\Views\Dto\Attachment\AttachmentDto;
 use Planka\Bridge\Views\Factory\Attachment\AttachmentDtoFactory;
 
-final class Attachment
+final class Attachment implements AttachmentResourceInterface
 {
-    public function __construct(
-        private readonly TransportClientInterface $client,
-    ) {}
+    public function __construct(private readonly TransportClientInterface $client) {}
 
     /**
      * 'POST /api/cards/:cardId/attachments'.
@@ -47,13 +49,13 @@ final class Attachment
      * @param string $attachmentId Attachment ID
      * @param array{
      *   name?: string
-     * } $map Associative array of fields to update
+     * }|AttachmentPatchInput|PatchInputInterface $map Associative array or PatchInputInterface of fields to update
      */
-    public function patching(string $attachmentId, array $map): AttachmentDto
+    public function patching(string $attachmentId, array|PatchInputInterface $map): AttachmentDto
     {
         return $this->client->patch(new CommonPatchAction(
             urlPath: "api/attachments/{$attachmentId}",
-            data: $map,
+            data: PatchInputNormalizer::normalize($map),
             hydrateCallback: new AttachmentDtoFactory(),
         ));
     }
